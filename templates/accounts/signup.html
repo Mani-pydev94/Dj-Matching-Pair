@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Create Account — Campus Connect AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--p:#6D4AFF;--pd:#7C4DFF;--black:#171717;--gray:#777780;--muted:#9A9AA3;--border:#E5E5EA;--input:#E1E1E6;--soft:#F4F0FF;--err:#EF4444;--ok:#10B981;--warn:#F59E0B;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',system-ui,sans-serif;background:#FFFFFF;color:var(--black);-webkit-font-smoothing:antialiased;}
+  .app{max-width:430px;margin:0 auto;padding:0 20px;min-height:100dvh;display:flex;flex-direction:column;padding-bottom:calc(32px + env(safe-area-inset-bottom));}
+  .back{position:absolute;top:24px;left:20px;z-index:2;}
+  .back a{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--border);border-radius:50%;background:#FFFFFF;text-decoration:none;transition:background .15s;}
+  .back a:hover{background:#F8F7FB;}
+  .back svg{width:20px;height:20px;color:var(--black);}
+  .brand{display:flex;align-items:center;justify-content:center;gap:10px;padding-top:72px;padding-bottom:8px;animation:fadeUp .4s ease-out;}
+  .brand-circle{width:36px;height:36px;border-radius:50%;background:var(--p);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(109,74,255,0.18);}
+  .brand-circle svg{width:18px;height:18px;color:#fff;}
+  .brand-text{font-weight:700;font-size:14px;color:var(--black);letter-spacing:-0.2px;}
+  .heading{text-align:center;font-weight:800;font-size:30px;line-height:1.15;letter-spacing:-1px;margin-bottom:10px;animation:fadeUp .45s ease-out .05s both;}
+  .subtitle{text-align:center;font-size:15px;font-weight:400;color:var(--gray);line-height:1.45;max-width:310px;margin:0 auto 28px;animation:fadeUp .45s ease-out .1s both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .card{background:#FFFFFF;border:1px solid var(--border);border-radius:18px;padding:22px;box-shadow:0 12px 30px rgba(0,0,0,0.06);animation:fadeUp .5s ease-out .15s both;}
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-weight:600;font-size:14px;color:var(--black);margin-bottom:8px;}
+  .input-wrap{position:relative;}
+  .input-wrap svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:#7A7A82;pointer-events:none;}
+  input[type="text"],input[type="email"],input[type="password"]{width:100%;height:56px;padding-left:48px;padding-right:48px;border:1px solid var(--input);border-radius:16px;background:#FFFFFF;font-family:inherit;font-size:15px;color:var(--black);outline:none;transition:border-color .15s ease,box-shadow .15s ease;}
+  input:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(109,74,255,0.10);}
+  input.error-border{border-color:var(--err);}
+  .helper{font-size:12px;color:#8A8A93;margin-top:6px;}
+  .password-actions{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;gap:4px;}
+  .password-actions button{background:none;border:none;cursor:pointer;padding:6px;color:#7A7A82;}
+  .strength-label{font-size:10px;font-weight:700;letter-spacing:0.8px;color:#777780;text-transform:uppercase;margin-top:8px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;}
+  .strength-bar{height:4px;border-radius:4px;background:#E5E5EA;overflow:hidden;}
+  .strength-fill{height:100%;width:0%;border-radius:4px;transition:width .3s ease,background .3s ease;}
+  .reqs{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+  .req{display:flex;align-items:center;gap:8px;font-size:12px;color:#777780;}
+  .req.met{color:#55555D;}
+  .req .dot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+  .req .dot.unmet{background:#D9D9DF;color:#777780;}
+  .req .dot.met{background:#10B981;color:#fff;}
+  .checkbox-row{display:flex;align-items:flex-start;gap:10px;margin-top:10px;margin-bottom:8px;}
+  .checkbox-row input[type="checkbox"]{width:20px;height:20px;accent-color:var(--p);flex-shrink:0;margin-top:2px;cursor:pointer;}
+  .checkbox-row label{font-size:13px;color:#777780;line-height:1.35;cursor:pointer;}
+  .checkbox-row label a{color:var(--p);font-weight:600;text-decoration:none;}
+  .btn{display:block;width:100%;height:56px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;font-family:inherit;font-weight:700;font-size:16px;box-shadow:0 10px 24px rgba(109,74,255,0.24);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(109,74,255,0.30);}
+  .btn:active{transform:translateY(1px);}
+  .btn:disabled{opacity:.7;cursor:not-allowed;transform:none;}
+  .divider{display:flex;align-items:center;gap:16px;margin:26px 0 22px;color:#777780;font-size:13px;font-weight:500;}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:#E3E3E8;}
+  .social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border:1px solid #E1E1E6;border-radius:14px;background:#FFFFFF;font-family:inherit;font-weight:600;font-size:15px;color:var(--black);text-decoration:none;cursor:pointer;transition:background .15s,border-color .15s,transform .15s;}
+  .social-btn:hover{background:#FAFAFC;border-color:#DADAE2;transform:translateY(-1px);}
+  .social-btn:active{transform:translateY(1px);}
+  .social-btn + .social-btn{margin-top:12px;}
+  .benefits{margin-top:28px;padding-top:24px;border-top:1px solid #E8E8ED;}
+  .benefits h3{font-size:11px;font-weight:700;letter-spacing:1px;color:#777780;text-transform:uppercase;text-align:center;margin-bottom:14px;}
+  .benefit-cards{display:flex;flex-direction:column;gap:10px;}
+  .b-card{background:#FFFFFF;border:1px solid #E8E8ED;border-radius:16px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,0.04);display:flex;gap:12px;align-items:flex-start;}
+  .b-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .b-icon.p{background:#F0EBFF;color:var(--p);}
+  .b-icon.o{background:#FFF3E8;color:#F59E0B;}
+  .b-icon.g{background:#EAFBF5;color:#10B981;}
+  .b-text h4{font-size:13px;font-weight:700;color:var(--black);margin-bottom:2px;}
+  .b-text p{font-size:12px;color:#777780;line-height:1.35;}
+  .bottom{margin-top:28px;text-align:center;font-size:14px;color:#777780;}
+  .bottom a{color:var(--p);font-weight:600;text-decoration:none;}
+  .bottom a:hover{text-decoration:underline;}
+  .error{font-size:12px;color:var(--err);margin-top:4px;}
+  @media (prefers-reduced-motion:reduce){.brand,.heading,.subtitle,.card{animation:none!important;}.btn,.social-btn{transition:none!important;}.back a:hover{background:none;}}
+  @media (max-width:374px){.app{padding:0 20px;}.heading{font-size:28px;}.card{padding:18px;}}
+</style>
+</head>
+<body>
+<div class="app" role="main" aria-label="Signup page">
+  <nav class="back" aria-label="Back"><a href="/" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></a></nav>
+  <div class="brand"><div class="brand-circle" aria-label="Brand"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6"/><path d="M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div><span class="brand-text">Campus Connect AI</span></div>
+  <h1 class="heading">Create Your Account ✨</h1>
+  <p class="subtitle">Join thousands of students discovering the right people to learn, build and grow together.</p>
+
+  <form class="card" method="post" action="{% url 'signup' %}" novalidate autocomplete="on" aria-label="Sign up form">
+    {% csrf_token %}
+    <div class="field">
+      <label for="id_full_name">Full Name</label>
+      <div class="input-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <input id="id_full_name" name="full_name" type="text" placeholder="Enter your full name" required value="{{ form.full_name.value|default:'' }}" {% if form.full_name.errors %}class="error-border"{% endif %}></div>
+      {% if form.full_name.errors %}<div class="error" role="alert">{{ form.full_name.errors.0 }}</div>{% endif %}
+    </div>
+    <div class="field">
+      <label for="id_email">Student Email</label>
+      <div class="input-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      <input id="id_email" name="email" type="email" placeholder="Enter your college email" autocomplete="email" required value="{{ form.email.value|default:'' }}" {% if form.email.errors %}class="error-border"{% endif %}></div>
+      <div class="helper">Use your official university email for verification.</div>
+      {% if form.email.errors %}<div class="error" role="alert">{{ form.email.errors.0 }}</div>{% endif %}
+    </div>
+    <div class="field">
+      <label for="id_password1">Password</label>
+      <div class="input-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <input id="id_password1" name="password1" type="password" placeholder="Create a password" autocomplete="new-password" required {% if form.password1.errors %}class="error-border"{% endif %} oninput="updateStrength(this.value)">
+      <div class="password-actions"><button type="button" onclick="togglePass(this, 'id_password1')" aria-label="Show password"><svg class="eye" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="left: -10px;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" style="display:none" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="left: -10px;"><path d="M10.733 5.076a10.744 10.744 0 0 1-2.619-.005"/><path d="M6.12 6.65a13.17 13.17 0 0 1-1.097-1.34"/><path d="M2 12a7 7 0 0 0 7 7 7.01 7.01 0 0 0 3.118-.82"/><path d="M17.06 17.06 22 22"/><path d="M15.31 14.19a10.74 10.74 0 0 1-1.538-2.249"/><path d="M2.01 2.01 5.4 5.4"/><path d="M10.929 10.929a3 3 0 0 0 4.242 4.242"/></svg></button></div></div>
+      <div class="strength-label"><span>STRENGTH</span><span id="str-label">—</span></div>
+      <div class="strength-bar" aria-hidden="true"><div id="str-fill" class="strength-fill"></div></div>
+      <div class="reqs" aria-label="Password requirements">
+        <div class="req" id="r1"><span class="dot unmet">◌</span><span>Minimum 8 characters</span></div>
+        <div class="req" id="r2"><span class="dot unmet">◌</span><span>One uppercase letter</span></div>
+        <div class="req" id="r3"><span class="dot unmet">◌</span><span>One lowercase letter</span></div>
+        <div class="req" id="r4"><span class="dot unmet">◌</span><span>One number</span></div>
+        <div class="req" id="r5"><span class="dot unmet">◌</span><span>One special character</span></div>
+      </div>
+      {% if form.password1.errors %}<div class="error" role="alert">{{ form.password1.errors.0 }}</div>{% endif %}
+    </div>
+    <div class="field">
+      <label for="id_password2">Confirm Password</label>
+      <div class="input-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <input id="id_password2" name="password2" type="password" placeholder="Confirm your password" autocomplete="new-password" required oninput="checkMatch()" {% if form.password2.errors %}class="error-border"{% endif %}>
+      <div class="password-actions"><button type="button" onclick="togglePass(this, 'id_password2')" aria-label="Show password"><svg class="eye" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="left: -10px;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" style="display:none" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="left: -10px;"><path d="M10.733 5.076a10.744 10.744 0 0 1-2.619-.005"/><path d="M6.12 6.65a13.17 13.17 0 0 1-1.097-1.34"/><path d="M2 12a7 7 0 0 0 7 7 7.01 7.01 0 0 0 3.118-.82"/><path d="M17.06 17.06 22 22"/><path d="M15.31 14.19a10.74 10.74 0 0 1-1.538-2.249"/><path d="M2.01 2.01 5.4 5.4"/><path d="M10.929 10.929a3 3 0 0 0 4.242 4.242"/></svg></button></div></div>
+      <div id="match-err" class="error" style="display:none" role="alert">Passwords do not match.</div>
+      {% if form.password2.errors %}<div class="error" role="alert">{{ form.password2.errors.0 }}</div>{% endif %}
+    </div>
+    <div class="checkbox-row"><input type="checkbox" id="terms" name="terms" required aria-required="true"><label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</label></div>
+    <button type="submit" id="submit-btn" class="btn" aria-label="Create account">Create Account</button>
+    {% for error in form.non_field_errors %}<div class="error" role="alert">{{ error }}</div>{% endfor %}
+  </form>
+
+  <div class="divider"><span>OR</span></div>
+  <a href="{% url 'account_login' %}" class="social-btn" aria-label="Continue with Google"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Continue with Google</a>
+  <a href="#" class="social-btn" aria-label="Continue with Microsoft"><svg width="20" height="20" viewBox="0 0 21 21"><rect width="9" height="9" x="1" y="1" fill="#f25022"/><rect width="9" height="9" x="11" y="1" fill="#7fba00"/><rect width="9" height="9" x="1" y="11" fill="#00a4ed"/><rect width="9" height="9" x="11" y="11" fill="#ffb900"/></svg>Continue with Microsoft</a>
+
+  <div class="benefits"><h3>WHY JOIN CAMPUS CONNECT?</h3><div class="benefit-cards">
+    <div class="b-card"><div class="b-icon p"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v3"/><path d="M11 17v.01"/></svg></div><div class="b-text"><h4>AI Student Matching</h4><p>Find students compatible with your goals and personality.</p></div></div>
+    <div class="b-card"><div class="b-icon o"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.5-2 3-2 3s2.5 1 4-2c1.5-1.5-1-2-2-1z"/><path d="M12 2v20"/><path d="M2 12h20"/></svg></div><div class="b-text"><h4>Build Amazing Projects</h4><p>Meet teammates for hackathons, startups and college projects.</p></div></div>
+    <div class="b-card"><div class="b-icon g"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="b-text"><h4>Learn Together</h4><p>Discover study partners who match your learning style.</p></div></div>
+  </div></div>
+
+  <div class="bottom"><span>Already have an account?</span> <a href="{% url 'login' %}">Login</a></div>
+</div>
+<script>
+function togglePass(btn,id){const i=document.getElementById(id);const e=btn.querySelector('.eye');const o=btn.querySelector('.eye-off');if(i.type==='password'){i.type='text';e.style.display='none';o.style.display='block';btn.setAttribute('aria-label','Hide password');btn.setAttribute('aria-pressed','true');}else{i.type='password';e.style.display='block';o.style.display='none';btn.setAttribute('aria-label','Show password');btn.setAttribute('aria-pressed','false');}}
+function updateStrength(v){const r1=document.getElementById('r1'),r2=document.getElementById('r2'),r3=document.getElementById('r3'),r4=document.getElementById('r4'),r5=document.getElementById('r5');const f=document.getElementById('str-fill'),l=document.getElementById('str-label');const c=v.length>=8,up=/[A-Z]/.test(v),lo=/[a-z]/.test(v),nu=/\d/.test(v),sp=/[^A-Za-z0-9]/.test(v);function set(el,met){el.querySelector('.dot').textContent=met?'✓':'◌';el.querySelector('.dot').className='dot '+(met?'met':'unmet');el.className='req '+(met?'met':'');}[r1,r2,r3,r4,r5].forEach((el,i)=>set(el,[c,up,lo,nu,sp][i]));const score=(c?1:0)+(up?1:0)+(lo?1:0)+(nu?1:0)+(sp?1:0);const pct=Math.round(score/5*100);f.style.width=pct+'%';if(pct<=20){f.style.background='#EF4444';l.textContent='Weak';}else if(pct<=60){f.style.background='#F59E0B';l.textContent='Medium';}else{f.style.background='#10B981';l.textContent='Strong';}}
+function checkMatch(){const a=document.getElementById('id_password1').value,b=document.getElementById('id_password2').value;document.getElementById('match-err').style.display=(a&&b&&a!==b)?'block':'none';}
+document.getElementById('id_password1').addEventListener('input',function(){updateStrength(this.value);checkMatch();});
+document.getElementById('id_password2').addEventListener('input',checkMatch);
+</script>
+</body>
+</html>

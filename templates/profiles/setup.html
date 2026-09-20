@@ -1,0 +1,76 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Profile Setup — Campus Connect AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--purple:#7547F5;--purple-dark:#6A3FE8;--ink:#171717;--muted:#737373;--line:#ECECF2;--soft:#F3EEFF;--page:#FAF9FF;--green:#10B981}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    .app{max-width:460px;min-height:100dvh;margin:auto;background:#fff;padding-bottom:32px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px}
+    .back{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;color:var(--ink);text-decoration:none}
+    .topbar h1{font-size:15px;margin:0;font-weight:700}.skip{font-size:13px;color:var(--purple);font-weight:600;text-decoration:none}
+    .progress{padding:4px 20px 0}.progress-label{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.08em;margin-bottom:8px}.progress-label strong{color:var(--purple);letter-spacing:0}
+    .track{height:5px;background:#E9E9EE;border-radius:999px;overflow:hidden}.fill{height:100%;width:{{ profile_pct }}%;background:linear-gradient(90deg,var(--purple),var(--purple-dark));border-radius:inherit;transition:width .3s}
+    .hero{text-align:center;padding:28px 24px 22px}.avatar{width:92px;height:92px;border-radius:50%;object-fit:cover;background:var(--soft);border:3px solid #F0ECFF;box-shadow:0 8px 24px #1e144612}.avatar-placeholder{display:inline-grid;place-items:center;width:92px;height:92px;border-radius:50%;background:var(--soft);color:var(--purple);font-size:30px;font-weight:800;border:3px solid #F0ECFF}
+    .hero h2{font-size:24px;line-height:1.2;margin:16px 0 7px;letter-spacing:-.5px}.hero p{max-width:330px;margin:auto;color:var(--muted);font-size:13px;line-height:1.55}
+    form{display:grid;gap:16px}.card{margin:0 20px;padding:20px;border:1px solid var(--line);border-radius:18px;box-shadow:0 5px 20px #1e14460d}.card h3{display:flex;align-items:center;gap:9px;margin:0 0 16px;font-size:15px}.icon{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:var(--soft);color:var(--purple);font-size:14px}
+    .field{margin-bottom:13px}.field:last-child{margin-bottom:0}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{display:block;margin-bottom:6px;font-size:11px;font-weight:700;color:#303030}
+    input,select,textarea{width:100%;border:1px solid #E2E2E9;border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:11px 12px;outline:none}input,select{height:43px}textarea{resize:vertical;min-height:88px;line-height:1.5}input:focus,select:focus,textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px #7547f51a}
+    .chips{display:flex;flex-wrap:wrap;gap:7px}.chip{position:relative}.chip input{position:absolute;opacity:0;pointer-events:none}.chip label{margin:0;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#F8F8FA;color:#555;font-size:11px;font-weight:600;cursor:pointer}.chip input:checked+label{border-color:var(--purple);background:var(--soft);color:var(--purple)}
+    .error{color:#EF4444;font-size:11px;margin-top:5px}.help{color:var(--muted);font-size:11px;margin:5px 0 0}.upload{display:flex;align-items:center;gap:12px;padding:13px;border:1px dashed #D9D0FF;border-radius:13px;background:#FCFAFF}.upload input{height:auto;padding:0;border:0;font-size:11px}.upload small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+    .strength{margin:0 20px;padding:18px;border:1px solid #EEE7FF;border-radius:18px;background:#FCFAFF}.strength-head{display:flex;justify-content:space-between;align-items:center}.strength h3{font-size:15px;margin:0}.percent{color:var(--purple);font-size:20px;font-weight:800}.strength p{font-size:11px;color:var(--muted);margin:4px 0 14px}.strength-track{height:7px;background:#EAE5F8;border-radius:99px;overflow:hidden}.strength-fill{height:100%;width:{{ profile_pct }}%;background:var(--purple);border-radius:inherit}.actions{padding:20px}.primary,.secondary{display:block;width:100%;height:48px;border:0;border-radius:13px;font:700 14px Inter,sans-serif;text-align:center;text-decoration:none;line-height:48px;cursor:pointer}.primary{background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;box-shadow:0 9px 20px #7547f538}.secondary{margin-top:10px;color:#444;border:1px solid var(--line);background:#fff}
+    @media (min-width:461px){body{padding:18px 0}.app{border-radius:24px;box-shadow:0 10px 40px #1e144612}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <a class="back" href="{% url 'home' %}" aria-label="Go back">←</a>
+    <h1>Profile Setup</h1>
+    <a class="skip" href="{% url 'home' %}">Skip</a>
+  </header>
+  <div class="progress">
+    <div class="progress-label"><span>STEP 1 OF 2</span><strong>{{ profile_pct }}% COMPLETE</strong></div>
+    <div class="track"><div class="fill"></div></div>
+  </div>
+  <section class="hero">
+    {% if profile.photo %}<img class="avatar" src="{{ profile.photo.url }}" alt="Profile photo">{% else %}<div class="avatar-placeholder">{{ request.user.first_name|default:request.user.email|slice:":1"|upper }}</div>{% endif %}
+    <h2>Tell us about yourself <span aria-hidden="true">👋</span></h2>
+    <p>Build your profile so we can recommend students who match your personality, interests and goals.</p>
+  </section>
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    <section class="card">
+      <h3><span class="icon">◉</span>Profile photo</h3>
+      <div class="upload"><span class="icon">＋</span><div><label for="id_photo">Add a profile photo</label><small>Optional, but recommended for better connections.</small></div><input id="id_photo" name="photo" type="file" accept="image/*"></div>
+      {% if form.photo.errors %}<div class="error">{{ form.photo.errors.0 }}</div>{% endif %}
+    </section>
+    <section class="card">
+      <h3><span class="icon">✦</span>Basic information</h3>
+      <div class="field"><label for="{{ form.display_name.id_for_label }}">Display name</label>{{ form.display_name }}{% if form.display_name.errors %}<div class="error">{{ form.display_name.errors.0 }}</div>{% endif %}</div>
+      <div class="row"><div class="field"><label for="{{ form.age.id_for_label }}">Age</label>{{ form.age }}</div><div class="field"><label for="{{ form.city.id_for_label }}">City</label>{{ form.city }}</div></div>
+      <div class="field"><label for="{{ form.gender.id_for_label }}">Gender</label>{{ form.gender }}</div>
+      <div class="field"><label>Languages</label><div class="chips">{% for checkbox in form.languages %}<div class="chip">{{ checkbox.tag }}<label for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label></div>{% endfor %}</div></div>
+      <div class="field"><label for="{{ form.bio.id_for_label }}">Short bio</label>{{ form.bio }}<p class="help">A short introduction helps people find common ground.</p></div>
+    </section>
+    <section class="card">
+      <h3><span class="icon">⌂</span>Academic information</h3>
+      <div class="field"><label for="{{ form.university.id_for_label }}">University</label>{{ form.university }}</div>
+      <div class="row"><div class="field"><label for="{{ form.major.id_for_label }}">Major</label>{{ form.major }}</div><div class="field"><label for="{{ form.year.id_for_label }}">Year</label>{{ form.year }}</div></div>
+    </section>
+    <section class="strength">
+      <div class="strength-head"><h3>Profile strength</h3><span class="percent">{{ profile_pct }}%</span></div>
+      <p>Complete your profile to get more relevant recommendations.</p>
+      <div class="strength-track"><div class="strength-fill"></div></div>
+    </section>
+    <div class="actions"><button class="primary" type="submit">Save and continue</button><a class="secondary" href="{% url 'home' %}">Complete later</a></div>
+  </form>
+</main>
+</body>
+</html>

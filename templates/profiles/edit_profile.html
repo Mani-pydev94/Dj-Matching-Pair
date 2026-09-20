@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Edit Profile — Campus Connect AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--p:#7547F5;--pd:#6A3FE8;--ink:#171717;--muted:#737373;--line:#ECECF2;--soft:#F3EEFF;--page:#FAF9FF}
+    *{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif}.app{max-width:460px;min-height:100dvh;margin:auto;background:#fff;padding-bottom:26px}
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fffffff2;backdrop-filter:blur(12px);z-index:2}header h1{font-size:16px;margin:0;font-weight:700}.back,.cancel{font-size:13px;text-decoration:none}.back{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;color:var(--ink)}.cancel{color:var(--muted);font-weight:600}
+    main{padding:22px 20px}.intro{margin-bottom:20px}.intro h2{font-size:25px;letter-spacing:-.5px;margin:0 0 6px}.intro p{font-size:13px;color:var(--muted);line-height:1.5;margin:0}.card{border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 5px 18px #1e14460b}.card h3{font-size:15px;margin:0 0 16px}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{margin-bottom:14px}.field:last-child{margin-bottom:0}label{display:block;margin-bottom:6px;font-size:11px;font-weight:700;color:#303030}input,select,textarea{width:100%;border:1px solid #E2E2E9;border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:11px 12px;outline:none}input,select{height:43px}textarea{resize:vertical;min-height:100px;line-height:1.5}input:focus,select:focus,textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px #7547f51a}.error{color:#EF4444;font-size:11px;margin-top:5px}.help{color:var(--muted);font-size:11px;margin:5px 0 0}
+    .avatar-row{display:flex;align-items:center;gap:14px}.avatar,.placeholder{width:68px;height:68px;border-radius:20px}.avatar{object-fit:cover;border:3px solid #F1ECFF}.placeholder{display:grid;place-items:center;background:var(--soft);color:var(--p);font-size:24px;font-weight:800}.file{flex:1}.file input{height:auto;padding:9px;font-size:11px}.file small{display:block;color:var(--muted);font-size:11px;margin-top:5px}.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{position:relative}.chip input{position:absolute;opacity:0;pointer-events:none}.chip label{margin:0;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#F8F8FA;color:#555;font-size:11px;cursor:pointer}.chip input:checked+label{border-color:var(--p);background:var(--soft);color:var(--p)}
+    .visibility{display:flex;align-items:center;justify-content:space-between;gap:12px}.visibility p{font-size:12px;color:var(--muted);line-height:1.45;margin:0}.switch{width:44px;height:24px;accent-color:var(--p)}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}.btn{height:48px;border-radius:13px;font:700 14px Inter,sans-serif;cursor:pointer}.save{border:0;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;box-shadow:0 9px 20px #7547f538}.discard{border:1px solid var(--line);background:#fff;color:#444;text-decoration:none;display:grid;place-items:center}
+    @media (min-width:461px){body{padding:18px 0}.app{border-radius:24px;box-shadow:0 10px 40px #1e144612}}
+  </style>
+</head>
+<body><div class="app">
+  <header><a class="back" href="{% url 'profiles:my_profile' %}" aria-label="Back">←</a><h1>Edit Profile</h1><a class="cancel" href="{% url 'profiles:my_profile' %}">Cancel</a></header>
+  <main>
+    <section class="intro"><h2>Make your profile yours</h2><p>Keep your details current so your student recommendations stay relevant.</p></section>
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <section class="card"><h3>Profile photo</h3><div class="avatar-row">{% if profile.photo %}<img class="avatar" src="{{ profile.photo.url }}" alt="Current profile photo">{% else %}<div class="placeholder">{{ request.user.first_name|default:request.user.email|slice:":1"|upper }}</div>{% endif %}<div class="file"><label for="id_photo">Replace photo</label><input id="id_photo" name="photo" type="file" accept="image/*"><small>Use a clear photo that represents you.</small></div></div>{% if form.photo.errors %}<div class="error">{{ form.photo.errors.0 }}</div>{% endif %}</section>
+      <section class="card"><h3>Personal details</h3><div class="field"><label for="{{ form.display_name.id_for_label }}">Display name</label>{{ form.display_name }}{% if form.display_name.errors %}<div class="error">{{ form.display_name.errors.0 }}</div>{% endif %}</div><div class="row"><div class="field"><label for="{{ form.age.id_for_label }}">Age</label>{{ form.age }}</div><div class="field"><label for="{{ form.city.id_for_label }}">City</label>{{ form.city }}</div></div><div class="field"><label for="{{ form.gender.id_for_label }}">Gender</label>{{ form.gender }}</div><div class="field"><label>Languages</label><div class="chips">{% for checkbox in form.languages %}<div class="chip">{{ checkbox.tag }}<label for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label></div>{% endfor %}</div></div><div class="field"><label for="{{ form.bio.id_for_label }}">Short bio</label>{{ form.bio }}<p class="help">Maximum 500 characters.</p></div></section>
+      <section class="card"><h3>Academic details</h3><div class="field"><label for="{{ form.university.id_for_label }}">University</label>{{ form.university }}</div><div class="row"><div class="field"><label for="{{ form.major.id_for_label }}">Major</label>{{ form.major }}</div><div class="field"><label for="{{ form.year.id_for_label }}">Year</label>{{ form.year }}</div></div></section>
+      <section class="card"><div class="visibility"><div><h3 style="margin-bottom:5px">Public profile</h3><p>Allow other students to discover your profile in matches.</p></div><input class="switch" type="checkbox" name="is_public" {% if profile.is_public %}checked{% endif %}></div></section>
+      <div class="actions"><a class="btn discard" href="{% url 'profiles:my_profile' %}">Discard</a><button class="btn save" type="submit">Save changes</button></div>
+    </form>
+  </main>
+</div></body>
+</html>

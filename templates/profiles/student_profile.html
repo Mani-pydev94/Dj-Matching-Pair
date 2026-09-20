@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{{ student.get_full_name|default:student.email }} — Campus Connect AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--p:#7547F5;--pd:#6A3FE8;--ink:#171717;--muted:#737373;--line:#ECECF2;--soft:#F3EEFF;--page:#FAF9FF}
+    *{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif}.app{max-width:460px;min-height:100dvh;margin:auto;background:#fff;padding-bottom:32px}
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line)}header h1{font-size:16px;margin:0;font-weight:700}.round{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;color:var(--ink);background:#fff;text-decoration:none;font-size:18px}
+    main{padding:24px 20px}.hero{text-align:center;padding:5px 0 24px}.avatar,.placeholder{width:112px;height:112px;border-radius:34px}.avatar{object-fit:cover;border:5px solid #F1ECFF;box-shadow:0 10px 26px #1e144615}.placeholder{display:inline-grid;place-items:center;background:var(--soft);color:var(--p);font-size:36px;font-weight:800}.hero h2{font-size:28px;letter-spacing:-.7px;margin:16px 0 6px}.sub{display:flex;justify-content:center;gap:6px;align-items:center;color:var(--muted);font-size:13px}.tags{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:13px}.tag{padding:7px 10px;border-radius:999px;background:#F8F8FA;color:#5b5b5b;font-size:11px;font-weight:600}.match{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:8px 12px;border-radius:999px;background:var(--soft);color:var(--p);font-size:12px;font-weight:700}
+    .card{border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 5px 18px #1e14460b}.card h3{font-size:15px;margin:0 0 12px}.bio{margin:0;color:#4f4f4f;font-size:13px;line-height:1.65}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{padding:12px;border-radius:13px;background:#FCFCFE}.label{display:block;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}.value{font-size:13px;font-weight:600;line-height:1.35}.insight{border:0;color:#fff;background:linear-gradient(135deg,var(--p),var(--pd));box-shadow:0 12px 25px #7547f536}.insight h3{color:#fff}.insight p{color:#fff;opacity:.9;line-height:1.6;font-size:13px;margin:0}.empty{color:var(--muted);font-size:13px;line-height:1.55;margin:0}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.btn{height:46px;border-radius:13px;display:grid;place-items:center;text-decoration:none;font-size:13px;font-weight:700}.primary{color:#fff;background:linear-gradient(135deg,var(--p),var(--pd));box-shadow:0 8px 18px #7547f52e}.secondary{color:var(--ink);border:1px solid var(--line)}@media (min-width:461px){body{padding:18px 0}.app{border-radius:24px;box-shadow:0 10px 40px #1e144612}}
+  </style>
+</head>
+<body><div class="app">
+  <header><a class="round" href="{% url 'home' %}" aria-label="Back">←</a><h1>Student Profile</h1><span class="round" aria-hidden="true">⋯</span></header>
+  <main>
+    <section class="hero">
+      {% if profile.photo %}<img class="avatar" src="{{ profile.photo.url }}" alt="{{ student.get_full_name }}">{% else %}<div class="placeholder">{{ student.first_name|default:student.email|slice:":1"|upper }}</div>{% endif %}
+      <h2>{{ student.get_full_name|default:student.email }}</h2>
+      <div class="sub">{% if profile.university %}<span>{{ profile.university }}</span>{% else %}<span>Campus Connect student</span>{% endif %}{% if profile.city %}<span>· {{ profile.city }}</span>{% endif %}</div>
+      <div class="tags">{% if profile.major %}<span class="tag">{{ profile.major }}</span>{% endif %}{% if profile.year %}<span class="tag">{{ profile.year }}</span>{% endif %}{% if profile.age %}<span class="tag">{{ profile.age }} years</span>{% endif %}</div>
+      {% if match %}<div class="match">✦ {{ match.compatibility_score|floatformat:0 }}% compatible with you</div>{% endif %}
+      <div class="actions"><a class="btn primary" href="{% url 'home' %}">Connect</a><a class="btn secondary" href="{% url 'home' %}">Message</a></div>
+    </section>
+    {% if insight %}<section class="card insight"><h3>Why you may connect</h3><p>{{ insight.insight_text }}</p></section>{% endif %}
+    <section class="card"><h3>About {{ student.first_name|default:"this student" }}</h3>{% if profile.bio %}<p class="bio">{{ profile.bio }}</p>{% else %}<p class="empty">This student has not added a bio yet.</p>{% endif %}</section>
+    <section class="card"><h3>Academic details</h3><div class="grid"><div class="item"><span class="label">University</span><span class="value">{{ profile.university|default:"Not added" }}</span></div><div class="item"><span class="label">Major</span><span class="value">{{ profile.major|default:"Not added" }}</span></div><div class="item"><span class="label">Year</span><span class="value">{{ profile.year|default:"Not added" }}</span></div><div class="item"><span class="label">Location</span><span class="value">{{ profile.city|default:"Not added" }}</span></div></div></section>
+    {% if profile.languages %}<section class="card"><h3>Languages</h3><p class="bio">{{ profile.languages }}</p></section>{% endif %}
+    {% if profile.interests %}<section class="card"><h3>Interests</h3><p class="bio">{{ profile.interests }}</p></section>{% endif %}
+  </main>
+</div></body>
+</html>

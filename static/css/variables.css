@@ -1,0 +1,49 @@
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --bottom-nav-height: 68px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0; width: 100%; min-height: 100%;
+}
+
+body {
+  background: #ffffff;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-shell {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: #ffffff;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.mobile-page {
+  width: 100%;
+  min-height: 100dvh;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+}
+
+.mobile-page.with-bottom-nav {
+  padding-bottom: calc(var(--bottom-nav-height) + 28px + env(safe-area-inset-bottom));
+}

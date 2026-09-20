@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Login — Campus Connect AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--p:#6D4AFF;--pd:#7C4DFF;--black:#171717;--gray:#777780;--muted:#9A9AA3;--border:#E5E5EA;--soft:#F4F0FF;--err:#EF4444;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',system-ui,sans-serif;background:#FFFFFF;color:var(--black);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+  .app{max-width:430px;margin:0 auto;padding:0 20px;min-height:100dvh;display:flex;flex-direction:column;padding-bottom:calc(32px + env(safe-area-inset-bottom));}
+  .back{position:absolute;top:24px;left:20px;z-index:2;}
+  .back a{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--border);border-radius:50%;background:#FFFFFF;text-decoration:none;transition:background .15s ease;}
+  .back a:hover{background:#F8F7FB;}
+  .back svg{width:20px;height:20px;color:var(--black);}
+  .logo-wrap{display:flex;justify-content:center;padding-top:75px;padding-bottom:28px;}
+  .logo{width:64px;height:64px;border-radius:50%;background:var(--p);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 25px rgba(109,74,255,0.22);animation:fadeUp .4s ease-out both;}
+  .logo svg{width:30px;height:30px;color:#fff;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:translateY(0);}}
+  .heading{text-align:center;font-weight:800;font-size:32px;line-height:1.15;letter-spacing:-0.5px;margin-bottom:12px;}
+  .subtitle{text-align:center;font-size:16px;font-weight:400;color:var(--gray);line-height:1.45;max-width:280px;margin:0 auto 32px;}
+  .card{width:100%;max-width:382px;background:#FFFFFF;border:1px solid var(--border);border-radius:18px;padding:24px;box-shadow:0 12px 30px rgba(0,0,0,0.06);animation:fadeUp .45s ease-out .08s both;}
+  .field{margin-bottom:22px;}
+  .field label{display:block;font-weight:600;font-size:14px;color:var(--black);margin-bottom:8px;}
+  .input-wrap{position:relative;}
+  .input-wrap svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:#7A7A82;pointer-events:none;}
+  input[type="email"],input[type="password"],input[type="text"]{width:100%;height:56px;padding-left:48px;padding-right:48px;border:1px solid #E1E1E6;border-radius:17px;background:#FFFFFF;font-family:inherit;font-size:15px;color:var(--black);outline:none;transition:border-color .15s ease,box-shadow .15s ease;}
+  input:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(109,74,255,0.10);}
+  .password-actions{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;gap:4px;}
+  .password-actions button{background:none;border:none;cursor:pointer;padding:6px;color:#7A7A82;transition:color .15s;}
+  .password-actions button:hover{color:var(--black);}
+  .forgot{display:block;text-align:right;font-size:14px;font-weight:600;color:var(--p);text-decoration:none;margin-top:-16px;margin-bottom:22px;transition:color .15s;}
+  .forgot:hover{color:var(--pd);text-decoration:underline;}
+  .btn{display:block;width:100%;height:56px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;font-family:inherit;font-weight:700;font-size:17px;box-shadow:0 10px 24px rgba(109,74,255,0.24);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(109,74,255,0.30);}
+  .btn:active{transform:translateY(1px);}
+  .btn:disabled{opacity:.7;cursor:not-allowed;transform:none;}
+  .divider{display:flex;align-items:center;gap:16px;margin:28px 0 22px;color:var(--gray);font-size:13px;font-weight:500;}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:#E3E3E8;}
+  .social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border:1px solid #E1E1E6;border-radius:14px;background:#FFFFFF;font-family:inherit;font-weight:600;font-size:15px;color:var(--black);text-decoration:none;cursor:pointer;transition:background .15s ease,border-color .15s ease,transform .15s ease;}
+  .social-btn:hover{background:#FAFAFC;border-color:#DADAE2;transform:translateY(-1px);}
+  .social-btn:active{transform:translateY(1px);}
+  .social-btn svg{flex-shrink:0;}
+  .social-btn + .social-btn{margin-top:12px;}
+  .bottom{margin-top:40px;text-align:center;font-size:14px;color:var(--gray);}
+  .bottom a{color:var(--p);font-weight:600;text-decoration:none;}
+  .bottom a:hover{text-decoration:underline;}
+  .error{font-size:12px;color:var(--err);margin-top:4px;}
+  input.error-border{border-color:var(--err);}
+  @media (prefers-reduced-motion:reduce){.logo,.card{animation:none!important;}.btn{transition:none!important;}.social-btn{transition:none!important;}}
+  @media (max-width:374px){.app{padding:0 20px;}.heading{font-size:30px;}.card{padding:20px;}.login-wrap{padding-top:60px;}}
+</style>
+</head>
+<body>
+<div class="app" role="main" aria-label="Login page">
+  <nav class="back" aria-label="Back navigation"><a href="/" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></a></nav>
+
+  <div class="logo-wrap"><div class="logo" aria-label="Campus Connect AI"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6"/><path d="M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div></div>
+
+  <h1 class="heading">Welcome Back 👋</h1>
+  <p class="subtitle">Sign in to continue discovering compatible students.</p>
+
+  <form class="card" method="post" action="{% url 'login' %}" novalidate aria-label="Login form" autocomplete="on">
+    {% csrf_token %}
+    <div class="field">
+      <label for="id_username">Email Address</label>
+      <div class="input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <input id="id_username" name="username" type="email" placeholder="Enter your email" autocomplete="email" aria-required="true" required value="{{ form.username.value|default:'' }}" {% if form.username.errors %}class="error-border"{% endif %}>
+      </div>
+      {% if form.username.errors %}<div class="error" role="alert">{{ form.username.errors.0 }}</div>{% endif %}
+    </div>
+    <div class="field">
+      <label for="id_password">Password</label>
+      <div class="input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input id="id_password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" aria-required="true" required {% if form.password.errors %}class="error-border"{% endif %}>
+        <div class="password-actions"><button type="button" onclick="togglePass(this)" aria-label="Show password" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye" style="left: -10px;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-off" style="display:none" style="left: -10px;"><path d="M10.733 5.076a10.744 10.744 0 0 1-2.619-.005"/><path d="M6.12 6.65a13.17 13.17 0 0 1-1.097-1.34"/><path d="M2 12a7 7 0 0 0 7 7 7.01 7.01 0 0 0 3.118-.82"/><path d="M17.06 17.06 22 22"/><path d="M15.31 14.19a10.74 10.74 0 0 1-1.538-2.249"/><path d="M2.01 2.01 5.4 5.4"/><path d="M10.929 10.929a3 3 0 0 0 4.242 4.242"/></svg></button></div>
+      </div>
+      {% if form.password.errors %}<div class="error" role="alert">{{ form.password.errors.0 }}</div>{% endif %}
+    </div>
+    <a href="/auth/password_reset/" class="forgot">Forgot Password?</a>
+    <button type="submit" class="btn" aria-label="Login">Login</button>
+  </form>
+
+  <div class="divider" aria-label="OR separator"><span>OR</span></div>
+
+  <a href="{% url 'account_login' %}" class="social-btn" aria-label="Continue with Google">
+    <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+    Continue with Google
+  </a>
+  <a href="#" class="social-btn" aria-label="Continue with Microsoft">
+    <svg width="20" height="20" viewBox="0 0 21 21"><rect width="9" height="9" x="1" y="1" fill="#f25022"/><rect width="9" height="9" x="11" y="1" fill="#7fba00"/><rect width="9" height="9" x="1" y="11" fill="#00a4ed"/><rect width="9" height="9" x="11" y="11" fill="#ffb900"/></svg>
+    Continue with Microsoft
+  </a>
+
+  <div class="bottom"><span>Don't have an account?</span> <a href="{% url 'signup' %}">Create Account</a></div>
+</div>
+<script>
+  function togglePass(btn){const i=document.getElementById('id_password');const eye=btn.querySelector('.eye');const off=btn.querySelector('.eye-off');if(i.type==='password'){i.type='text';eye.style.display='none';off.style.display='block';btn.setAttribute('aria-label','Hide password');btn.setAttribute('aria-pressed','true');}else{i.type='password';eye.style.display='block';off.style.display='none';btn.setAttribute('aria-label','Show password');btn.setAttribute('aria-pressed','false');}}
+</script>
+</body>
+</html>

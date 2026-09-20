@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Campus Connect AI — Find your study partner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #6D4AFF;
+    --purple-dark: #7C4DFF;
+    --black: #171717;
+    --gray: #7A7A82;
+    --soft-bg: #F7F4FF;
+    --pink-soft: #FFF0F7;
+    --green-soft: #EAFBF5;
+    --yellow-soft: #FFF8E8;
+    --radius: 15px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #FFFFFF;
+    color: var(--black);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .app-container {
+    max-width: 430px;
+    margin: 0 auto;
+    padding: 0 20px;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom));
+  }
+  main { flex: 1; display: flex; flex-direction: column; }
+  .hero { padding-top: 70px; }
+  .hero h1 {
+    font-weight: 800;
+    font-size: clamp(34px, 9vw, 40px);
+    line-height: 1.05;
+    letter-spacing: -1.2px;
+    margin-bottom: 16px;
+  }
+  .hero h1 .purple { color: var(--purple); }
+  .hero h1 .dark { color: var(--black); }
+  .subtitle {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--gray);
+    line-height: 1.45;
+    max-width: 300px;
+    margin-bottom: 28px;
+  }
+  .illustration-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .glow {
+    position: absolute;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(109,74,255,0.10) 0%, rgba(109,74,255,0.04) 35%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .student-img {
+    position: relative;
+    z-index: 1;
+    width: 340px; max-width: 90vw;
+    height: auto;
+    display: block;
+    animation: gentleStudentFloat 6s ease-in-out infinite;
+  }
+  .floating-icon {
+    position: absolute;
+    z-index: 2;
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    background: #F7F4FF;
+    box-shadow: 0 8px 20px rgba(109,74,255,0.10);
+    display: flex; align-items: center; justify-content: center;
+    animation: gentleFloat 4.5s ease-in-out infinite;
+  }
+  .floating-icon svg { width: 24px; height: 24px; color: var(--purple); flex-shrink: 0; }
+  .icon-1 { top: 10%; left: 6%; animation-delay: 0s; animation-duration: 4.2s; }
+  .icon-2 { top: 8%; right: 10%; animation-delay: 0.8s; animation-duration: 4.8s; background: #FFF0F7; }
+  .icon-3 { top: 42%; right: 2%; animation-delay: 1.4s; animation-duration: 5.2s; background: #EAFBF5; }
+  .icon-3 svg { color: #2A9D8F; }
+  .icon-4 { bottom: 18%; left: 10%; animation-delay: 0.4s; animation-duration: 4.6s; background: #FFF8E8; }
+  .icon-4 svg { color: #E9A817; }
+  @keyframes gentleStudentFloat {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-6px); }
+    100% { transform: translateY(0); }
+  }
+  @keyframes gentleFloat {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-8px); }
+    100% { transform: translateY(0); }
+  }
+  .cta-wrap { margin-top: 32px; display: flex; flex-direction: column; align-items: center; }
+  .cta-btn {
+    display: block; width: 100%; max-width: 367px;
+    height: 54px; border-radius: 15px; border: none;
+    background: linear-gradient(135deg, #6D4AFF, #7C4DFF);
+    color: #fff; font-family: inherit; font-weight: 700; font-size: 16px;
+    box-shadow: 0 10px 25px rgba(109,74,255,0.25);
+    text-align: center; text-decoration: none; line-height: 54px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .cta-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(109,74,255,0.30); }
+  .cta-btn:active { transform: translateY(1px); }
+  .login-link { margin-top: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+  .login-link span { color: #777780; }
+  .login-link a { color: var(--purple); text-decoration: none; }
+  .login-link a:hover { text-decoration: underline; }
+  @media (prefers-reduced-motion: reduce) {
+    .student-img, .floating-icon { animation: none !important; }
+    .cta-btn { transition: none; }
+  }
+  @media (max-width: 374px) {
+    .hero h1 { font-size: 34px; }
+    .student-img { width: 280px; }
+    .floating-icon { width: 46px; height: 46px; }
+    .floating-icon svg { width: 20px; height: 20px; }
+    .app-container { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="app-container" role="main" aria-label="Campus Connect AI landing page">
+  <main>
+    <section class="hero" aria-label="Hero introduction">
+      <h1>
+        <span class="purple">Find your</span><br>
+        <span class="dark">perfect study</span><br>
+        <span class="dark">partner.</span>
+      </h1>
+      <p class="subtitle">AI powered matches based on your personality, goals, values and interests.</p>
+    </section>
+
+    <section aria-label="Student illustration and floating icons" style="position:relative;">
+      <div class="illustration-wrap">
+        <div class="glow" aria-hidden="true"></div>
+        <img class="student-img" src="/media/students.png" alt="Students collaborating with tablets and backpacks" loading="eager" />
+
+        <div class="floating-icon icon-1" aria-hidden="true" role="img" aria-label="Heart icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </div>
+        <div class="floating-icon icon-2" aria-hidden="true" role="img" aria-label="People icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="floating-icon icon-3" aria-hidden="true" role="img" aria-label="Sparkles icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 3v4"/><path d="M5 17v4"/><path d="M19 17v4"/></svg>
+        </div>
+        <div class="floating-icon icon-4" aria-hidden="true" role="img" aria-label="Message connection icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-wrap" aria-label="Call to action">
+      <a href="/auth/signup/" class="cta-btn" aria-label="Get started with Campus Connect AI">Get Started</a>
+      <p class="login-link"><span>Already have an account?</span> <a href="/auth/login/">Login</a></p>
+    </section>
+  </main>
+</div>
+</body>
+</html>
