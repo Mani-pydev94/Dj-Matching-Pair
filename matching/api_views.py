@@ -18,7 +18,6 @@ class MatchesAPIView(APIView):
         candidates = User.objects.filter(
             is_active=True,
             profile__is_public=True,
-            profile__questionnaire_completed=True,
         ).exclude(id__in=excluded_ids(request.user)).select_related('profile')
         min_score = float(request.query_params.get('min_score', MIN_MATCH_SCORE))
         university = request.query_params.get('university')

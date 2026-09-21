@@ -96,3 +96,16 @@ class CompatibilityTests(TestCase):
         self.assertFalse(result['is_private'])
         self.assertEqual(result['university'], 'ABC University')
         self.assertEqual(result['field_of_study'], 'Computer Science')
+
+    def test_same_university_match_is_bidirectional_for_incomplete_questionnaire(self):
+        self.b.profile.questionnaire_completed = False
+        self.b.profile.university = 'ABC University'
+        self.a.profile.university = 'ABC University'
+        self.a.profile.save()
+        self.b.profile.save()
+
+        client = APIClient()
+        client.force_authenticate(self.a)
+        response = client.get('/api/matches/?min_score=75')
+
+        self.assertIn(self.b.id, {item['user_id'] for item in response.data['results']})
