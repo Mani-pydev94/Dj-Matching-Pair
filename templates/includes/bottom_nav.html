@@ -1,0 +1,49 @@
+<style>
+.app-bottom-nav{position:fixed;z-index:20;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:space-around;max-width:430px;margin:0 auto;padding:10px 0 calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);border-top:1px solid #EEEEF2;box-shadow:0 -8px 22px rgba(30,20,70,.06);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.app-bottom-nav a{position:relative;display:flex;min-width:52px;flex-direction:column;align-items:center;gap:4px;color:#92929B;text-decoration:none;font:600 10px Inter,system-ui,sans-serif}
+.app-bottom-nav a.active{color:#6D45F5}.app-bottom-nav svg{width:21px;height:21px}
+.chat-unread-badge{display:none;position:absolute;top:-3px;right:8px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#E53935;color:#fff;font:700 9px/16px Inter,system-ui,sans-serif;text-align:center}
+.chat-unread-badge.visible{display:block}
+</style>
+<nav class="app-bottom-nav" aria-label="Main navigation">
+  <a href="{% url 'home' %}" class="{% if active_nav == 'home' %}active{% endif %}" {% if active_nav == 'home' %}aria-current="page"{% endif %}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span>
+  </a>
+  <a href="/matches/explore/" class="{% if active_nav == 'matches' %}active{% endif %}" {% if active_nav == 'matches' %}aria-current="page"{% endif %}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span>Matches</span>
+  </a>
+  <a href="/communities/" class="{% if active_nav == 'communities' %}active{% endif %}" {% if active_nav == 'communities' %}aria-current="page"{% endif %}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Communities</span>
+  </a>
+  <a href="/chat/" class="{% if active_nav == 'chat' %}active{% endif %}" {% if active_nav == 'chat' %}aria-current="page"{% endif %}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span><span id="chat-unread-badge" class="chat-unread-badge" aria-label="Unread messages"></span>
+  </a>
+  <a href="/profiles/" class="{% if active_nav == 'profile' %}active{% endif %}" {% if active_nav == 'profile' %}aria-current="page"{% endif %}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span>
+  </a>
+</nav>
+<script>
+(function() {
+  const badge = document.getElementById('chat-unread-badge');
+  if (!badge) return;
+
+  function updateChatBadge() {
+    fetch('{% url "chat_unread_count" %}', {credentials: 'same-origin', cache: 'no-store'})
+      .then(function(response) {
+        if (!response.ok) throw new Error('Unable to load unread chat count.');
+        return response.json();
+      })
+      .then(function(data) {
+        const count = Number(data.unread_count) || 0;
+        badge.textContent = count > 99 ? '99+' : String(count);
+        badge.classList.toggle('visible', count > 0);
+      })
+      .catch(function(error) {
+        console.error('Chat unread alert failed:', error);
+      });
+  }
+
+  updateChatBadge();
+  window.setInterval(updateChatBadge, 10000);
+})();
+</script>

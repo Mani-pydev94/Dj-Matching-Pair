@@ -70,7 +70,6 @@ class SignupForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.username = user.email  # keep Django happy for AbstractUser internals
         user.email = self.cleaned_data['email'].lower().strip()
         user.set_password(self.cleaned_data['password1'])
         # Split full_name

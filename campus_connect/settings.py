@@ -9,6 +9,17 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-insecure-key-change-in-pro
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
 
+# Matching is intentionally questionnaire-first; deployments can tune these
+# values without changing questionnaire data or scoring code.
+MATCHING = {
+    'QUESTIONNAIRE_WEIGHT': float(os.environ.get('MATCHING_QUESTIONNAIRE_WEIGHT', '0.70')),
+    'PROFILE_WEIGHTS': {'interests': .15, 'university': .10, 'city': .05},
+    'MINIMUM_SCORE': float(os.environ.get('MATCHING_MINIMUM_SCORE', '75')),
+    'SAME_UNIVERSITY_DISCOVERY_SCORE': float(
+        os.environ.get('MATCHING_SAME_UNIVERSITY_DISCOVERY_SCORE', '40')
+    ),
+}
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -17,11 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    # Email/password auth
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    'rest_framework',
     # Local apps
     'accounts',
     'profiles',
@@ -32,6 +39,8 @@ INSTALLED_APPS = [
     'events',
     'chat',
     'notifications',
+    'demo_seed',
+    'admin_dashboard',
     'core',
 ]
 
@@ -43,7 +52,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'campus_connect.urls'
@@ -65,13 +73,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'campus_connect.wsgi.application'
 
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database: SQLite remains the zero-config local default. Set
+# DJANGO_DB_ENGINE=postgresql in deployment environments.
+if os.environ.get('DJANGO_DB_ENGINE', 'sqlite').lower() == 'postgresql':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_DB', ''),
+            'USER': os.environ.get('POSTGRES_USER', ''),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+            'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -100,25 +121,7 @@ SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
 )
-
-# Allauth settings (django-allauth 0.59.0 compatible)
-ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
-ACCOUNT_EMAIL_VERIFICATION = 'optional'
-ACCOUNT_LOGOUT_ON_GET = False
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': os.environ.get('GOOGLE_CLIENT_ID', ''),
-            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', ''),
-            'key': '',
-        }
-    }
-}
 
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False

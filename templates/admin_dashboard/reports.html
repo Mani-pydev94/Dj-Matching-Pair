@@ -1,0 +1,3 @@
+{% extends "admin_dashboard/base.html" %}{% block title %}Reports{% endblock %}{% block heading %}Reports{% endblock %}{% block content %}
+<div class="cards"><div class="stat"><span class="muted">Suspended users</span><b>0</b><span class="muted">No suspension field exists yet</span></div><div class="stat"><span class="muted">Unread notifications</span><b>{{ request.user.notifications.all|length }}</b><span class="muted">Your notifications</span></div></div>
+{% endblock %}

@@ -71,6 +71,6 @@
     </section>
     <div class="actions"><button class="primary" type="submit">Save and continue</button><a class="secondary" href="{% url 'home' %}">Complete later</a></div>
   </form>
-</main>
+</main>{% include 'includes/bottom_nav.html' with active_nav='profile' %}
 </body>
 </html>

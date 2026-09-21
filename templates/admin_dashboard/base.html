@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Control centre{% endblock %} · Campus Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--purple:#6d45f5;--dark:#17122b;--muted:#77738a;--line:#eceaf4;--bg:#f7f6fb}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#211d32;font:14px Inter,system-ui,sans-serif}
+    .layout{display:flex;min-height:100vh}.sidebar{width:245px;background:var(--dark);color:#fff;padding:24px 14px;flex-shrink:0}
+    .brand{font-size:18px;font-weight:800;padding:0 12px 28px}.brand small{display:block;color:#aaa2c4;font-size:11px;font-weight:500;margin-top:5px}
+    .nav-title{color:#817a9e;text-transform:uppercase;font-size:10px;font-weight:700;padding:14px 12px 7px;letter-spacing:.08em}
+    .nav a{display:block;color:#c8c3d8;text-decoration:none;padding:10px 12px;border-radius:9px;margin:2px 0}.nav a:hover,.nav a.active{background:#30255b;color:#fff}
+    .main{flex:1;min-width:0}.topbar{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px}
+    .topbar h1{font-size:20px;margin:0}.identity{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px}.badge{background:#eee9ff;color:var(--purple);border-radius:99px;padding:6px 10px;font-weight:700;font-size:10px}
+    .content{padding:30px 34px;max-width:1400px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.stat,.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 4px 18px #2c205408}.stat b{font-size:27px;display:block;margin:8px 0}.muted{color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}.panel h2{font-size:16px;margin:0 0 16px}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;border-bottom:1px solid var(--line);padding:13px 8px;white-space:nowrap}.table th{font-size:11px;color:var(--muted);text-transform:uppercase}.btn{display:inline-block;border:0;border-radius:8px;background:var(--purple);color:#fff;padding:9px 13px;text-decoration:none;font:600 12px Inter;cursor:pointer}.btn.secondary{background:#f0edff;color:var(--purple)}.btn.danger{background:#fff0f0;color:#b32e2e}.actions{display:flex;gap:7px;flex-wrap:wrap}.search{display:flex;gap:8px;margin-bottom:18px}.search input,.field input,.field textarea,.field select{border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit;width:100%}.search input{max-width:360px}.field{margin:14px 0}.field label{display:block;font-weight:700;font-size:12px;margin-bottom:6px}.form-card{max-width:720px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}.messages{margin-bottom:18px}.message{padding:10px 14px;border-radius:8px;background:#edf9f0;color:#19733a}.role{display:inline-block;margin:3px;padding:5px 8px;background:#f0edff;color:var(--purple);border-radius:99px;font-size:11px}
+    @media(max-width:900px){.sidebar{width:205px}.content{padding:22px 18px}.topbar{padding:0 18px}.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+    @media(max-width:600px){.layout{display:block}.sidebar{width:100%;padding:12px}.brand{padding:10px}.nav{display:flex;overflow:auto;gap:4px}.nav-title{display:none}.nav a{white-space:nowrap}.topbar{height:64px}.identity span{display:none}.cards{grid-template-columns:1fr 1fr}.content{padding:16px 12px}}
+  </style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">Campus Admin<small>Control centre</small></div>
+    <nav class="nav">
+      <div class="nav-title">Overview</div><a href="{% url 'admin_dashboard:dashboard' %}">Dashboard</a>
+      <div class="nav-title">Manage</div><a href="{% url 'admin_dashboard:users' %}">Users</a><a href="{% url 'admin_dashboard:roles' %}">Roles & Permissions</a><a href="{% url 'admin_dashboard:events' %}">Events</a><a href="{% url 'admin_dashboard:event_registrations' %}">Event Registrations</a><a href="{% url 'admin_dashboard:communities' %}">Communities</a><a href="{% url 'admin_dashboard:community_joins' %}">Community Joins</a><a href="{% url 'admin_dashboard:questionnaire' %}">Questionnaire</a><a href="{% url 'admin_dashboard:matches' %}">Matches</a><a href="{% url 'admin_dashboard:notifications' %}">Notifications</a><a href="{% url 'admin_dashboard:reports' %}">Reports</a><a href="{% url 'admin_dashboard:questionnaire_import_export' %}">Import / Export</a>
+      <div class="nav-title">System</div><a href="/admin/">Standard Django admin</a><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button style="display:block;width:100%;text-align:left;background:none;border:0;color:#c8c3d8;padding:10px 12px;border-radius:9px;font:inherit;cursor:pointer">Logout</button></form>
+    </nav>
+  </aside>
+  <main class="main">
+    <header class="topbar"><h1>{% block heading %}Dashboard{% endblock %}</h1><div class="identity"><span>Signed in as <strong>{{ request.user.get_full_name|default:request.user.email }}</strong></span><b class="badge">{{ admin_role }}</b></div></header>
+    <section class="content">
+      {% if messages %}<div class="messages">{% for message in messages %}<div class="message">{{ message }}</div>{% endfor %}</div>{% endif %}
+      {% block content %}{% endblock %}
+    </section>
+  </main>
+</div>
+</body>
+</html>

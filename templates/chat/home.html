@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Chat — Campus Connect AI</title>
+  <style>
+    :root{--p:#7C4DFF;--pd:#6F42E8;--soft:#F1EBFF;--ink:#171717;--muted:#737373;--line:#ECECF2}
+    *{box-sizing:border-box}body{margin:0;background:#FAF9FF;color:var(--ink);font-family:Inter,system-ui,sans-serif}.app{max-width:430px;min-height:100dvh;margin:auto;background:#fff;padding:20px 18px 105px}.top{display:flex;align-items:center;gap:14px}.back{font-size:24px;color:var(--ink);text-decoration:none}.top strong{font-size:18px}h1{margin:30px 0 5px;font-size:25px;letter-spacing:-.5px}.intro{margin:0 0 22px;color:var(--muted);font-size:12px}.contact{display:flex;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink)}.avatar{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;background:var(--soft);color:var(--p);font-weight:800}.name{font-weight:750;font-size:14px}.last{margin-top:4px;color:var(--muted);font-size:11px}.empty{padding:35px 8px;color:var(--muted);font-size:13px;line-height:1.5}
+  </style>
+</head>
+<body><main class="app"><div class="top"><a class="back" href="{% url 'home' %}" aria-label="Back">←</a><strong>Chat</strong></div><h1>Your conversations</h1><p class="intro">Message your accepted connections.</p>
+{% for contact in contacts %}<a class="contact" href="{% url 'chat_conversation' contact.id %}"><div class="avatar">{{ contact.first_name|default:contact.email|slice:":1"|upper }}</div><div><div class="name">{{ contact.get_full_name|default:contact.email }}</div><div class="last">Open conversation</div></div></a>{% empty %}<p class="empty">No conversations yet. Accept a connection request to start chatting.</p>{% endfor %}
+</main>{% include 'includes/bottom_nav.html' with active_nav='chat' %}</body></html>

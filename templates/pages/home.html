@@ -16,8 +16,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:#F7F5FF;color:var(--bla
 .header{display:flex;align-items:center;justify-content:space-between;padding:24px 20px 6px;}
 .greeting h2{font-weight:800;font-size:26px;line-height:1.15;letter-spacing:-0.6px;color:var(--black);}
 .greeting p{font-size:13px;color:#8A8A8A;margin-top:4px;font-weight:400;}
-.notif-btn{width:44px;height:44px;border-radius:50%;background:#FFFFFF;border:1px solid #E9E9EF;box-shadow:0 2px 10px rgba(30,20,70,0.06);display:flex;align-items:center;justify-content:center;color:var(--black);text-decoration:none;transition:transform .15s ease,box-shadow .15s ease;}
+.notif-btn{position:relative;width:44px;height:44px;border-radius:50%;background:#FFFFFF;border:1px solid #E9E9EF;box-shadow:0 2px 10px rgba(30,20,70,0.06);display:flex;align-items:center;justify-content:center;color:var(--black);text-decoration:none;transition:transform .15s ease,box-shadow .15s ease;}
 .notif-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(30,20,70,0.10);}
+.notif-badge{position:absolute;top:-4px;right:-4px;display:none;min-width:19px;height:19px;padding:0 5px;border:2px solid #fff;border-radius:999px;background:#EF4444;color:#fff;font-size:10px;font-weight:800;line-height:15px;text-align:center;}
 .card{background:#FFFFFF;border:1px solid #E8E8ED;border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(30,20,70,0.06);margin:0 20px 28px;}
 .section-title{display:flex;align-items:center;justify-content:space-between;padding:0 20px;margin:34px 0 16px;}
 .section-title h3{font-weight:700;font-size:17px;letter-spacing:-0.3px;color:var(--black);}
@@ -67,23 +68,61 @@ body{font-family:'Inter',system-ui,sans-serif;background:#F7F5FF;color:var(--bla
 .event-card .meta{font-size:11px;color:#7A7A7A;padding:0 12px 10px;line-height:1.35;}
 .event-card .btn{display:block;width:calc(100% - 24px);margin:0 12px 12px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;font-family:inherit;font-weight:600;font-size:12px;text-align:center;line-height:36px;text-decoration:none;border:none;box-shadow:0 4px 12px rgba(109,69,245,0.22);transition:transform .15s ease,box-shadow .15s ease;}
 .event-card .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(109,69,245,0.28);}
+.event-card .register-btn.is-registered{background:#F1EBFF;color:var(--p);box-shadow:none;cursor:default}
+.modal-backdrop{position:fixed;inset:0;z-index:40;display:grid;place-items:end center;padding:16px;background:rgba(23,18,43,.48);opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-backdrop.open{opacity:1;pointer-events:auto}.registration-modal{width:min(100%,390px);padding:22px;border-radius:22px;background:#fff;box-shadow:0 -8px 35px rgba(30,20,70,.2);transform:translateY(25px);transition:transform .2s}
+.modal-backdrop.open .registration-modal{transform:translateY(0)}.modal-head{display:flex;align-items:start;justify-content:space-between;gap:12px}.modal-head h2{margin:0;font-size:19px}.modal-sub{margin:6px 0 18px;color:var(--gray);font-size:12px;line-height:1.45}.modal-close{display:grid;place-items:center;width:32px;height:32px;border:1px solid var(--border);border-radius:50%;background:#fff;color:var(--gray);font-size:20px;cursor:pointer}.registration-form label{display:block;margin:12px 0 6px;color:#4E4A58;font-size:11px;font-weight:700}.registration-form input{width:100%;height:44px;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:#FCFCFE;color:var(--black);font:13px Inter,system-ui,sans-serif;outline:none}.registration-form input:focus{border-color:var(--p);box-shadow:0 0 0 3px #7c4dff18}.modal-submit{width:100%;height:44px;margin-top:18px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;font:700 13px Inter,system-ui,sans-serif;cursor:pointer;box-shadow:0 7px 16px #7547f52e}.toast{position:fixed;z-index:50;top:18px;right:16px;left:16px;max-width:390px;margin:auto;padding:13px 15px;border-radius:12px;background:#ECFDF3;color:#087443;font-size:12px;font-weight:700;box-shadow:0 8px 24px rgba(20,80,45,.16)}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-around;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid #EEEEF2;padding:10px 0 calc(10px + env(safe-area-inset-bottom));max-width:430px;margin:0 auto;box-shadow:0 -8px 25px rgba(30,20,70,0.08);z-index:100;border-radius:22px 22px 0 0;height:68px;}
+.chat-unread-badge{display:none;position:absolute;top:-3px;right:8px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#E53935;color:#fff;font:700 9px/16px Inter,system-ui,sans-serif;text-align:center;}
+.chat-unread-badge.visible{display:block;}
 .nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#8B8B95;font-weight:500;font-size:10px;min-width:56px;flex:1;height:100%;transition:color .15s;}
 .nav-item.active{color:var(--p);}
 .nav-item svg{width:21px;height:21px;stroke-width:1.8;}
 @media (max-width:374px){.quick-icon{width:52px;height:52px;}.header{padding:20px 16px 4px;}.card{padding:16px;}.bottom-nav{padding:8px 0 calc(8px + env(safe-area-inset-bottom));height:64px;}}
+/* Premium mobile-app surface */
+body{background:linear-gradient(180deg,#f8f6ff 0%,#fbfaff 46%,#f7f5ff 100%);}
+.app-shell{box-shadow:0 18px 55px rgba(42,24,96,.08);}
+.header{padding:28px 20px 18px;background:linear-gradient(180deg,#fff 0%,#fcfbff 100%);}
+.greeting h2{font-size:24px;letter-spacing:-.8px;}
+.greeting p{color:#77738a;font-size:12px;}
+.notif-btn{border-color:#eeeaf8;background:#fff;box-shadow:0 7px 20px rgba(72,40,150,.09);}
+.card{border-color:#eeeaf8;border-radius:22px;box-shadow:0 10px 28px rgba(52,31,118,.07);}
+.section-title{margin:30px 0 14px;}
+.section-title h3{font-size:16px;}
+.section-title a{padding:7px 10px;border-radius:10px;background:#f3eeff;}
+.profile-card .pct{font-size:31px;}
+.ai-card{border-radius:22px;background:radial-gradient(circle at 90% 10%,#9b7aff 0,#7547f5 42%,#6337d9 100%);box-shadow:0 18px 34px rgba(109,69,245,.25);}
+.ai-card h2{font-size:17px;}
+.quick-row,.match-scroller,.community-row,.event-row{padding-left:20px;padding-right:20px;gap:14px;}
+.quick-card{width:78px;height:88px;border:1px solid #eeeaf8;border-radius:18px;box-shadow:0 8px 18px rgba(45,26,105,.06);}
+.quick-icon{width:42px;height:42px;border-radius:14px;}
+.match-card{min-width:272px;border-radius:20px;padding:18px;border-color:#eeeaf8;}
+.match-card .pct{background:#f1ebff;border-radius:999px;padding:5px 9px;}
+.community-card{min-width:228px;min-height:106px;border-radius:20px;border-color:#eeeaf8;background:linear-gradient(145deg,#fff,#fbf9ff);padding:20px;}
+.community-card:before{content:'✦';display:grid;place-items:center;width:30px;height:30px;margin-bottom:12px;border-radius:10px;background:#f3eeff;color:#7547f5;font-weight:800;}
+.event-card{min-width:184px;border:1px solid #eeeaf8;border-radius:20px;box-shadow:0 9px 22px rgba(45,26,105,.07);}
+.event-img{height:96px;position:relative;overflow:hidden;color:#fff;background:var(--event-color,#7547f5);}
+.event-img:after{content:'✦';position:absolute;right:16px;bottom:-10px;color:rgba(255,255,255,.2);font-size:72px;font-weight:800;}
+.event-card h4{padding:14px 14px 0;font-size:13px;}
+.event-card .meta{padding:7px 14px 12px;color:#77738a;line-height:1.55;}
+.event-card .btn{width:calc(100% - 28px);margin:0 14px 14px;border-radius:12px;}
+.empty-state{margin:0 20px;padding:22px;border:1px dashed #dcd4f7;border-radius:18px;background:#fcfbff;color:#77738a;text-align:center;font-size:12px;line-height:1.55;}
+.bottom-nav{border:1px solid #eeeaf8;border-bottom:0;box-shadow:0 -10px 28px rgba(45,26,105,.1);}
+.nav-item{font-weight:600;}
+.nav-item:focus-visible,.btn:focus-visible,.notif-btn:focus-visible,.section-title a:focus-visible{outline:3px solid #c9baff;outline-offset:3px;}
 </style>
 </head>
 <body>
 <div class="app-shell">
+{% if messages %}<div class="toast">{% for message in messages %}{{ message }}{% endfor %}</div>{% endif %}
 <header class="header" aria-label="Header">
   <div class="greeting">
-    <h2>Hi, Student 👋</h2>
+    <h2>Hi, {{ student_name }} 👋</h2>
     <p>Ready to find your perfect match?</p>
   </div>
-  <br> <br>
-  <a href="/notifications/" class="notif-btn" aria-label="Notifications">
+  <a href="{% url 'notifications_inbox' %}" class="notif-btn" aria-label="Notifications">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+    <span class="notif-badge" id="notification-badge" aria-live="polite"></span>
   </a>
 </header>
 
@@ -105,7 +144,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#F7F5FF;color:var(--bla
     <h2>Start your AI Compatibility Profile</h2>
   </div>
   <p>Answer a few quick questions so our AI can match you with truly compatible students.</p>
-  <a href="/questionnaire-intro/" class="btn-white">Answer Questions</a>
+  <a href="/questionnaire/intro/" class="btn-white">Answer Questions</a>
 </section>
 
 <section aria-label="Quick actions">
@@ -120,24 +159,20 @@ body{font-family:'Inter',system-ui,sans-serif;background:#F7F5FF;color:var(--bla
 </section>
 
 <section aria-label="Top matches">
-  <div class="section-title"><h3>Top Matches for You</h3><a href="/explore-matches/">See All</a></div>
-  {% if questionnaire_done %}
-    {% if top_matches %}
+  <div class="section-title"><h3>Top Matches for You</h3><a href="/matches/explore/">See All</a></div>
+  {% if top_matches %}
     <div class="match-scroller">
       {% for m in top_matches %}
       <div class="match-card">
-        <div class="match-header"><img src="{{ m.profile.photo.url|default:'/media/default-avatar.png' }}" alt="{{ m.first_name }}"><div><h4>{{ m.first_name }} {{ m.last_name }}</h4><p class="sub">{{ m.profile.university|default:'University' }}</p></div></div>
-        <div class="pct">{{ m.compat|default:'85' }}% Match</div>
-        <div class="tags">{{ m.profile.interests|truncatechars:40|default:'Interests loading...' }}</div>
+        <div class="match-header">{% if m.photo_url %}<img src="{{ m.photo_url }}" alt="{{ m.first_name }}">{% else %}<div class="avatar-placeholder">🔒</div>{% endif %}<div><h4>{{ m.first_name }} {{ m.last_name }}</h4><p class="sub">{% if m.can_view_full_profile %}{{ m.university|default:'Campus Connect student' }}{% else %}Private profile · Connect to unlock{% endif %}</p></div></div>
+        <div class="pct">{{ m.compat }}% Match</div>
+        <div class="tags">{% if m.can_view_full_profile %}{{ m.interests|truncatechars:40|default:'Interests loading...' }}{% else %}🔒 Details hidden until connection{% endif %}</div>
         <a href="/profiles/{{ m.id }}/" style="display:inline-block;margin-top:10px;font-size:12px;color:var(--p);font-weight:600;text-decoration:none;">View Profile →</a>
       </div>
       {% endfor %}
     </div>
-    {% else %}
-    <div class="card" style="padding:20px;min-height:78px;display:flex;align-items:center;justify-content:center;"><p style="font-size:13px;color:#7A7A7A;text-align:center;line-height:1.5;">Complete your profile to see your best matches.</p></div>
-    {% endif %}
   {% else %}
-  <div class="card" style="padding:20px;min-height:78px;display:flex;align-items:center;justify-content:center;"><p style="font-size:13px;color:#7A7A7A;text-align:center;line-height:1.5;">Complete your AI Compatibility Profile first to see matches tailored to you.</p></div>
+  <div class="empty-state">Complete your profile and add your university to discover students from your campus.</div>
   {% endif %}
 </section>
 
@@ -147,7 +182,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#F7F5FF;color:var(--bla
     {% for c in communities %}
     <a href="/communities/{{ c.id }}/" class="community-card"><h4 style="font-weight:700;font-size:14px;margin-bottom:4px;color:var(--black);">{{ c.name }}</h4><p style="font-size:12px;color:#8A8A8A;">{{ c.members.count|default:0 }} members</p></a>
     {% empty %}
-    <div class="card" style="padding:20px;min-width:220px;min-height:78px;display:flex;align-items:center;justify-content:center;"><p style="font-size:13px;color:#7A7A7A;text-align:center;line-height:1.5;">No communities yet — be the first to create one from the Communities tab.</p></div>
+    <div class="empty-state" style="min-width:228px;">No communities yet — be the first to create one from the Communities tab.</div>
     {% endfor %}
   </div>
 </section>
@@ -157,24 +192,82 @@ body{font-family:'Inter',system-ui,sans-serif;background:#F7F5FF;color:var(--bla
   <div class="event-row">
     {% for e in events %}
     <div class="event-card" aria-label="{{ e.title }}">
-      <div class="event-img">Event</div>
+      <div class="event-img" style="--event-color:{{ e.color|default:'#7C4DFF' }}">Event</div>
       <h4>{{ e.title }}</h4>
       <div class="meta">📅 {{ e.start|date:"d M, H:i" }} · 📍 {{ e.location|default:"Campus" }}</div>
-      <a href="/events/{{ e.id }}/" class="btn">{% if e.is_registered %}Registered{% else %}Register{% endif %}</a>
+      {% if e.id in registered_event_ids %}<button class="btn register-btn is-registered" type="button" disabled>Registered</button>{% else %}<button class="btn register-btn" type="button" data-event-id="{{ e.id }}" data-event-title="{{ e.title|escape }}">Register</button>{% endif %}
     </div>
     {% empty %}
-    <div class="card" style="padding:20px;min-width:200px;min-height:78px;display:flex;align-items:center;justify-content:center;"><p style="font-size:13px;color:#7A7A7A;text-align:center;line-height:1.5;">No upcoming events available.</p></div>
+    <div class="empty-state" style="min-width:200px;">No upcoming events available.</div>
     {% endfor %}
   </div>
 </section>
 
+<div class="modal-backdrop" id="registration-modal" aria-hidden="true">
+  <section class="registration-modal" role="dialog" aria-modal="true" aria-labelledby="registration-title">
+    <div class="modal-head"><div><h2 id="registration-title">Register for event</h2><p class="modal-sub" id="registration-event-name"></p></div><button class="modal-close" id="registration-close" type="button" aria-label="Close">×</button></div>
+    <form class="registration-form" id="registration-form" method="post">
+      {% csrf_token %}
+      <label for="registration-name">Full name</label><input id="registration-name" name="name" required maxlength="150" value="{{ request.user.get_full_name }}" placeholder="Your full name" autocomplete="name">
+      <label for="registration-email">Email address</label><input id="registration-email" name="email" type="email" required value="{{ request.user.email }}" placeholder="you@example.com" autocomplete="email">
+      <label for="registration-phone">Phone number</label><input id="registration-phone" name="phone_number" type="tel" required minlength="7" maxlength="30" placeholder="Your phone number" autocomplete="tel">
+      <button class="modal-submit" type="submit">Confirm registration</button>
+    </form>
+  </section>
+</div>
+
 <nav class="bottom-nav" aria-label="Main navigation">
   <a href="/" class="nav-item active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 0-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></a>
-  <a href="/matches/" class="nav-item" aria-label="Matches"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span>Matches</span></a>
+  <a href="/matches/explore/" class="nav-item" aria-label="Matches"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span>Matches</span></a>
   <a href="/communities/" class="nav-item" aria-label="Communities"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Communities</span></a>
-  <a href="/chat/" class="nav-item" aria-label="Chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span></a>
+  <a href="/chat/" class="nav-item" aria-label="Chat" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span><span id="chat-unread-badge" class="chat-unread-badge" aria-label="Unread messages"></span></a>
   <a href="/profiles/" class="nav-item" aria-label="Profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></a>
 </nav>
 </div>
+<script>
+const registrationModal = document.getElementById('registration-modal');
+const registrationForm = document.getElementById('registration-form');
+const registrationEventName = document.getElementById('registration-event-name');
+const notificationBadge = document.getElementById('notification-badge');
+const chatUnreadBadge = document.getElementById('chat-unread-badge');
+async function updateNotificationBadge() {
+  try {
+    const response = await fetch('/notifications/unread-count/');
+    if (!response.ok) return;
+    const data = await response.json();
+    const unreadCount = Number(data.unread_count) || 0;
+    notificationBadge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+    notificationBadge.style.display = unreadCount ? 'block' : 'none';
+  } catch (error) {
+    notificationBadge.style.display = 'none';
+  }
+}
+updateNotificationBadge();
+async function updateChatUnreadBadge() {
+  try {
+    const response = await fetch('{% url "chat_unread_count" %}', {credentials: 'same-origin', cache: 'no-store'});
+    if (!response.ok) throw new Error('Unable to load unread chat count.');
+    const data = await response.json();
+    const unreadCount = Number(data.unread_count) || 0;
+    chatUnreadBadge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+    chatUnreadBadge.classList.toggle('visible', unreadCount > 0);
+  } catch (error) {
+    console.error('Chat unread alert failed:', error);
+  }
+}
+updateChatUnreadBadge();
+window.setInterval(updateChatUnreadBadge, 10000);
+function closeRegistrationModal(){registrationModal.classList.remove('open');registrationModal.setAttribute('aria-hidden','true');}
+document.querySelectorAll('.register-btn[data-event-id]').forEach(button => button.addEventListener('click', () => {
+  registrationForm.action = `/events/${button.dataset.eventId}/register/`;
+  registrationEventName.textContent = button.dataset.eventTitle;
+  registrationModal.classList.add('open');
+  registrationModal.setAttribute('aria-hidden','false');
+  document.getElementById('registration-name').focus();
+}));
+document.getElementById('registration-close').addEventListener('click', closeRegistrationModal);
+registrationModal.addEventListener('click', event => {if(event.target === registrationModal) closeRegistrationModal();});
+document.addEventListener('keydown', event => {if(event.key === 'Escape') closeRegistrationModal();});
+</script>
 </body>
 </html>

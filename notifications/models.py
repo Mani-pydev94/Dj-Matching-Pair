@@ -8,6 +8,10 @@ class Notification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     title = models.CharField(max_length=200)
     message = models.TextField()
+    connection = models.ForeignKey(
+        'connections.Connection', null=True, blank=True, on_delete=models.CASCADE,
+        related_name='notifications',
+    )
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

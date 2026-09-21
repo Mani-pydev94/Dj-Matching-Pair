@@ -1,0 +1,43 @@
+{% extends "admin_dashboard/base.html" %}
+{% block title %}Questionnaire import/export{% endblock %}
+{% block heading %}Questionnaire import/export{% endblock %}
+{% block content %}
+<div class="grid">
+  <div class="panel">
+    <h2>Questionnaire Import</h2>
+    <p class="muted">Upload one row per answer option. The same question_key groups options into one question.</p>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}<input type="hidden" name="action" value="preview">
+      <div class="field"><label for="workbook">Excel workbook (.xlsx)</label><input id="workbook" type="file" name="workbook" accept=".xlsx" required></div>
+      <button class="btn">Preview import</button>
+    </form>
+  </div>
+  <div class="panel">
+    <h2>Questionnaire Export</h2>
+    <p class="muted">Download all questions and options using the import format.</p>
+    <form method="get" action="{% url 'admin_dashboard:export_questionnaire' %}" class="field">
+      <label>Category</label><select name="category"><option value="">All</option>{% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}</select>
+      <label>Question type</label><select name="question_type"><option value="">All</option><option value="SINGLE_CHOICE">Single choice</option><option value="MULTIPLE_CHOICE">Multiple choice</option><option value="SCALE">Scale</option><option value="YES_NO">Yes/No</option></select>
+      <label>Status</label><select name="status"><option value="">All</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
+      <label>Required</label><select name="required"><option value="">All</option><option value="required">Required</option><option value="optional">Optional</option></select>
+      <button class="btn">Export Questions</button>
+    </form>
+    <a class="btn secondary" href="{% url 'admin_dashboard:export_questionnaire' %}?template=1">Download Template</a>
+  </div>
+</div>
+{% if errors %}<div class="panel" style="margin-top:20px"><h2>Import failed</h2>{% for error in errors %}<p class="message" style="background:#fff0f0;color:#b32e2e">{{ error }}</p>{% endfor %}</div>{% endif %}
+{% if preview %}
+<div class="panel" style="margin-top:20px">
+  <h2>Import Preview</h2>
+  <p>Questions found: <strong>{{ preview.questions }}</strong> · New: <strong>{{ preview.new_questions }}</strong> · Updates: <strong>{{ preview.updates }}</strong> · Options: <strong>{{ preview.options }}</strong></p>
+  <div class="table-wrap"><table class="table"><tr><th>Question key</th><th>Question</th><th>Option</th><th>Value</th></tr>
+  {% for row in preview.rows %}<tr><td>{{ row.question_key }}</td><td>{{ row.question_text }}</td><td>{{ row.option_text }}</td><td>{{ row.option_value }}</td></tr>{% endfor %}
+  </table></div>
+  <form method="post" style="margin-top:18px">{% csrf_token %}<input type="hidden" name="action" value="import">
+    <label><input type="radio" name="mode" value="update" checked> Create / Update</label>
+    <label><input type="radio" name="mode" value="create"> Create Only</label>
+    <button class="btn">Import Data</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Notifications — Campus Connect AI</title>
+  <style>
+    body{margin:0;background:#FAF9FF;color:#171717;font-family:Inter,system-ui,sans-serif}
+    .app{max-width:430px;min-height:100vh;margin:auto;padding:20px 18px 100px;background:#fff}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:22px}header a{color:#7547F5;text-decoration:none;font-size:22px}h1{font-size:20px;margin:0}
+    .notification{padding:16px;border:1px solid #E8E6EE;border-radius:16px;margin-bottom:12px}.notification.unread{border-color:#CDBDFF;background:#FCFAFF}
+    .notification h2{font-size:14px;margin:0 0 6px}.notification p{font-size:12px;line-height:1.5;color:#737373;margin:0 0 12px}.notification time{font-size:10px;color:#999}
+    .actions{display:flex;gap:8px}.actions button{flex:1;border:0;border-radius:10px;padding:10px;font-weight:700;cursor:pointer}.accept{background:#7547F5;color:#fff}.reject{background:#F4F1FA;color:#5D536D}
+    .empty{text-align:center;color:#737373;padding:50px 20px;font-size:13px}
+  </style>
+</head>
+<body><main class="app">
+  <header><a href="{% url 'home' %}" aria-label="Back">←</a><h1>Notifications{% if unread_count %} ({{ unread_count }}){% endif %}</h1></header>
+  {% for item in notifications %}
+    <article class="notification {% if not item.is_read %}unread{% endif %}" data-notification="{{ item.id }}">
+      <h2>{{ item.title }}</h2><p>{{ item.message }}</p>
+      {% if item.connection and item.connection.status == 'PENDING' and item.connection.recipient_id == request.user.id %}
+        <div class="actions"><button class="accept" data-action="accept">Accept</button><button class="reject" data-action="reject">Reject</button></div>
+      {% endif %}
+      <time>{{ item.created_at|date:"M j, Y g:i A" }}</time>
+    </article>
+  {% empty %}<div class="empty">You have no notifications yet.</div>{% endfor %}
+</main>
+<script>
+function csrfToken() {
+  const match = document.cookie.match(/csrftoken=([^;]+)/);
+  return match ? match[1] : '';
+}
+document.querySelectorAll('[data-action]').forEach(button => button.addEventListener('click', async event => {
+  const card = event.currentTarget.closest('[data-notification]');
+  const response = await fetch(`/notifications/${card.dataset.notification}/${event.currentTarget.dataset.action}/`, {
+    method:'POST', headers:{'X-CSRFToken':csrfToken()}
+  });
+  if (response.ok) card.querySelector('.actions').remove();
+}));
+</script>
+</body></html>

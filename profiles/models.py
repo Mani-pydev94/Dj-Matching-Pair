@@ -18,7 +18,8 @@ class Profile(models.Model):
     bio = models.TextField(blank=True, max_length=500)
     interests = models.CharField(max_length=300, blank=True)
     photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
-    is_public = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=True)
+    questionnaire_completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

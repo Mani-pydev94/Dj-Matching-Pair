@@ -9,26 +9,23 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-## Local Google Authentication Setup
+Local development uses SQLite by default. For production PostgreSQL, set
+`DJANGO_DB_ENGINE=postgresql` plus `POSTGRES_DB`, `POSTGRES_USER`,
+`POSTGRES_PASSWORD`, `POSTGRES_HOST`, and `POSTGRES_PORT` before running
+migrations.
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create / select a project
-3. Configure OAuth consent screen (External or Internal)
-4. Create OAuth credentials (Web application)
-5. Authorized JavaScript origins:
-   - `http://localhost:8000`
-   - `http://127.0.0.1:8000`
-6. Authorized redirect URIs:
-   - `http://localhost:8000/accounts/google/login/callback/`
-   - `http://127.0.0.1:8000/accounts/google/login/callback/`
-7. Copy Client ID and Client Secret
-8. Add them to `.env`:
-   ```
-   GOOGLE_CLIENT_ID=your_client_id
-   GOOGLE_CLIENT_SECRET=your_client_secret
-   ```
-9. Run `python manage.py runserver`
-10. Click "Continue with Google" on Login / Signup pages and complete OAuth.
+## Authentication
+
+The application currently uses traditional email/password authentication.
+
+Create an administrator account with:
+
+```bash
+python manage.py createsuperuser
+```
+
+Google authentication is intentionally disabled for now. It can be added later
+without changing the existing profile data.
 
 ## Environment Variables
 

@@ -1,0 +1,27 @@
+{% extends "admin_dashboard/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block heading %}{{ title }}{% endblock %}
+{% block content %}
+<form method="post">
+  {% csrf_token %}
+  <div class="form-card">
+    {{ form.non_field_errors }}
+    {% for field in form %}<div class="field">{{ field.errors }}{{ field.label_tag }}{{ field }}</div>{% endfor %}
+    {% if form.instance.question_type != 'SCALE' %}
+      <h2>Answer Options</h2>
+      {{ option_formset.management_form }}
+      {{ option_formset.non_form_errors }}
+      {% for option_form in option_formset %}
+        <div class="panel" style="margin:14px 0">
+          <strong>Option {{ forloop.counter }}</strong>
+          {{ option_form.id }}
+          {% for field in option_form.visible_fields %}<div class="field">{{ field.errors }}{{ field.label_tag }}{{ field }}</div>{% endfor %}
+          {% if option_form.instance.pk %}<div class="field">{{ option_form.DELETE }} {{ option_form.DELETE.label }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <p class="muted">Add another option by completing the empty option card. Values must be unique for this question.</p>
+    {% endif %}
+    <div class="actions"><button class="btn">Save question</button><a class="btn secondary" href="{{ back_url }}">Cancel</a></div>
+  </div>
+</form>
+{% endblock %}

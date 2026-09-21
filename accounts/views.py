@@ -12,7 +12,7 @@ User = get_user_model()
 
 def signup_view(request):
     if request.user.is_authenticated:
-        return redirect('landing')
+        return redirect('home')
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
@@ -30,7 +30,7 @@ def signup_view(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('landing')
+        return redirect('home')
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -40,7 +40,7 @@ def login_view(request):
             if user is not None:
                 login(request, user, backend="django.contrib.auth.backends.ModelBackend")
                 messages.success(request, 'Welcome back!')
-                return redirect('landing')
+                return redirect('home')
             else:
                 messages.error(request, 'Invalid email or password.')
         else:
