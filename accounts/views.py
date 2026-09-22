@@ -39,7 +39,7 @@ def login_view(request):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-                messages.success(request, 'Welcome back!')
+                # messages.success(request, 'Welcome back!')
                 return redirect('home')
             else:
                 messages.error(request, 'Invalid email or password.')
@@ -53,5 +53,5 @@ def login_view(request):
 @require_POST
 def logout_view(request):
     logout(request)
-    messages.success(request, 'Logged out successfully.')
+    # messages.success(request, 'Logged out successfully.')
     return redirect('login')

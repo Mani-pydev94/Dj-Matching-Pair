@@ -37,7 +37,7 @@ class ResponseSerializer(serializers.ModelSerializer):
     value = serializers.CharField(required=False, allow_blank=True, default='')
     selected_option_ids = serializers.PrimaryKeyRelatedField(
         source='selected_options', many=True, queryset=QuestionOption.objects.all(),
-        write_only=True, required=False,
+        required=False,
     )
 
     class Meta:

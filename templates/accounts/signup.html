@@ -137,6 +137,7 @@
 
   <div class="bottom"><span>Already have an account?</span> <a href="{% url 'login' %}">Login</a></div>
 </div>
+<br><br>
 <script>
 function togglePass(btn,id){const i=document.getElementById(id);const e=btn.querySelector('.eye');const o=btn.querySelector('.eye-off');if(i.type==='password'){i.type='text';e.style.display='none';o.style.display='block';btn.setAttribute('aria-label','Hide password');btn.setAttribute('aria-pressed','true');}else{i.type='password';e.style.display='block';o.style.display='none';btn.setAttribute('aria-label','Show password');btn.setAttribute('aria-pressed','false');}}
 function updateStrength(v){const r1=document.getElementById('r1'),r2=document.getElementById('r2'),r3=document.getElementById('r3'),r4=document.getElementById('r4'),r5=document.getElementById('r5');const f=document.getElementById('str-fill'),l=document.getElementById('str-label');const c=v.length>=8,up=/[A-Z]/.test(v),lo=/[a-z]/.test(v),nu=/\d/.test(v),sp=/[^A-Za-z0-9]/.test(v);function set(el,met){el.querySelector('.dot').textContent=met?'✓':'◌';el.querySelector('.dot').className='dot '+(met?'met':'unmet');el.className='req '+(met?'met':'');}[r1,r2,r3,r4,r5].forEach((el,i)=>set(el,[c,up,lo,nu,sp][i]));const score=(c?1:0)+(up?1:0)+(lo?1:0)+(nu?1:0)+(sp?1:0);const pct=Math.round(score/5*100);f.style.width=pct+'%';if(pct<=20){f.style.background='#EF4444';l.textContent='Weak';}else if(pct<=60){f.style.background='#F59E0B';l.textContent='Medium';}else{f.style.background='#10B981';l.textContent='Strong';}}

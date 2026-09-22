@@ -2,41 +2,187 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
   <title>Notifications — Campus Connect AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body{margin:0;background:#FAF9FF;color:#171717;font-family:Inter,system-ui,sans-serif}
-    .app{max-width:430px;min-height:100vh;margin:auto;padding:20px 18px 100px;background:#fff}
-    header{display:flex;align-items:center;gap:14px;margin-bottom:22px}header a{color:#7547F5;text-decoration:none;font-size:22px}h1{font-size:20px;margin:0}
-    .notification{padding:16px;border:1px solid #E8E6EE;border-radius:16px;margin-bottom:12px}.notification.unread{border-color:#CDBDFF;background:#FCFAFF}
-    .notification h2{font-size:14px;margin:0 0 6px}.notification p{font-size:12px;line-height:1.5;color:#737373;margin:0 0 12px}.notification time{font-size:10px;color:#999}
-    .actions{display:flex;gap:8px}.actions button{flex:1;border:0;border-radius:10px;padding:10px;font-weight:700;cursor:pointer}.accept{background:#7547F5;color:#fff}.reject{background:#F4F1FA;color:#5D536D}
-    .empty{text-align:center;color:#737373;padding:50px 20px;font-size:13px}
+    :root{--purple:#6D45F5;--purple-dark:#6938D9;--ink:#171717;--muted:#85828f;--line:#eceaf2;--soft:#f5f1ff;--page:#f7f5ff}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100vh;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    .app-shell{position:relative;width:100%;max-width:430px;min-height:100dvh;margin:auto;padding-bottom:calc(96px + env(safe-area-inset-bottom));background:#fff}
+    .hero{position:relative;overflow:hidden;padding:26px 20px 28px;color:#fff;background:linear-gradient(135deg,#7547f5 0%,#6938d9 100%);border-radius:0 0 28px 28px;box-shadow:0 12px 28px #6d45f53b}
+    .hero:after{position:absolute;right:-42px;bottom:-70px;width:190px;height:190px;border:1px solid #ffffff2e;border-radius:50%;content:""}
+    .hero-top,.hero-main{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
+    .back-btn{display:grid;place-items:center;width:40px;height:40px;border:1px solid #ffffff38;border-radius:14px;background:#ffffff1c;color:#fff;text-decoration:none;font-size:24px;line-height:1}
+    .hero-kicker{font-size:10px;font-weight:700;letter-spacing:1.3px;opacity:.75;text-transform:uppercase}
+    .hero h1{margin-top:4px;font-size:27px;font-weight:800;letter-spacing:-.8px}
+    .bell{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#ffffff1c;font-size:20px}
+    .hero-main{align-items:flex-end;margin-top:26px}
+    .hero-copy{max-width:270px}
+    .hero-copy p{margin-top:7px;color:#ffffffd9;font-size:12px;line-height:1.5}
+    .unread-pill{padding:8px 11px;border:1px solid #ffffff3d;border-radius:999px;background:#ffffff1c;font-size:11px;font-weight:700;white-space:nowrap}
+    .content{padding:22px 20px 0}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .section-head h2{font-size:16px;letter-spacing:-.25px}
+    .mark-all{border:0;background:none;color:var(--purple);font:600 11px Inter,system-ui,sans-serif;cursor:pointer}
+    .filters{display:flex;gap:8px;overflow-x:auto;margin:0 -20px 20px;padding:0 20px 3px;scrollbar-width:none}
+    .filters::-webkit-scrollbar{display:none}
+    .filter{flex:none;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#777481;font:600 11px Inter,system-ui,sans-serif;cursor:pointer;transition:.2s}
+    .filter.active{border-color:var(--purple);background:var(--purple);color:#fff;box-shadow:0 5px 12px #6d45f52e}
+    .notification{position:relative;margin-bottom:12px;padding:15px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 5px 16px #1e14470a;transition:transform .18s,box-shadow .18s}
+    .notification:hover{transform:translateY(-1px);box-shadow:0 9px 22px #1e144714}
+    .notification.unread{border-color:#ddd2ff;background:linear-gradient(135deg,#fff 45%,#faf8ff)}
+    .notification.unread:before{position:absolute;top:17px;right:16px;width:7px;height:7px;border-radius:50%;background:var(--purple);content:""}
+    .notification-row{display:flex;gap:12px}
+    .notification-icon{display:grid;flex:none;place-items:center;width:42px;height:42px;border-radius:14px;background:var(--soft);color:var(--purple);font-size:19px}
+    .notification.unread .notification-icon{background:linear-gradient(135deg,#eee7ff,#e1d6ff)}
+    .notification-content{min-width:0;flex:1;padding-right:14px}
+    .notification-title{padding-right:6px;font-size:13px;font-weight:700;line-height:1.35}
+    .notification-body{margin-top:4px;color:#777481;font-size:12px;line-height:1.5}
+    .notification-meta{display:flex;align-items:center;gap:8px;margin-top:8px;color:#aaa6b2;font-size:10px}
+    .tag{padding:3px 7px;border-radius:999px;background:#f1edff;color:var(--purple);font-size:9px;font-weight:700}
+    .connection-card{margin:14px 0 0 54px;padding:12px;border:1px solid #e9e0ff;border-radius:14px;background:#faf8ff}
+    .connection-label{margin-bottom:9px;color:var(--purple);font-size:10px;font-weight:700}
+    .connection-actions{display:flex;gap:8px}
+    .btn{flex:1;padding:9px 10px;border-radius:10px;font:700 11px Inter,system-ui,sans-serif;cursor:pointer}
+    .btn-primary{border:1px solid var(--purple);background:var(--purple);color:#fff}
+    .btn-outline{border:1px solid #dcd6eb;background:#fff;color:#6e6978}
+    .empty-state{padding:48px 24px;border:1px dashed #dcd5ef;border-radius:20px;background:#fcfaff;text-align:center}
+    .empty-icon{display:grid;place-items:center;width:60px;height:60px;margin:0 auto 15px;border-radius:20px;background:var(--soft);font-size:26px}
+    .empty-state h2{font-size:16px}
+    .empty-state p{margin-top:7px;color:var(--muted);font-size:12px;line-height:1.55}
+    .toast{position:fixed;z-index:30;top:20px;left:50%;display:none;transform:translateX(-50%);padding:11px 16px;border-radius:12px;background:#171717;color:#fff;font-size:12px;font-weight:600;box-shadow:0 8px 24px #17171733}
+    .toast.visible{display:block}
   </style>
 </head>
-<body><main class="app">
-  <header><a href="{% url 'home' %}" aria-label="Back">←</a><h1>Notifications{% if unread_count %} ({{ unread_count }}){% endif %}</h1></header>
-  {% for item in notifications %}
-    <article class="notification {% if not item.is_read %}unread{% endif %}" data-notification="{{ item.id }}">
-      <h2>{{ item.title }}</h2><p>{{ item.message }}</p>
-      {% if item.connection and item.connection.status == 'PENDING' and item.connection.recipient_id == request.user.id %}
-        <div class="actions"><button class="accept" data-action="accept">Accept</button><button class="reject" data-action="reject">Reject</button></div>
-      {% endif %}
-      <time>{{ item.created_at|date:"M j, Y g:i A" }}</time>
-    </article>
-  {% empty %}<div class="empty">You have no notifications yet.</div>{% endfor %}
-</main>
-<script>
-function csrfToken() {
-  const match = document.cookie.match(/csrftoken=([^;]+)/);
-  return match ? match[1] : '';
-}
-document.querySelectorAll('[data-action]').forEach(button => button.addEventListener('click', async event => {
-  const card = event.currentTarget.closest('[data-notification]');
-  const response = await fetch(`/notifications/${card.dataset.notification}/${event.currentTarget.dataset.action}/`, {
-    method:'POST', headers:{'X-CSRFToken':csrfToken()}
-  });
-  if (response.ok) card.querySelector('.actions').remove();
-}));
-</script>
-</body></html>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <div class="hero-top">
+        <a href="{% url 'home' %}" class="back-btn" aria-label="Back to home">‹</a>
+        <div class="hero-kicker">Campus Connect</div>
+        <div class="bell" aria-hidden="true">♢</div>
+      </div>
+      <div class="hero-main">
+        <div class="hero-copy">
+          <h1>Notifications</h1>
+          <p>Stay in the loop with your campus community.</p>
+        </div>
+        {% if unread_count %}
+          <div class="unread-pill">{{ unread_count }} unread</div>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="content">
+      <div class="section-head">
+        <h2>Recent activity</h2>
+        {% if unread_count %}<button class="mark-all" id="mark-all" type="button">Stay tuned</button>{% endif %}
+      </div>
+      <div class="filters" role="tablist" aria-label="Notification filters">
+        <button class="filter active" data-filter="all" type="button">All</button>
+        <button class="filter" data-filter="connection-request" type="button">Connections</button>
+        <button class="filter" data-filter="message" type="button">Messages</button>
+        <button class="filter" data-filter="community" type="button">Communities</button>
+        <button class="filter" data-filter="event" type="button">Events</button>
+        <button class="filter" data-filter="other" type="button">Other</button>
+      </div>
+
+      <div id="notification-list">
+        {% for item in notifications %}
+          <article class="notification {% if not item.is_read %}unread{% endif %}" data-notification="{{ item.id }}" data-type="{% if item.connection and item.connection.status == 'PENDING' %}connection-request{% elif 'message' in item.title|lower %}message{% elif 'community' in item.title|lower %}community{% elif 'event' in item.title|lower %}event{% elif 'match' in item.title|lower %}match{% elif 'profile' in item.title|lower %}profile{% else %}other{% endif %}">
+            <div class="notification-row">
+              <div class="notification-icon" aria-hidden="true">{% if item.connection %}♡{% elif 'message' in item.title|lower %}✦{% elif 'event' in item.title|lower %}◫{% elif 'community' in item.title|lower %}♧{% else %}✧{% endif %}</div>
+              <div class="notification-content">
+                <div class="notification-title">{{ item.title }}</div>
+                <div class="notification-body">{{ item.message }}</div>
+                <div class="notification-meta">
+                  <time class="notification-time" data-time="{{ item.created_at|date:'c' }}">{{ item.created_at|date:"M j, g:i A" }}</time>
+                  {% if not item.is_read %}<span class="tag">NEW</span>{% endif %}
+                </div>
+              </div>
+            </div>
+            {% if item.connection and item.connection.status == 'PENDING' and item.connection.recipient_id == request.user.id %}
+              <div class="connection-card">
+                <div class="connection-label">Connection request</div>
+                <div class="connection-actions">
+                  <button class="btn btn-primary" data-action="accept" type="button">Accept</button>
+                  <button class="btn btn-outline" data-action="reject" type="button">Decline</button>
+                </div>
+              </div>
+            {% endif %}
+          </article>
+        {% empty %}
+          <div class="empty-state">
+            <div class="empty-icon" aria-hidden="true">♢</div>
+            <h2>You're all caught up</h2>
+            <p>New connection requests, messages and campus updates will show up here.</p>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+  {% include 'includes/bottom_nav.html' with active_nav='' %}
+  <script>
+    function csrfToken() {
+      const match = document.cookie.match(/csrftoken=([^;]+)/);
+      return match ? match[1] : '';
+    }
+    function formatTime(value) {
+      const date = new Date(value), seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+      if (seconds < 60) return 'Just now';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return minutes + (minutes === 1 ? ' minute ago' : ' minutes ago');
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+      const days = Math.floor(hours / 24);
+      if (days < 7) return days === 1 ? 'Yesterday' : days + ' days ago';
+      return date.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+    }
+    function updateTimes() {
+      document.querySelectorAll('.notification-time').forEach(function(time) {
+        if (time.dataset.time) time.textContent = formatTime(time.dataset.time);
+      });
+    }
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('visible');
+      window.setTimeout(function() { toast.classList.remove('visible'); }, 2600);
+    }
+    document.querySelectorAll('.filter').forEach(function(filter) {
+      filter.addEventListener('click', function() {
+        document.querySelectorAll('.filter').forEach(function(button) { button.classList.remove('active'); });
+        filter.classList.add('active');
+        document.querySelectorAll('.notification').forEach(function(card) {
+          card.hidden = filter.dataset.filter !== 'all' && card.dataset.type !== filter.dataset.filter;
+        });
+      });
+    });
+    document.querySelectorAll('[data-action]').forEach(function(button) {
+      button.addEventListener('click', async function(event) {
+        event.preventDefault();
+        const notification = button.closest('.notification');
+        const action = button.dataset.action;
+        notification.querySelectorAll('[data-action]').forEach(function(item) { item.disabled = true; });
+        try {
+          const response = await fetch('/notifications/' + notification.dataset.notification + '/' + action + '/', {
+            method: 'POST', headers: {'X-CSRFToken': csrfToken(), 'Content-Type': 'application/json'}
+          });
+          if (!response.ok) throw new Error('Unable to update notification.');
+          showToast(action === 'accept' ? 'Connection request accepted' : 'Connection request declined');
+          window.setTimeout(function() { notification.remove(); }, 900);
+        } catch (error) {
+          notification.querySelectorAll('[data-action]').forEach(function(item) { item.disabled = false; });
+          showToast('Could not update this notification.');
+          console.error(error);
+        }
+      });
+    });
+    updateTimes();
+    window.setInterval(updateTimes, 60000);
+  </script>
+</body>
+</html>

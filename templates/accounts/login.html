@@ -98,6 +98,7 @@
 
   <div class="bottom"><span>Don't have an account?</span> <a href="{% url 'signup' %}">Create Account</a></div>
 </div>
+<br><br>
 <script>
   function togglePass(btn){const i=document.getElementById('id_password');const eye=btn.querySelector('.eye');const off=btn.querySelector('.eye-off');if(i.type==='password'){i.type='text';eye.style.display='none';off.style.display='block';btn.setAttribute('aria-label','Hide password');btn.setAttribute('aria-pressed','true');}else{i.type='password';eye.style.display='block';off.style.display='none';btn.setAttribute('aria-label','Show password');btn.setAttribute('aria-pressed','false');}}
 </script>
