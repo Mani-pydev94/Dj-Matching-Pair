@@ -48,6 +48,7 @@ def home_view(request):
                     'last_name': candidate.last_name,
                     'compat': breakdown['overall_score'],
                     'can_view_full_profile': connected,
+                    'is_private': not connected,
                     'photo_url': (
                         candidate.profile.photo.url
                         if connected and candidate.profile.photo else ''

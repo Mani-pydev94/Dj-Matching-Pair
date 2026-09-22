@@ -167,7 +167,7 @@ body{background:linear-gradient(180deg,#f8f6ff 0%,#fbfaff 46%,#f7f5ff 100%);}
         <div class="match-header">{% if m.photo_url %}<img src="{{ m.photo_url }}" alt="{{ m.first_name }}">{% else %}<div class="avatar-placeholder">🔒</div>{% endif %}<div><h4>{{ m.first_name }} {{ m.last_name }}</h4><p class="sub">{% if m.can_view_full_profile %}{{ m.university|default:'Campus Connect student' }}{% else %}Private profile · Connect to unlock{% endif %}</p></div></div>
         <div class="pct">{{ m.compat }}% Match</div>
         <div class="tags">{% if m.can_view_full_profile %}{{ m.interests|truncatechars:40|default:'Interests loading...' }}{% else %}🔒 Details hidden until connection{% endif %}</div>
-        <a href="/profiles/{{ m.id }}/" style="display:inline-block;margin-top:10px;font-size:12px;color:var(--p);font-weight:600;text-decoration:none;">View Profile →</a>
+        <a href="/profiles/{{ m.id }}/" style="display:inline-block;margin-top:10px;font-size:12px;color:var(--p);font-weight:600;text-decoration:none;">{% if m.is_private %}🔒 View locked profile →{% else %}View Profile →{% endif %}</a>
       </div>
       {% endfor %}
     </div>

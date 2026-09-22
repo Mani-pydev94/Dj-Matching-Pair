@@ -11,6 +11,7 @@ urlpatterns = [
     path('admin-dashboard/', include('admin_dashboard.urls')),
     path('', include('core.urls')),
     path('auth/', include('accounts.urls')),
+    path('accounts/', include('allauth.urls')),
     path('profiles/', include('profiles.urls')),
     path('api/', include('profiles.api_urls')),
     path('api/questionnaire/', include('questionnaire.api_urls')),

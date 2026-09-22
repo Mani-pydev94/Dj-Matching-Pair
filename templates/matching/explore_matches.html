@@ -85,7 +85,7 @@ function renderMatches() {
     }
     const meta = isConnected ? `${escapeHtml(match.field_of_study || 'Student')}${match.university ? ' · ' + escapeHtml(match.university) : ''}` : '🔒 Private until connection';
     const reason = isConnected ? escapeHtml((match.reasons || []).join(' · ') || 'Compatible questionnaire answers') : 'Connect to unlock profile details';
-    return `<article class="card${isConnected ? '' : ' private-card'}"><div class="person">${photo}<div><div class="name">${escapeHtml(match.display_name)}</div><div class="meta${isConnected ? '' : ' private-meta'}">${meta}</div></div>${score}</div><div class="tags">${tags}</div><p class="reason"><strong>${isConnected ? 'Why you match' : 'Private profile'}</strong><br>${reason}</p><div class="actions">${action}<a class="btn secondary" href="/profiles/${escapeHtml(match.user_id)}/">View profile</a></div></article>`;
+    return `<article class="card${isConnected ? '' : ' private-card'}"><div class="person">${photo}<div><div class="name">${escapeHtml(match.display_name)}</div><div class="meta${isConnected ? '' : ' private-meta'}">${meta}</div></div>${score}</div><div class="tags">${tags}</div><p class="reason"><strong>${isConnected ? 'Why you match' : 'Private profile'}</strong><br>${reason}</p><div class="actions">${action}<a class="btn secondary" href="/profiles/${escapeHtml(match.user_id)}/">${isConnected ? 'View profile' : '🔒 View locked profile'}</a></div></article>`;
   }).join('');
   document.querySelectorAll('.connect').forEach(button => button.addEventListener('click', sendRequest));
   document.querySelectorAll('.cancel-request').forEach(button => button.addEventListener('click', cancelRequest));

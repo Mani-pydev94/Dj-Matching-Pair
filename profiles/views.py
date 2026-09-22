@@ -87,12 +87,15 @@ def student_profile(request, user_id):
         Q(requester=student, recipient=request.user)
     ).first()
 
-    match = Match.objects.filter(
-        user_a=request.user, user_b=student,
-    ).first() or Match.objects.filter(
-        user_a=student, user_b=request.user,
-    ).first()
-    insight = getattr(match, 'insight', None) if match else None
+    match = None
+    insight = None
+    if is_connected:
+        match = Match.objects.filter(
+            user_a=request.user, user_b=student,
+        ).first() or Match.objects.filter(
+            user_a=student, user_b=request.user,
+        ).first()
+        insight = getattr(match, 'insight', None) if match else None
 
     return render(request, 'profiles/student_profile.html', {
         'student': student,
