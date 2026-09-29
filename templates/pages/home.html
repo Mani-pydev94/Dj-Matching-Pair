@@ -51,6 +51,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:#F7F5FF;color:var(--bla
 .match-card:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(30,20,70,0.08);}
 .match-card .match-header{display:flex;align-items:center;gap:10px;}
 .match-card img{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#E8E8ED;border:1px solid #F0F0F5;}
+.match-card .avatar-placeholder{display:grid;place-items:center;width:58px;height:58px;border-radius:17px;background:#F1EBFF;color:var(--p);font-size:20px;font-weight:800;flex:none;}
+.match-card .private-avatar{position:relative;}
+.match-card .private-avatar:after{content:'🔒';position:absolute;right:-5px;bottom:-5px;display:grid;place-items:center;width:21px;height:21px;border:2px solid #fff;border-radius:50%;background:var(--p);font-size:10px;}
 .match-card h4{font-weight:700;font-size:14px;line-height:1.15;color:var(--black);}
 .match-card .sub{font-size:12px;color:#8A8A8A;margin-top:1px;}
 .match-card .pct{font-size:11px;font-weight:700;color:var(--p);background:#F3EEFF;padding:3px 7px;border-radius:10px;margin-top:8px;display:inline-block;}
@@ -164,7 +167,7 @@ body{background:linear-gradient(180deg,#f8f6ff 0%,#fbfaff 46%,#f7f5ff 100%);}
     <div class="match-scroller">
       {% for m in top_matches %}
       <div class="match-card">
-        <div class="match-header">{% if m.photo_url %}<img src="{{ m.photo_url }}" alt="{{ m.first_name }}">{% else %}<div class="avatar-placeholder">🔒</div>{% endif %}<div><h4>{{ m.first_name }} {{ m.last_name }}</h4><p class="sub">{% if m.can_view_full_profile %}{{ m.university|default:'Campus Connect student' }}{% else %}Private profile · Connect to unlock{% endif %}</p></div></div>
+        <div class="match-header">{% if m.photo_url %}<img src="{{ m.photo_url }}" alt="{{ m.first_name }}">{% else %}<div class="avatar-placeholder private-avatar">🔒</div>{% endif %}<div><h4>{% if m.can_view_full_profile %}{{ m.first_name }} {{ m.last_name }}{% else %}??? ???{% endif %}</h4><p class="sub">{% if m.can_view_full_profile %}{{ m.university|default:'Campus Connect student' }}{% else %}Private profile · Connect to unlock{% endif %}</p></div></div>
         <div class="pct">{{ m.compat }}% Match</div>
         <div class="tags">{% if m.can_view_full_profile %}{{ m.interests|truncatechars:40|default:'Interests loading...' }}{% else %}🔒 Details hidden until connection{% endif %}</div>
         <a href="/profiles/{{ m.id }}/" style="display:inline-block;margin-top:10px;font-size:12px;color:var(--p);font-weight:600;text-decoration:none;">{% if m.is_private %}🔒 View locked profile →{% else %}View Profile →{% endif %}</a>

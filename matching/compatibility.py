@@ -3,12 +3,12 @@ from collections import defaultdict
 from questionnaire.models import QuestionResponse
 
 CATEGORY_WEIGHTS = {
-    'values': 0.20,
-    'learning-style': 0.20,
-    'communication': 0.15,
-    'career-goals': 0.20,
-    'lifestyle': 0.10,
-    'interests': 0.15,
+    'values': 1 / 6,
+    'learning-style': 1 / 6,
+    'communication': 1 / 6,
+    'career-goals': 1 / 6,
+    'lifestyle': 1 / 6,
+    'interests': 1 / 6,
 }
 MIN_MATCH_SCORE = 75
 
@@ -23,9 +23,15 @@ def _response_map(user):
 def _similarity(first, second):
     first_options = {option.option_value for option in first.selected_options.all()}
     second_options = {option.option_value for option in second.selected_options.all()}
-    if first_options or second_options:
-        union = first_options | second_options
-        return 100.0 * len(first_options & second_options) / len(union) if union else 0.0
+    first_other = set(first.other_text.strip().lower().split())
+    second_other = set(second.other_text.strip().lower().split())
+    if first_options or second_options or first_other or second_other:
+        first_answers = {f'option:{value}' for value in first_options}
+        first_answers.update(f'other-word:{word}' for word in first_other)
+        second_answers = {f'option:{value}' for value in second_options}
+        second_answers.update(f'other-word:{word}' for word in second_other)
+        union = first_answers | second_answers
+        return 100.0 * len(first_answers & second_answers) / len(union) if union else 0.0
     if first.value.isdigit() and second.value.isdigit():
         return max(0.0, 100.0 - abs(int(first.value) - int(second.value)) * 25.0)
     return 100.0 if first.value.strip().lower() == second.value.strip().lower() else 0.0

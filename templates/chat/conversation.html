@@ -1,14 +1,277 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>{{ other.get_full_name|default:other.email }} — Chat</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>{{ other.get_full_name|default:other.email }} — Chat | Campus Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{--p:#7C4DFF;--pd:#6F42E8;--soft:#F1EBFF;--ink:#171717;--muted:#737373;--line:#ECECF2}
-    *{box-sizing:border-box}body{margin:0;background:#FAF9FF;color:var(--ink);font-family:Inter,system-ui,sans-serif}.app{display:flex;flex-direction:column;max-width:430px;height:100dvh;margin:auto;background:#fff}.head{display:flex;align-items:center;gap:13px;padding:16px 18px;border-bottom:1px solid var(--line)}.back{font-size:24px;color:var(--ink);text-decoration:none}.avatar{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:var(--soft);color:var(--p);font-weight:800}.person{font-size:14px;font-weight:750}.connection{margin-top:3px;color:#10B981;font-size:10px}.messages{flex:1;overflow:auto;padding:20px 16px;background:#FAF9FF}.row{display:flex;margin:9px 0}.row.mine{justify-content:flex-end}.bubble{max-width:78%;padding:11px 13px;border-radius:16px 16px 16px 5px;background:#fff;border:1px solid var(--line);font-size:13px;line-height:1.45;box-shadow:0 3px 12px #1e144609}.mine .bubble{border:0;border-radius:16px 16px 5px 16px;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff}.time{display:block;margin-top:4px;color:#aaa;font-size:9px}.mine .time{color:#e6dcff}.composer{display:flex;gap:8px;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}.composer input{min-width:0;flex:1;height:44px;padding:0 13px;border:1px solid var(--line);border-radius:14px;font:13px Inter;outline:0}.composer input:focus{border-color:var(--p)}.send{width:76px;border:0;border-radius:13px;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;font-weight:750;cursor:pointer}
+    :root{--purple:#6D45F5;--purple-dark:#6938D9;--ink:#171717;--muted:#85828f;--line:#eceaf2;--soft:#f3eeff;--page:#f7f5ff}
+    *{box-sizing:border-box}
+    body{min-height:100vh;margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    .app{display:flex;flex-direction:column;width:100%;max-width:480px;height:100dvh;min-height:440px;margin:auto;background:#fff;box-shadow:0 0 36px #33245c0c}
+    .head{position:relative;z-index:2;display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line);background:#ffffffed;backdrop-filter:blur(12px)}
+    .back{display:grid;place-items:center;flex:none;width:38px;height:38px;border:1px solid var(--line);border-radius:13px;color:var(--ink);text-decoration:none;font-size:23px}
+    .avatar{position:relative;display:grid;flex:none;place-items:center;width:44px;height:44px;border:1px solid #e5dcff;border-radius:16px;background:linear-gradient(145deg,#f3eeff,#e9e1ff);color:var(--purple);font-weight:800}
+    .avatar:after{position:absolute;right:-1px;bottom:0;width:10px;height:10px;border:2px solid #fff;border-radius:50%;background:#18b77a;content:""}
+    .head-copy{min-width:0;flex:1}
+    .person{overflow:hidden;font-size:13px;font-weight:750;text-overflow:ellipsis;white-space:nowrap}
+    .connection{display:flex;align-items:center;gap:5px;margin-top:4px;color:#16865b;font-size:10px;font-weight:600}
+    .status-dot{width:6px;height:6px;border-radius:50%;background:#18b77a}
+    .head-action{display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:12px;background:#f6f3ff;color:var(--purple);font-size:19px}
+    .conversation-label{padding:11px 14px;background:#fff;text-align:center}
+    .conversation-label span{padding:6px 10px;border-radius:999px;background:#f6f4fa;color:#928e9b;font-size:9px;font-weight:600}
+    .messages{flex:1;overflow:auto;padding:13px 15px 20px;background:radial-gradient(ellipse at top,#fbfaff 0%,#f8f6ff 60%,#f7f5ff 100%);scroll-behavior:smooth}
+    .empty-state{padding:30px 20px;color:var(--muted);font-size:12px;line-height:1.6;text-align:center}
+    .empty-icon{display:grid;place-items:center;width:54px;height:54px;margin:0 auto 11px;border-radius:18px;background:#eee8ff;color:var(--purple);font-size:24px}
+    .row{display:flex;margin:8px 0}
+    .row.mine{justify-content:flex-end}
+    .bubble{max-width:min(82%,330px);padding:10px 12px 8px;border:1px solid #eeecf3;border-radius:17px 17px 17px 5px;background:#fff;box-shadow:0 3px 12px #1e144609;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+    .mine .bubble{border-color:transparent;border-radius:17px 17px 5px 17px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff}
+    .bubble-content{white-space:pre-wrap}
+    .bubble-image{display:block;width:auto;max-width:100%;max-height:280px;margin:0 0 7px;border-radius:12px;object-fit:cover}
+    .time{display:block;margin-top:5px;color:#aaa6b2;font-size:9px}
+    .mine .time{color:#e6dcff}
+    .composer-wrap{position:relative;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}
+    .attachment-preview{display:none;align-items:center;gap:10px;margin:0 2px 9px;padding:8px;border:1px solid var(--line);border-radius:13px;background:#fbfaff}
+    .attachment-preview.visible{display:flex}
+    .attachment-preview img{width:48px;height:48px;border-radius:9px;object-fit:cover}
+    .attachment-name{min-width:0;flex:1;overflow:hidden;color:#686472;font-size:10px;text-overflow:ellipsis;white-space:nowrap}
+    .remove-image{width:28px;height:28px;border:0;border-radius:9px;background:#f0edf5;color:#625d6c;font-size:17px}
+    .composer{display:flex;align-items:flex-end;gap:7px;padding:6px;border:1px solid #e9e6f0;border-radius:19px;background:#fbfaff;transition:border-color .18s,box-shadow .18s}
+    .composer:focus-within{border-color:#c9b9ff;box-shadow:0 0 0 3px #6d45f511}
+    .tool{display:grid;flex:none;place-items:center;width:36px;height:36px;border:0;border-radius:13px;background:transparent;color:#777282;font-size:20px;cursor:pointer}
+    .tool:hover{background:#f0ebff;color:var(--purple)}
+    .composer textarea{min-width:0;max-height:100px;flex:1;resize:none;padding:9px 3px;border:0;outline:0;background:transparent;color:var(--ink);font:12px/1.4 Inter,system-ui,sans-serif}
+    .composer textarea::placeholder{color:#a19dab}
+    .send{display:grid;flex:none;place-items:center;width:38px;height:38px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;box-shadow:0 4px 10px #6d45f53d;cursor:pointer}
+    .send:disabled{opacity:.55;cursor:wait}
+    .emoji-picker{position:absolute;right:54px;bottom:calc(100% + 7px);z-index:5;display:none;width:min(290px,calc(100vw - 40px));padding:11px;border:1px solid var(--line);border-radius:17px;background:#fff;box-shadow:0 12px 35px #24164a24}
+    .emoji-picker.open{display:block}
+    .emoji-title{margin:0 0 8px 3px;color:var(--muted);font-size:10px;font-weight:700}
+    .emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px}
+    .emoji{height:32px;border:0;border-radius:9px;background:transparent;font-size:19px;cursor:pointer}
+    .emoji:hover{background:var(--soft)}
+    .send-error{display:none;margin:0 3px 7px;color:#b42318;font-size:10px}
+    .send-error.visible{display:block}
+    .file-input{display:none}
+    @media(min-width:600px){body{padding:18px 0}.app{height:calc(100dvh - 36px);min-height:500px;border:1px solid #efedf4;border-radius:24px;overflow:hidden}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
   </style>
 </head>
-<body><main class="app"><header class="head"><a class="back" href="{% url 'chat_home' %}" aria-label="Back">←</a><div class="avatar">{{ other.first_name|default:other.email|slice:":1"|upper }}</div><div><div class="person">{{ other.get_full_name|default:other.email }}</div><div class="connection">Connected</div></div></header>
-<section class="messages" id="messages">{% for message in messages %}<div class="row {% if message.sender_id == request.user.id %}mine{% endif %}"><div class="bubble">{{ message.content|linebreaksbr }}<span class="time">{{ message.created_at|date:"g:i A" }}</span></div></div>{% empty %}<div style="text-align:center;color:#737373;font-size:12px;padding:35px 10px">Start the conversation with {{ other.first_name|default:"your connection" }}.</div>{% endfor %}</section>
-<form class="composer" method="post">{% csrf_token %}<input name="content" maxlength="2000" placeholder="Write a message..." autocomplete="off" required><button class="send" type="submit">Send</button></form>
-</main><script>const messages=document.getElementById('messages');messages.scrollTop=messages.scrollHeight;</script></body></html>
+<body>
+  <main class="app">
+    <header class="head">
+      <a class="back" href="{% url 'chat_home' %}" aria-label="Back to conversations">‹</a>
+      <div class="avatar" aria-hidden="true">{{ other.first_name|default:other.email|slice:":1"|upper }}</div>
+      <div class="head-copy">
+        <div class="person">{{ other.get_full_name|default:other.email }}</div>
+        <div class="connection"><span class="status-dot"></span><span id="chat-status">Connected · Live chat</span></div>
+      </div>
+      <div class="head-action" aria-hidden="true">✦</div>
+    </header>
+    <div class="conversation-label"><span>CONNECTED ON CAMPUS CONNECT</span></div>
+    <section class="messages" id="messages" aria-label="Messages">
+      {% for message in messages %}
+        <div class="row {% if message.sender_id == request.user.id %}mine{% endif %}" data-message-id="{{ message.id }}">
+          <div class="bubble">
+            {% if message.image %}<img class="bubble-image" src="{% url 'chat_message_image' message.id %}" alt="Photo shared in chat">{% endif %}
+            {% if message.content %}<div class="bubble-content">{{ message.content }}</div>{% endif %}
+            <span class="time">{{ message.created_at|date:"g:i A" }}</span>
+          </div>
+        </div>
+      {% empty %}
+        <div class="empty-state" id="empty-state"><div class="empty-icon">✦</div><strong>Say hello!</strong><br>Share a message, an emoji, or a campus moment.</div>
+      {% endfor %}
+    </section>
+    <div class="composer-wrap">
+      <div class="emoji-picker" id="emoji-picker" aria-label="Choose an emoji">
+        <p class="emoji-title">Pick an emoji</p>
+        <div class="emoji-grid">
+          {% for emoji in chat_emojis %}<button class="emoji" type="button">{{ emoji }}</button>{% endfor %}
+        </div>
+      </div>
+      <div class="attachment-preview" id="attachment-preview"><img id="preview-image" alt="Selected image preview"><span class="attachment-name" id="attachment-name"></span><button class="remove-image" id="remove-image" type="button" aria-label="Remove photo">×</button></div>
+      <p class="send-error" id="send-error" role="alert"></p>
+      <form class="composer" id="composer" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input class="file-input" id="image-input" type="file" accept="image/jpeg,image/png,image/webp">
+        <button class="tool" id="photo-button" type="button" aria-label="Share a photo">＋</button>
+        <button class="tool" id="emoji-button" type="button" aria-label="Choose an emoji" aria-expanded="false">☺</button>
+        <textarea id="message-input" name="content" maxlength="2000" rows="1" placeholder="Write a message..." aria-label="Write a message"></textarea>
+        <button class="send" id="send-button" type="submit" aria-label="Send message">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        </button>
+      </form>
+    </div>
+  </main>
+  <script>
+    const messageList = document.getElementById('messages');
+    const chatStatus = document.getElementById('chat-status');
+    const messagesUrl = "{% url 'chat_messages' other.id %}";
+    const sendUrl = "{% url 'chat_send_message' other.id %}";
+    const form = document.getElementById('composer');
+    const textInput = document.getElementById('message-input');
+    const imageInput = document.getElementById('image-input');
+    const sendButton = document.getElementById('send-button');
+    const errorMessage = document.getElementById('send-error');
+    const emojiPicker = document.getElementById('emoji-picker');
+    const emojiButton = document.getElementById('emoji-button');
+    const preview = document.getElementById('attachment-preview');
+    const previewImage = document.getElementById('preview-image');
+    const attachmentName = document.getElementById('attachment-name');
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    let previewUrl = null;
+
+    function formatTime(value) {
+      return new Date(value).toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
+    }
+
+    function appendMessage(message) {
+      if (messageList.querySelector(`[data-message-id="${message.id}"]`)) return;
+      const wasNearBottom = messageList.scrollHeight - messageList.scrollTop - messageList.clientHeight < 100;
+      const emptyState = document.getElementById('empty-state');
+      if (emptyState) emptyState.remove();
+
+      const row = document.createElement('div');
+      row.className = `row${message.is_mine ? ' mine' : ''}`;
+      row.dataset.messageId = message.id;
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      if (message.image_url) {
+        const image = document.createElement('img');
+        image.className = 'bubble-image';
+        image.src = message.image_url;
+        image.alt = 'Photo shared in chat';
+        bubble.appendChild(image);
+      }
+      if (message.content) {
+        const content = document.createElement('div');
+        content.className = 'bubble-content';
+        content.textContent = message.content;
+        bubble.appendChild(content);
+      }
+      const time = document.createElement('span');
+      time.className = 'time';
+      time.textContent = formatTime(message.created_at);
+      bubble.appendChild(time);
+      row.appendChild(bubble);
+      messageList.appendChild(row);
+      if (wasNearBottom) messageList.scrollTop = messageList.scrollHeight;
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('visible');
+    }
+
+    function clearImage() {
+      imageInput.value = '';
+      preview.classList.remove('visible');
+      previewImage.removeAttribute('src');
+      attachmentName.textContent = '';
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      previewUrl = null;
+    }
+
+    imageInput.addEventListener('change', () => {
+      const image = imageInput.files[0];
+      if (!image) return;
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      previewUrl = URL.createObjectURL(image);
+      previewImage.src = previewUrl;
+      attachmentName.textContent = image.name;
+      preview.classList.add('visible');
+      errorMessage.classList.remove('visible');
+      textInput.focus();
+    });
+
+    document.getElementById('photo-button').addEventListener('click', () => imageInput.click());
+    document.getElementById('remove-image').addEventListener('click', clearImage);
+    emojiButton.addEventListener('click', () => {
+      const isOpen = emojiPicker.classList.toggle('open');
+      emojiButton.setAttribute('aria-expanded', String(isOpen));
+    });
+    emojiPicker.querySelectorAll('.emoji').forEach(button => button.addEventListener('click', () => {
+      const start = textInput.selectionStart;
+      const end = textInput.selectionEnd;
+      textInput.setRangeText(button.textContent, start, end, 'end');
+      textInput.focus();
+      emojiPicker.classList.remove('open');
+      emojiButton.setAttribute('aria-expanded', 'false');
+    }));
+    document.addEventListener('click', event => {
+      if (!emojiPicker.contains(event.target) && !emojiButton.contains(event.target)) {
+        emojiPicker.classList.remove('open');
+        emojiButton.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const content = textInput.value.trim();
+      const image = imageInput.files[0];
+      if (!content && !image) return;
+
+      const payload = new FormData();
+      payload.append('content', content);
+      if (image) payload.append('image', image);
+      sendButton.disabled = true;
+      errorMessage.classList.remove('visible');
+      try {
+        const response = await fetch(sendUrl, {
+          method: 'POST',
+          headers: {'X-CSRFToken': csrfToken},
+          body: payload,
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Unable to send your message.');
+        appendMessage({...data, is_mine: true});
+        textInput.value = '';
+        textInput.style.height = '';
+        clearImage();
+        messageList.scrollTop = messageList.scrollHeight;
+      } catch (error) {
+        showError(error.message || 'Unable to send your message. Please try again.');
+      } finally {
+        sendButton.disabled = false;
+        textInput.focus();
+      }
+    });
+
+    textInput.addEventListener('input', () => {
+      textInput.style.height = 'auto';
+      textInput.style.height = `${Math.min(textInput.scrollHeight, 100)}px`;
+    });
+    textInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        form.requestSubmit();
+      }
+    });
+
+    async function pollMessages() {
+      try {
+        const rows = messageList.querySelectorAll('.row[data-message-id]');
+        const lastRow = rows[rows.length - 1];
+        const url = new URL(messagesUrl, window.location.origin);
+        if (lastRow) url.searchParams.set('after', lastRow.dataset.messageId);
+        const response = await fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}});
+        if (!response.ok) throw new Error(`Message update failed (${response.status}).`);
+        const data = await response.json();
+        data.messages.forEach(appendMessage);
+        chatStatus.textContent = 'Connected · Live chat';
+      } catch (error) {
+        chatStatus.textContent = 'Reconnecting…';
+        console.error(error);
+      } finally {
+        window.setTimeout(pollMessages, 2000);
+      }
+    }
+
+    messageList.scrollTop = messageList.scrollHeight;
+    window.setTimeout(pollMessages, 2000);
+  </script>
+</body>
+</html>

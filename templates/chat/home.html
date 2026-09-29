@@ -1,13 +1,144 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Chat — Campus Connect AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{--p:#7C4DFF;--pd:#6F42E8;--soft:#F1EBFF;--ink:#171717;--muted:#737373;--line:#ECECF2}
-    *{box-sizing:border-box}body{margin:0;background:#FAF9FF;color:var(--ink);font-family:Inter,system-ui,sans-serif}.app{max-width:430px;min-height:100dvh;margin:auto;background:#fff;padding:20px 18px 105px}.top{display:flex;align-items:center;gap:14px}.back{font-size:24px;color:var(--ink);text-decoration:none}.top strong{font-size:18px}h1{margin:30px 0 5px;font-size:25px;letter-spacing:-.5px}.intro{margin:0 0 22px;color:var(--muted);font-size:12px}.contact{display:flex;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink)}.avatar{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;background:var(--soft);color:var(--p);font-weight:800}.name{font-weight:750;font-size:14px}.last{margin-top:4px;color:var(--muted);font-size:11px}.empty{padding:35px 8px;color:var(--muted);font-size:13px;line-height:1.5}
+    :root{--purple:#6D45F5;--purple-dark:#6938D9;--ink:#171717;--muted:#85828f;--line:#eceaf2;--soft:#f3eeff;--page:#f7f5ff}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100vh;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    .app-shell{width:100%;max-width:430px;min-height:100dvh;margin:auto;padding-bottom:calc(98px + env(safe-area-inset-bottom));background:#fff}
+    .hero{position:relative;overflow:hidden;padding:22px 20px 25px;color:#fff;background:linear-gradient(135deg,#7547f5,#6938d9);border-radius:0 0 28px 28px;box-shadow:0 12px 28px #6d45f53b}
+    .hero:after{position:absolute;right:-55px;bottom:-120px;width:230px;height:230px;border:1px solid #ffffff2e;border-radius:50%;content:""}
+    .hero-top,.hero-main{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
+    .back{display:grid;place-items:center;width:40px;height:40px;border:1px solid #ffffff38;border-radius:14px;background:#ffffff1c;color:#fff;text-decoration:none;font-size:26px;line-height:1}
+    .brand{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;opacity:.82}
+    .hero-main{align-items:flex-end;margin-top:24px}
+    .hero-copy h1{font-size:29px;font-weight:800;letter-spacing:-.8px}
+    .hero-copy p{max-width:240px;margin-top:6px;color:#ffffffd9;font-size:12px;line-height:1.5}
+    .unread-pill{padding:8px 10px;border:1px solid #ffffff3d;border-radius:999px;background:#ffffff1c;font-size:10px;font-weight:700;white-space:nowrap}
+    .content{padding:20px 20px 0}
+    .search{display:flex;align-items:center;gap:10px;height:46px;padding:0 13px;border:1px solid #eeecf3;border-radius:15px;background:#f7f6fa;color:#9995a3}
+    .search svg{width:18px;height:18px;flex:none}
+    .search input{width:100%;border:0;outline:0;background:transparent;color:var(--ink);font:12px Inter,system-ui,sans-serif}
+    .search input::placeholder{color:#9995a3}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin:23px 0 12px}
+    .section-head h2{font-size:16px;letter-spacing:-.25px}
+    .section-head span{color:var(--muted);font-size:10px}
+    .filters{display:flex;gap:8px;margin-bottom:10px}
+    .filter{padding:8px 13px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#777481;font:600 10px Inter,system-ui,sans-serif;cursor:pointer}
+    .filter.active{border-color:var(--purple);background:var(--purple);color:#fff;box-shadow:0 5px 12px #6d45f52e}
+    .contact-list{display:grid}
+    .contact{display:flex;align-items:center;gap:12px;min-width:0;padding:13px 0;border-bottom:1px solid #f0eef4;color:inherit;text-decoration:none;transition:background .15s}
+    .contact:hover{background:#fcfbff}
+    .avatar{position:relative;display:grid;flex:none;place-items:center;width:52px;height:52px;border:1px solid #e5dcff;border-radius:18px;background:linear-gradient(145deg,#f3eeff,#e9e1ff);color:var(--purple);font-size:16px;font-weight:800}
+    .avatar:after{position:absolute;right:-1px;bottom:0;width:11px;height:11px;border:2px solid #fff;border-radius:50%;background:#18b77a;content:""}
+    .contact-copy{min-width:0;flex:1}
+    .contact-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .name{overflow:hidden;font-size:13px;font-weight:700;text-overflow:ellipsis;white-space:nowrap}
+    .time{flex:none;color:#a09daa;font-size:9px}
+    .last{overflow:hidden;margin-top:5px;color:#85828f;font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+    .last.unread{color:#393542;font-weight:600}
+    .contact-side{display:flex;flex:none;align-items:flex-end;flex-direction:column;gap:7px}
+    .unread-count{display:grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--purple);color:#fff;font-size:9px;font-weight:700}
+    .empty-state{margin-top:16px;padding:34px 22px;border:1px dashed #dcd5ef;border-radius:20px;background:#fcfaff;text-align:center}
+    .empty-icon{display:grid;place-items:center;width:58px;height:58px;margin:0 auto 14px;border-radius:19px;background:var(--soft);color:var(--purple);font-size:25px}
+    .empty-state h2{font-size:15px}
+    .empty-state p{margin-top:7px;color:var(--muted);font-size:11px;line-height:1.6}
+    .discover{display:inline-flex;align-items:center;justify-content:center;margin-top:16px;padding:10px 15px;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;text-decoration:none;font-size:11px;font-weight:700}
+    .no-results{display:none;padding:24px 10px;color:var(--muted);font-size:12px;text-align:center}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
   </style>
 </head>
-<body><main class="app"><div class="top"><a class="back" href="{% url 'home' %}" aria-label="Back">←</a><strong>Chat</strong></div><h1>Your conversations</h1><p class="intro">Message your accepted connections.</p>
-{% for contact in contacts %}<a class="contact" href="{% url 'chat_conversation' contact.id %}"><div class="avatar">{{ contact.first_name|default:contact.email|slice:":1"|upper }}</div><div><div class="name">{{ contact.get_full_name|default:contact.email }}</div><div class="last">Open conversation</div></div></a>{% empty %}<p class="empty">No conversations yet. Accept a connection request to start chatting.</p>{% endfor %}
-</main>{% include 'includes/bottom_nav.html' with active_nav='chat' %}</body></html>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <div class="hero-top">
+        <a class="back" href="{% url 'home' %}" aria-label="Back to home">‹</a>
+        <span class="brand">Campus Connect</span>
+        <span class="unread-pill" aria-label="Unread messages">{{ unread_count }} unread</span>
+      </div>
+      <div class="hero-main">
+        <div class="hero-copy">
+          <h1>Messages</h1>
+          <p>Stay close to your campus connections and keep the conversation going.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="content" aria-label="Conversations">
+      {% if contacts %}
+        <label class="search" for="conversation-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input id="conversation-search" type="search" placeholder="Search your connections" autocomplete="off">
+        </label>
+        <div class="section-head"><h2>Your conversations</h2><span>{{ contacts|length }} connection{{ contacts|length|pluralize }}</span></div>
+        <div class="filters" role="tablist" aria-label="Filter conversations">
+          <button class="filter active" type="button" data-filter="all" aria-selected="true">All</button>
+          <button class="filter" type="button" data-filter="unread" aria-selected="false">Unread</button>
+        </div>
+        <div class="contact-list" id="contact-list">
+          {% for contact in contacts %}
+            <a class="contact" href="{% url 'chat_conversation' contact.id %}" data-name="{{ contact.get_full_name|default:contact.email|lower }}" data-unread="{% if contact.unread_count %}true{% else %}false{% endif %}">
+              <div class="avatar" aria-hidden="true">{{ contact.first_name|default:contact.email|slice:":1"|upper }}</div>
+              <div class="contact-copy">
+                <div class="contact-top">
+                  <span class="name">{{ contact.get_full_name|default:contact.email }}</span>
+                  {% if contact.latest_message %}<time class="time">{{ contact.latest_message.created_at|date:"g:i A" }}</time>{% endif %}
+                </div>
+                <div class="last{% if contact.unread_count %} unread{% endif %}">{% if contact.latest_message %}{% if contact.latest_message.sender_id == request.user.id %}You: {% endif %}{{ contact.latest_message.content|truncatechars:55 }}{% else %}Start a conversation{% endif %}</div>
+              </div>
+              {% if contact.unread_count %}<div class="contact-side"><span class="unread-count">{{ contact.unread_count }}</span></div>{% endif %}
+            </a>
+          {% endfor %}
+        </div>
+        <p class="no-results" id="no-results">No conversations match your search.</p>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon" aria-hidden="true">✦</div>
+          <h2>Your campus conversations start here</h2>
+          <p>Connect with students who share your interests and study goals. Once a connection is accepted, you can message each other here.</p>
+          <a class="discover" href="/matches/explore/">Discover students <span aria-hidden="true">&nbsp;→</span></a>
+        </div>
+      {% endif %}
+    </section>
+  </main>
+  {% include 'includes/bottom_nav.html' with active_nav='chat' %}
+  {% if contacts %}
+    <script>
+      const searchInput = document.getElementById('conversation-search');
+      const contactRows = Array.from(document.querySelectorAll('.contact'));
+      const filterButtons = Array.from(document.querySelectorAll('.filter'));
+      const noResults = document.getElementById('no-results');
+      let activeFilter = 'all';
+
+      function filterConversations() {
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+        contactRows.forEach(row => {
+          const matchesSearch = row.dataset.name.includes(query);
+          const matchesFilter = activeFilter === 'all' || row.dataset.unread === 'true';
+          const visible = matchesSearch && matchesFilter;
+          row.hidden = !visible;
+          if (visible) visibleCount += 1;
+        });
+        noResults.style.display = visibleCount ? 'none' : 'block';
+      }
+
+      searchInput.addEventListener('input', filterConversations);
+      filterButtons.forEach(button => button.addEventListener('click', () => {
+        activeFilter = button.dataset.filter;
+        filterButtons.forEach(option => {
+          const selected = option === button;
+          option.classList.toggle('active', selected);
+          option.setAttribute('aria-selected', String(selected));
+        });
+        filterConversations();
+      }));
+    </script>
+  {% endif %}
+</body>
+</html>

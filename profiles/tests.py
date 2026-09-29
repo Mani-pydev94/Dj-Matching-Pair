@@ -118,6 +118,18 @@ class ProfileAPITests(TestCase):
         response = self.client.get(f'/api/students/{self.other.id}/profile/')
         self.assertIn('bio', response.data)
 
+    def test_private_student_profile_hides_name_until_connection(self):
+        self.client.force_login(self.user)
+        response = self.client.get(f'/profiles/{self.other.id}/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '??? ???')
+        self.assertNotContains(response, 'Other Student')
+        self.assertNotContains(response, 'other@example.com')
+
+        Connection.objects.create(requester=self.user, recipient=self.other, status='ACCEPTED')
+        response = self.client.get(f'/profiles/{self.other.id}/')
+        self.assertContains(response, 'Other Student')
+
 
 class ProfileSetupTests(TestCase):
     def setUp(self):

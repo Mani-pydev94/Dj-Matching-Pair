@@ -99,6 +99,11 @@ def student_profile(request, user_id):
 
     return render(request, 'profiles/student_profile.html', {
         'student': student,
+        'display_name': (
+            '??? ???'
+            if student != request.user and not is_connected
+            else student.get_full_name() or student.email
+        ),
         'profile': visible_profile,
         'match': match,
         'insight': insight,

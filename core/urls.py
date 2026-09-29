@@ -30,17 +30,17 @@ def home_view(request):
                     ranked.append((candidate, breakdown))
             from connections.models import Connection
             connected_ids = set(Connection.objects.filter(
-                Q(requester=request.user, status='ACCEPTED') |
-                Q(recipient=request.user, status='ACCEPTED'),
+                Q(requester=request.user, status__in=('ACCEPTED', 'CONNECTED')) |
+                Q(recipient=request.user, status__in=('ACCEPTED', 'CONNECTED')),
             ).values_list('requester_id', flat=True))
             connected_ids.update(Connection.objects.filter(
-                Q(requester=request.user, status='ACCEPTED') |
-                Q(recipient=request.user, status='ACCEPTED'),
+                Q(requester=request.user, status__in=('ACCEPTED', 'CONNECTED')) |
+                Q(recipient=request.user, status__in=('ACCEPTED', 'CONNECTED')),
             ).values_list('recipient_id', flat=True))
             top_matches = []
             for candidate, breakdown in sorted(
                 ranked, key=lambda item: item[1]['overall_score'], reverse=True
-            )[:5]:
+            ):
                 connected = candidate.id in connected_ids
                 top_matches.append({
                     'id': candidate.id,

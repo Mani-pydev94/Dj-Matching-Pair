@@ -1,8 +1,219 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Compatibility Profile</title><style>
-body{margin:0;background:#faf9ff;color:#171717;font-family:Inter,system-ui,sans-serif}.app{max-width:430px;min-height:100dvh;margin:auto;background:#fff;padding:22px 20px;box-sizing:border-box}.top{display:flex;justify-content:space-between;align-items:center}.back{font-size:24px;color:#171717;text-decoration:none}h1{font-size:24px;margin:28px 0 6px}.sub{font-size:13px;color:#737373}.progress{margin:20px 0;height:8px;background:#eeeaf8;border-radius:99px;overflow:hidden}.fill{height:100%;width:0;background:#7547f5}.card{display:block;text-decoration:none;color:#171717;border:1px solid #ececf2;border-radius:17px;padding:16px;margin:10px 0;box-shadow:0 5px 18px #1e14460b}.card strong{display:block;font-size:14px}.card small{color:#737373;display:block;margin-top:6px;font-size:11px}.btn{display:block;text-align:center;margin-top:20px;height:48px;line-height:48px;border-radius:13px;background:linear-gradient(135deg,#7547f5,#6a3fe8);color:#fff;text-decoration:none;font-weight:700;font-size:14px}</style></head><body><main class="app"><div class="top"><a class="back" href="{% url 'questionnaire_intro' %}">←</a><span>Compatibility Profile</span><span>0%</span></div><h1>Your Compatibility Profile</h1><p class="sub">Your answers help us find the right students for you.</p><div class="progress"><div class="fill"></div></div><div id="categories"><p class="sub">Loading your categories...</p></div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Your compatibility profile — Campus Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--purple:#6D45F5;--purple-dark:#6938D9;--ink:#171717;--muted:#85828f;--line:#eceaf2;--soft:#f3eeff;--page:#f7f5ff;--green:#16865b}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100vh;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    .app-shell{position:relative;width:100%;max-width:430px;min-height:100dvh;margin:auto;padding-bottom:calc(160px + env(safe-area-inset-bottom));background:#fff}
+    .hero{position:relative;overflow:hidden;padding:19px 20px 26px;border-radius:0 0 28px 28px;background:linear-gradient(135deg,#7547f5,#6938d9);color:#fff;box-shadow:0 12px 28px #6d45f53b}
+    .hero:after{position:absolute;right:-62px;bottom:-115px;width:230px;height:230px;border:1px solid #ffffff2e;border-radius:50%;content:""}
+    .top,.hero-main{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
+    .back{display:grid;place-items:center;width:40px;height:40px;border:1px solid #ffffff38;border-radius:14px;background:#ffffff1c;color:#fff;text-decoration:none;font-size:25px;line-height:1}
+    .brand{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;opacity:.82}
+    .hero-main{align-items:flex-end;margin-top:22px}
+    .hero-copy{max-width:270px}
+    .eyebrow{font-size:9px;font-weight:700;letter-spacing:1px;opacity:.77}
+    h1{margin-top:5px;font-size:25px;font-weight:800;letter-spacing:-.7px}
+    .hero-copy p{margin-top:7px;color:#ffffffd9;font-size:11px;line-height:1.5}
+    .progress-ring{display:grid;flex:none;place-items:center;width:62px;height:62px;border:1px solid #ffffff50;border-radius:20px;background:#ffffff1c;text-align:center}
+    .progress-ring strong{display:block;font-size:17px;line-height:1.1}
+    .progress-ring span{display:block;margin-top:3px;font-size:8px;opacity:.8}
+    .content{padding:20px 20px 0}
+    .section-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
+    .section-head h2{font-size:15px;letter-spacing:-.2px}
+    .section-head p{margin-top:4px;color:var(--muted);font-size:10px}
+    .answered-summary{color:var(--purple);font-size:10px;font-weight:700;white-space:nowrap}
+    .category-list{display:grid;gap:9px}
+    .category-card{display:flex;align-items:center;gap:12px;min-height:76px;padding:12px;border:1px solid var(--line);border-radius:17px;background:#fff;color:inherit;text-decoration:none;box-shadow:0 4px 14px #1e144609;transition:border-color .16s,transform .16s,box-shadow .16s}
+    .category-card:hover{transform:translateY(-1px);border-color:#d9ceff;box-shadow:0 8px 18px #1e144610}
+    .category-icon{display:grid;flex:none;place-items:center;width:44px;height:44px;border-radius:15px;background:var(--soft);font-size:19px}
+    .category-copy{min-width:0;flex:1}
+    .category-title{display:block;overflow:hidden;font-size:12px;font-weight:750;text-overflow:ellipsis;white-space:nowrap}
+    .category-description{display:block;overflow:hidden;margin-top:4px;color:var(--muted);font-size:9px;text-overflow:ellipsis;white-space:nowrap}
+    .category-progress{display:flex;align-items:center;gap:7px;margin-top:8px}
+    .mini-track{height:4px;flex:1;overflow:hidden;border-radius:999px;background:#eeeaf5}
+    .mini-fill{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--purple),var(--purple-dark));transition:width .25s}
+    .category-count{flex:none;color:#777481;font-size:9px;font-weight:600}
+    .category-end{display:grid;flex:none;place-items:center;width:28px;height:28px;border-radius:10px;background:#f8f6fc;color:#9894a1;font-size:15px}
+    .category-card.complete .category-end{background:#eaf8f1;color:var(--green)}
+    .category-card.complete .mini-fill{background:linear-gradient(90deg,#22b77c,#119b68)}
+    .notice{margin-top:13px;padding:12px 13px;border:1px solid #e8e0ff;border-radius:15px;background:#faf8ff;color:#777281;font-size:10px;line-height:1.5}
+    .notice strong{color:#363241}
+    .loading,.error{padding:27px 16px;border:1px dashed #dcd5ef;border-radius:17px;background:#fcfaff;color:var(--muted);font-size:11px;line-height:1.5;text-align:center}
+    .spinner{width:24px;height:24px;margin:0 auto 10px;border:3px solid #e8e1fb;border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .retry{margin-top:10px;padding:8px 13px;border:0;border-radius:10px;background:var(--soft);color:var(--purple);font:700 10px Inter,system-ui,sans-serif;cursor:pointer}
+    .footer{position:fixed;right:0;bottom:calc(66px + env(safe-area-inset-bottom));left:0;z-index:5;max-width:430px;margin:auto;padding:14px 20px 8px;background:linear-gradient(180deg,#ffffff00,#fff 22%)}
+    .continue{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:49px;border-radius:15px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;text-decoration:none;font-size:12px;font-weight:750;box-shadow:0 8px 18px #6d45f53d;transition:transform .16s,box-shadow .16s}
+    .continue:hover{transform:translateY(-1px);box-shadow:0 11px 22px #6d45f54a}
+    .footer-note{margin-top:7px;color:#9995a2;font-size:9px;text-align:center}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <div class="top">
+        <a class="back" href="{% url 'questionnaire_intro' %}" aria-label="Back to introduction">‹</a>
+        <span class="brand">Campus Connect</span>
+        <span aria-hidden="true" style="width:40px"></span>
+      </div>
+      <div class="hero-main">
+        <div class="hero-copy">
+          <span class="eyebrow">YOUR COMPATIBILITY PROFILE</span>
+          <h1>Get to know yourself</h1>
+          <p>Your answers help us find students who share your interests and goals.</p>
+        </div>
+        <div class="progress-ring" aria-label="Questionnaire completion">
+          <div><strong id="overall-percent">0%</strong><span>COMPLETE</span></div>
+        </div>
+      </div>
+    </section>
 
-<a class="btn" href="/questionnaire/questions/">Continue</a></main><script>
-fetch('/api/questionnaire/categories/').then(r=>r.ok?r.json():Promise.reject()).then(data=>{document.getElementById('categories').innerHTML=data.map(c=>`<a class="card" href="/questionnaire/questions/"><strong>${c.name}</strong><small>${c.question_count} Questions · ${c.answered_count||0}/${c.question_count} answered</small></a>`).join('')}).catch(()=>{document.getElementById('categories').innerHTML='<p class="sub">Unable to load categories. Please try again.</p>'});
-</script>
-<br><br><br>
-{% include 'includes/bottom_nav.html' with active_nav='matches' %}</body></html>
+    <section class="content" aria-labelledby="categories-heading">
+      <div class="section-head">
+        <div><h2 id="categories-heading">Your question topics</h2><p>Pick up where you left off</p></div>
+        <span class="answered-summary" id="answered-summary">Loading</span>
+      </div>
+      <div id="categories" class="category-list" aria-live="polite">
+        <div class="loading"><div class="spinner" aria-hidden="true"></div>Loading your questionnaire...</div>
+      </div>
+      <p class="notice"><strong>✨ Built around you.</strong> Your answers are used to understand compatibility and suggest relevant campus connections.</p>
+    </section>
+  </main>
+
+  <div class="footer">
+    <a class="continue" href="{% url 'questionnaire_questions' %}">Continue questionnaire <span aria-hidden="true">→</span></a>
+    <p class="footer-note">Your progress is saved as you answer</p>
+  </div>
+  {% include 'includes/bottom_nav.html' with active_nav='matches' %}
+
+  <script>
+    const categoryList = document.getElementById('categories');
+    const overallPercent = document.getElementById('overall-percent');
+    const answeredSummary = document.getElementById('answered-summary');
+    const categoryIcons = {
+      heart: '💜',
+      'book-open': '📚',
+      'message-circle': '💬',
+      target: '🎯',
+      clock: '⏰',
+      sparkles: '✨',
+    };
+
+    function showError() {
+      categoryList.replaceChildren();
+      const message = document.createElement('div');
+      message.className = 'error';
+      message.textContent = 'We couldn’t load your question topics. Check your connection and try again.';
+      const retry = document.createElement('button');
+      retry.className = 'retry';
+      retry.type = 'button';
+      retry.textContent = 'Try again';
+      retry.addEventListener('click', loadCategories);
+      message.appendChild(document.createElement('br'));
+      message.appendChild(retry);
+      categoryList.appendChild(message);
+      answeredSummary.textContent = 'Unavailable';
+    }
+
+    function renderCategories(categories) {
+      if (!Array.isArray(categories)) throw new Error('Unexpected category response.');
+      const fragment = document.createDocumentFragment();
+      let answeredTotal = 0;
+      let questionTotal = 0;
+
+      categories.forEach(category => {
+        const questionCount = Number(category.question_count) || 0;
+        const answeredCount = Math.min(Number(category.answered_count) || 0, questionCount);
+        const percent = questionCount ? Math.round(answeredCount / questionCount * 100) : 0;
+        answeredTotal += answeredCount;
+        questionTotal += questionCount;
+
+        const link = document.createElement('a');
+        link.className = `category-card${questionCount > 0 && answeredCount >= questionCount ? ' complete' : ''}`;
+        link.href = "{% url 'questionnaire_questions' %}";
+        link.setAttribute('aria-label', `${category.name}: ${answeredCount} of ${questionCount} questions answered`);
+
+        const icon = document.createElement('span');
+        icon.className = 'category-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = categoryIcons[category.icon] || '✦';
+
+        const copy = document.createElement('span');
+        copy.className = 'category-copy';
+        const title = document.createElement('span');
+        title.className = 'category-title';
+        title.textContent = category.name;
+        const description = document.createElement('span');
+        description.className = 'category-description';
+        description.textContent = category.description || 'Questions to help us find your best matches.';
+        const progress = document.createElement('span');
+        progress.className = 'category-progress';
+        const track = document.createElement('span');
+        track.className = 'mini-track';
+        const fill = document.createElement('span');
+        fill.className = 'mini-fill';
+        fill.style.width = `${percent}%`;
+        track.appendChild(fill);
+        const count = document.createElement('span');
+        count.className = 'category-count';
+        count.textContent = `${answeredCount}/${questionCount}`;
+        progress.append(track, count);
+        copy.append(title, description, progress);
+
+        const end = document.createElement('span');
+        end.className = 'category-end';
+        end.setAttribute('aria-hidden', 'true');
+        end.textContent = questionCount > 0 && answeredCount >= questionCount ? '✓' : '›';
+        link.append(icon, copy, end);
+        fragment.appendChild(link);
+      });
+
+      if (!categories.length) {
+        const empty = document.createElement('div');
+        empty.className = 'error';
+        empty.textContent = 'No questionnaire topics are available right now.';
+        fragment.appendChild(empty);
+      }
+
+      categoryList.replaceChildren(fragment);
+      const overall = questionTotal ? Math.round(answeredTotal / questionTotal * 100) : 0;
+      overallPercent.textContent = `${overall}%`;
+      answeredSummary.textContent = `${answeredTotal}/${questionTotal} answered`;
+    }
+
+    async function loadCategories() {
+      categoryList.replaceChildren();
+      const loading = document.createElement('div');
+      loading.className = 'loading';
+      const spinner = document.createElement('div');
+      spinner.className = 'spinner';
+      spinner.setAttribute('aria-hidden', 'true');
+      loading.append(spinner, document.createTextNode('Loading your questionnaire...'));
+      categoryList.appendChild(loading);
+      answeredSummary.textContent = 'Loading';
+
+      try {
+        const response = await fetch('/api/questionnaire/categories/', {
+          credentials: 'same-origin',
+          cache: 'no-store',
+        });
+        if (!response.ok) throw new Error(`Unable to load questionnaire topics (${response.status}).`);
+        renderCategories(await response.json());
+      } catch (error) {
+        console.error(error);
+        showError();
+      }
+    }
+
+    loadCategories();
+  </script>
+</body>
+</html>

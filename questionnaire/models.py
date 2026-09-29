@@ -74,6 +74,7 @@ class QuestionResponse(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='question_responses')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='responses')
     value = models.CharField(max_length=500)
+    other_text = models.CharField(max_length=500, blank=True, default='')
     selected_options = models.ManyToManyField(QuestionOption, blank=True, related_name='responses')
     created_at = models.DateTimeField(auto_now_add=True)
 

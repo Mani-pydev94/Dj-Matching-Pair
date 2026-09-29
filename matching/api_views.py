@@ -52,7 +52,10 @@ class MatchesAPIView(APIView):
             }
             results.append({
                 'user_id': student.id,
-                'display_name': student.get_full_name() or student.email,
+                'display_name': (
+                    student.get_full_name() or student.email
+                    if full_profile else '??? ???'
+                ),
                 # Photos are unlocked only after an accepted connection.
                 'profile_photo': (
                     request.build_absolute_uri(student.profile.photo.url)

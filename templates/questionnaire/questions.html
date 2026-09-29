@@ -15,6 +15,7 @@
     .score-note{margin-bottom:30px;padding:12px 14px;border:1px solid #E8E0FF;border-radius:14px;background:#FCFAFF;color:#6F687E;font-size:11px;line-height:1.5}.score-note strong{color:var(--p)}
     .category{font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--p)}.question{font-size:27px;font-weight:500;line-height:1.28;margin:14px 0 30px;letter-spacing:-.65px}
     .option{display:flex;align-items:center;min-height:58px;border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:12px 0;background:#fff;box-shadow:0 4px 14px rgba(30,20,70,.035);font-size:14px;line-height:1.35;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s}.option:hover{border-color:#D9D0FF;box-shadow:0 6px 18px rgba(30,20,70,.06)}.option.selected{border-color:var(--p);background:var(--soft);color:var(--p);box-shadow:0 4px 14px rgba(109,69,245,.1)}.option input{display:none}
+    .other-description{display:none;width:100%;min-height:90px;margin:8px 0 14px;padding:13px;border:1px solid #D9D0FF;border-radius:14px;background:#FCFAFF;color:var(--ink);font:13px/1.5 Inter,sans-serif;outline:0;resize:vertical}.other-description.visible{display:block}.other-description:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(109,69,245,.09)}.other-hint{display:none;margin:-3px 0 12px;color:var(--muted);font-size:11px}.other-hint.visible{display:block}
     .actions{display:flex;gap:12px;margin-top:48px}.btn{flex:1;height:48px;border:0;border-radius:13px;font:700 14px Inter,sans-serif;cursor:pointer}.next{background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;box-shadow:0 9px 20px rgba(109,69,245,.22)}.backbtn{background:#fff;border:1px solid var(--line);color:var(--ink);box-shadow:0 4px 12px rgba(30,20,70,.03)}.error{color:var(--error);font-size:12px;margin-top:10px}
     @media (min-width:461px){body{padding:18px 0}.app{border-radius:24px;box-shadow:0 10px 40px rgba(30,20,70,.07)}}
   </style>
@@ -24,7 +25,7 @@
     {% csrf_token %}
     <div class="top"><a class="back" href="/questionnaire/hub/" aria-label="Go back">←</a><span id="counter"></span><span id="pct">0%</span></div>
     <div class="bar"><div class="fill" id="fill"></div></div>
-    <div class="score-note"><strong>How this works:</strong> progress shows answered questions. Match scores use category weights: Values 20%, Learning Style 20%, Communication 15%, Career Goals 20%, Lifestyle 10%, and Interests 15%.</div>
+    <div class="score-note"><strong>How this works:</strong> progress shows answered questions. Match scores give equal weight to all six categories, so each contributes one-sixth of the overall score.</div>
     <div id="question"><p>Loading questions...</p></div>
     <div class="actions"><button class="btn backbtn" id="prev" type="button">Back</button><button class="btn next" id="next" type="button">Next</button></div>
     <div class="error" id="error"></div>
@@ -35,14 +36,33 @@
     const qel = document.getElementById('question');
     const error = document.getElementById('error');
 
-    function selectedValues(question) {
+    function answerState(question) {
       const answer = answers[question.id];
-      return Array.isArray(answer) ? answer : answer ? [String(answer)] : [];
+      if (answer && typeof answer === 'object' && !Array.isArray(answer)) {
+        return {
+          selected: answer.selected || [],
+          otherSelected: Boolean(answer.otherSelected),
+          otherText: answer.otherText || '',
+        };
+      }
+      return {
+        selected: Array.isArray(answer) ? answer.map(String) : answer ? [String(answer)] : [],
+        otherSelected: false,
+        otherText: '',
+      };
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+      }[character]));
     }
 
     function render() {
       const question = questions[index];
-      const selected = selectedValues(question);
+      const choiceQuestion = ['SINGLE_CHOICE', 'MULTIPLE_CHOICE'].includes(question.question_type);
+      const answer = answerState(question);
+      const selected = answer.selected;
       document.getElementById('counter').textContent = `Question ${index + 1} of ${questions.length}`;
       document.getElementById('pct').textContent = `${Math.round((index / questions.length) * 100)}%`;
       document.getElementById('fill').style.width = `${(index / questions.length) * 100}%`;
@@ -58,23 +78,50 @@
             <input type="${question.question_type === 'MULTIPLE_CHOICE' ? 'checkbox' : 'radio'}" name="answer" value="${value}" ${isSelected ? 'checked' : ''}>
             ${option.option_text}
           </label>`;
-        }).join('')}`;
+        }).join('')}
+        ${choiceQuestion ? `<label class="option ${answer.otherSelected ? 'selected' : ''}">
+          <input type="${question.question_type === 'MULTIPLE_CHOICE' ? 'checkbox' : 'radio'}" name="answer-other" value="other" ${answer.otherSelected ? 'checked' : ''}>
+          Other
+        </label>
+        <textarea id="other-answer" class="other-description ${answer.otherSelected ? 'visible' : ''}" maxlength="500" placeholder="Tell us a little more..." aria-label="Other answer description">${escapeHtml(answer.otherText)}</textarea>
+        <p class="other-hint ${answer.otherSelected ? 'visible' : ''}">Add a short description to save your Other answer.</p>` : ''}`;
       qel.querySelectorAll('input').forEach(input => {
         input.onchange = () => {
+          const current = answerState(question);
+          if (input.name === 'answer-other') {
+            current.otherSelected = input.checked;
+            if (question.question_type === 'SINGLE_CHOICE' && input.checked) current.selected = [];
+            answers[question.id] = current;
+            render();
+            if (input.checked) document.getElementById('other-answer').focus();
+            return;
+          }
           if (question.question_type === 'MULTIPLE_CHOICE') {
-            const values = selectedValues(question);
-            answers[question.id] = input.checked
-              ? [...new Set([...values, input.value])]
-              : values.filter(value => value !== input.value);
+            current.selected = input.checked
+              ? [...new Set([...current.selected, input.value])]
+              : current.selected.filter(value => value !== input.value);
+            answers[question.id] = current;
             render();
           } else {
-            answers[question.id] = input.value;
+            answers[question.id] = {
+              selected: [input.value],
+              otherSelected: false,
+              otherText: current.otherText,
+            };
             render();
             clearTimeout(autoAdvanceTimer);
             autoAdvanceTimer = setTimeout(() => save(true), 300);
           }
         };
       });
+      const otherInput = document.getElementById('other-answer');
+      if (otherInput) {
+        otherInput.oninput = () => {
+          const current = answerState(question);
+          current.otherText = otherInput.value;
+          answers[question.id] = current;
+        };
+      }
     }
 
     function csrfToken() {
@@ -84,26 +131,54 @@
 
     async function save(autoAdvance) {
       const question = questions[index];
-      const answer = answers[question.id];
-      if (!answer || (Array.isArray(answer) && answer.length === 0)) {
+      const answer = answerState(question);
+      const hasChoice = answer.selected.length > 0;
+      if (question.question_type === 'SCALE' && !answers[question.id]) {
+        error.textContent = 'Please choose an answer to continue.';
+        return false;
+      }
+      if (['SINGLE_CHOICE', 'MULTIPLE_CHOICE'].includes(question.question_type)) {
+        if (!hasChoice && !answer.otherSelected) {
+          error.textContent = 'Please choose an answer to continue.';
+          return false;
+        }
+        if (answer.otherSelected && !answer.otherText.trim()) {
+          error.textContent = 'Please add a description for your Other answer.';
+          document.getElementById('other-answer').focus();
+          return false;
+        }
+      } else if (!answers[question.id] || (Array.isArray(answers[question.id]) && !answers[question.id].length)) {
         error.textContent = 'Please choose an answer to continue.';
         return false;
       }
       if (isSaving) return false;
       isSaving = true;
       error.textContent = '';
-      const payload = question.question_type === 'SCALE'
-        ? {question: question.id, value: answer}
-        : {question: question.id, value: '', selected_option_ids: Array.isArray(answer) ? answer : [answer]};
-      const response = await fetch('/api/questionnaire/responses/', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken()},
-        body: JSON.stringify(payload)
-      });
-      isSaving = false;
-      if (!response.ok) {
-        error.textContent = 'Your answer could not be saved.';
+      try {
+        const rawAnswer = answers[question.id];
+        const payload = question.question_type === 'SCALE'
+          ? {question: question.id, value: rawAnswer}
+          : {
+            question: question.id,
+            value: '',
+            selected_option_ids: answer.selected,
+            other_text: answer.otherSelected ? answer.otherText.trim() : '',
+          };
+        const response = await fetch('/api/questionnaire/responses/', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken()},
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+          const result = await response.json();
+          error.textContent = result.other_text?.[0] || result.selected_option_ids?.[0] || result.detail || 'Your answer could not be saved.';
+          return false;
+        }
+      } catch (saveError) {
+        error.textContent = 'Your answer could not be saved. Check your connection and try again.';
         return false;
+      } finally {
+        isSaving = false;
       }
       if (autoAdvance) await advance();
       return true;
@@ -142,9 +217,19 @@
       if (!Array.isArray(loadedQuestions) || loadedQuestions.length === 0) throw new Error('No active questionnaire questions found.');
       questions = loadedQuestions;
       savedResponses.forEach(response => {
-        answers[response.question] = response.selected_option_ids && response.selected_option_ids.length
-          ? response.selected_option_ids.map(String)
-          : response.value;
+        if (['SINGLE_CHOICE', 'MULTIPLE_CHOICE'].includes(
+          questions.find(question => question.id === response.question)?.question_type
+        )) {
+          answers[response.question] = {
+            selected: (response.selected_option_ids || []).map(String),
+            otherSelected: Boolean(response.other_text),
+            otherText: response.other_text || '',
+          };
+        } else {
+          answers[response.question] = response.selected_option_ids && response.selected_option_ids.length
+            ? response.selected_option_ids.map(String)
+            : response.value;
+        }
       });
       render();
     }).catch(() => {

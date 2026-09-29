@@ -6,7 +6,7 @@ from profiles.models import Profile
 from questionnaire.models import Question, QuestionResponse
 from questionnaire.services import seed_questionnaire_data
 from connections.models import Connection
-from .compatibility import calculate_compatibility
+from .compatibility import CATEGORY_WEIGHTS, calculate_compatibility
 from .services import is_discoverable, score_match
 
 
@@ -27,6 +27,11 @@ class CompatibilityTests(TestCase):
         second = calculate_compatibility(self.a, self.b)
         self.assertEqual(first, second)
         self.assertGreaterEqual(first['overall_score'], 75)
+
+    def test_all_match_categories_have_equal_weight(self):
+        self.assertEqual(len(CATEGORY_WEIGHTS), 6)
+        self.assertEqual(set(CATEGORY_WEIGHTS.values()), {1 / 6})
+        self.assertAlmostEqual(sum(CATEGORY_WEIGHTS.values()), 1)
 
     def test_matches_endpoint_excludes_self(self):
         client = APIClient()
@@ -74,14 +79,22 @@ class CompatibilityTests(TestCase):
         self.assertTrue(is_discoverable(self.a, self.b, breakdown))
 
     def test_matches_do_not_expose_photo_before_connection(self):
+        self.b.first_name = 'Bobby'
+        self.b.last_name = 'Student'
+        self.b.save(update_fields=('first_name', 'last_name'))
         self.client = APIClient()
         self.client.force_authenticate(self.a)
         response = self.client.get('/api/matches/?min_score=0')
         result = next(item for item in response.data['results'] if item['user_id'] == self.b.id)
         self.assertIsNone(result['profile_photo'])
         self.assertEqual(result['connection_status'], 'NONE')
+        self.assertEqual(result['display_name'], '??? ???')
+        self.assertNotIn('Bobby', result['display_name'])
 
     def test_matches_unlock_connected_profiles(self):
+        self.b.first_name = 'Bobby'
+        self.b.last_name = 'Student'
+        self.b.save(update_fields=('first_name', 'last_name'))
         Connection.objects.create(requester=self.a, recipient=self.b, status='ACCEPTED')
         self.b.profile.university = 'ABC University'
         self.b.profile.major = 'Computer Science'
@@ -96,6 +109,63 @@ class CompatibilityTests(TestCase):
         self.assertFalse(result['is_private'])
         self.assertEqual(result['university'], 'ABC University')
         self.assertEqual(result['field_of_study'], 'Computer Science')
+        self.assertEqual(result['display_name'], 'Bobby Student')
+
+    def test_matches_unlock_connected_status_profiles(self):
+        Connection.objects.create(requester=self.a, recipient=self.b, status='CONNECTED')
+
+        self.client = APIClient()
+        self.client.force_authenticate(self.a)
+        response = self.client.get('/api/matches/?min_score=0')
+        result = next(item for item in response.data['results'] if item['user_id'] == self.b.id)
+
+        self.assertEqual(result['connection_status'], 'CONNECTED')
+        self.assertFalse(result['is_private'])
+
+    def test_home_matches_mask_names_until_connection(self):
+        self.b.first_name = 'Bobby'
+        self.b.last_name = 'Student'
+        self.b.save(update_fields=('first_name', 'last_name'))
+
+        self.client = APIClient()
+        self.client.force_login(self.a)
+        response = self.client.get('/home/')
+
+        self.assertContains(response, '??? ???')
+        self.assertNotContains(response, 'Bobby Student')
+        self.assertContains(response, 'avatar-placeholder private-avatar')
+
+        Connection.objects.create(requester=self.a, recipient=self.b, status='ACCEPTED')
+        response = self.client.get('/home/')
+
+        self.assertContains(response, 'Bobby Student')
+
+    def test_home_renders_all_matches_for_horizontal_scrolling(self):
+        candidates = [self.b]
+        for index in range(5):
+            candidate = User.objects.create_user(
+                email=f'candidate{index}@example.com',
+                password='Strong-password-123',
+            )
+            Profile.objects.create(
+                user=candidate,
+                is_public=True,
+                questionnaire_completed=True,
+                interests='AI, Cloud',
+            )
+            for question in Question.objects.filter(is_active=True):
+                QuestionResponse.objects.create(
+                    user=candidate, question=question,
+                ).selected_options.add(question.options.first())
+            candidates.append(candidate)
+
+        self.client = APIClient()
+        self.client.force_login(self.a)
+        response = self.client.get('/home/')
+
+        self.assertEqual(response.status_code, 200)
+        for candidate in candidates:
+            self.assertContains(response, f'/profiles/{candidate.id}/')
 
     def test_same_university_match_is_bidirectional_for_incomplete_questionnaire(self):
         self.b.profile.questionnaire_completed = False
