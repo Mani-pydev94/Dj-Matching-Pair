@@ -7,6 +7,8 @@ from PIL import Image
 from rest_framework.test import APIClient
 
 from accounts.models import User
+from questionnaire.models import Question, QuestionResponse
+from questionnaire.services import seed_questionnaire_data
 from .models import Profile
 from connections.models import Connection
 
@@ -119,16 +121,54 @@ class ProfileAPITests(TestCase):
         self.assertIn('bio', response.data)
 
     def test_private_student_profile_hides_name_until_connection(self):
+        self.other.profile.is_public = True
+        self.other.profile.save(update_fields=('is_public',))
         self.client.force_login(self.user)
         response = self.client.get(f'/profiles/{self.other.id}/')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '??? ???')
+        self.assertContains(response, 'Overall Similarity Score')
         self.assertNotContains(response, 'Other Student')
         self.assertNotContains(response, 'other@example.com')
 
         Connection.objects.create(requester=self.user, recipient=self.other, status='ACCEPTED')
         response = self.client.get(f'/profiles/{self.other.id}/')
         self.assertContains(response, 'Other Student')
+
+    def test_anonymous_profile_shows_only_compatibility_analysis(self):
+        seed_questionnaire_data()
+        question = Question.objects.filter(is_active=True).first()
+        option = question.options.first()
+        QuestionResponse.objects.create(
+            user=self.user,
+            question=question,
+            importance=QuestionResponse.Importance.MOST_IMPORTANT,
+        ).selected_options.add(option)
+        QuestionResponse.objects.create(
+            user=self.other,
+            question=question,
+            importance=QuestionResponse.Importance.MOST_IMPORTANT,
+        ).selected_options.add(option)
+        self.other.profile.is_public = True
+        self.other.profile.university = 'Secret University'
+        self.other.profile.bio = 'Private personal biography'
+        self.other.profile.interests = 'Confidential interest'
+        self.other.profile.save()
+        self.client.force_login(self.user)
+
+        response = self.client.get(f'/profiles/{self.other.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Overall Similarity Score')
+        self.assertContains(response, 'Category-wise Similarity')
+        self.assertContains(response, 'Similarity on Most Important Questions')
+        self.assertContains(response, question.text)
+        self.assertContains(response, 'Connect')
+        self.assertNotContains(response, 'Other Student')
+        self.assertNotContains(response, 'other@example.com')
+        self.assertNotContains(response, 'Secret University')
+        self.assertNotContains(response, 'Private personal biography')
+        self.assertNotContains(response, 'Confidential interest')
+        self.assertNotContains(response, 'profile_photo')
 
 
 class ProfileSetupTests(TestCase):

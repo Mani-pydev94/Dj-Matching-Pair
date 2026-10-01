@@ -6,7 +6,7 @@ from profiles.models import Profile
 from questionnaire.models import Question, QuestionResponse
 from questionnaire.services import seed_questionnaire_data
 from connections.models import Connection
-from .compatibility import CATEGORY_WEIGHTS, calculate_compatibility
+from .compatibility import CATEGORY_WEIGHTS, calculate_compatibility, calculate_compatibility_analysis
 from .services import is_discoverable, score_match
 
 
@@ -27,6 +27,90 @@ class CompatibilityTests(TestCase):
         second = calculate_compatibility(self.a, self.b)
         self.assertEqual(first, second)
         self.assertGreaterEqual(first['overall_score'], 75)
+
+    def test_question_importance_weights_similarity_for_both_users(self):
+        question_a, question_b = list(
+            Question.objects.filter(is_active=True).order_by('category', 'order')[:2]
+        )
+        self.assertEqual(question_a.category, question_b.category)
+        mismatch_b = QuestionResponse.objects.get(user=self.b, question=question_b)
+        different_option = question_b.options.exclude(
+            id=mismatch_b.selected_options.first().id,
+        ).first()
+        mismatch_b.selected_options.set([different_option])
+        mismatch_a = QuestionResponse.objects.get(user=self.a, question=question_b)
+
+        mismatch_a.importance = QuestionResponse.Importance.MOST_IMPORTANT
+        mismatch_b.importance = QuestionResponse.Importance.MOST_IMPORTANT
+        mismatch_a.save(update_fields=('importance',))
+        mismatch_b.save(update_fields=('importance',))
+        high_priority_mismatch = calculate_compatibility(
+            self.a, self.b,
+        )['categories'][question_a.category_ref.slug]
+
+        mismatch_a.importance = QuestionResponse.Importance.NOT_VERY_IMPORTANT
+        mismatch_b.importance = QuestionResponse.Importance.NOT_VERY_IMPORTANT
+        mismatch_a.save(update_fields=('importance',))
+        mismatch_b.save(update_fields=('importance',))
+        low_priority_mismatch = calculate_compatibility(
+            self.a, self.b,
+        )['categories'][question_a.category_ref.slug]
+
+        self.assertGreater(low_priority_mismatch, high_priority_mismatch)
+
+    def test_compatibility_analysis_groups_question_scores_by_average_importance(self):
+        questions = list(Question.objects.filter(is_active=True).order_by('category', 'order')[:2])
+        most_question, least_question = questions
+        for user in (self.a, self.b):
+            QuestionResponse.objects.filter(user=user, question=most_question).update(
+                importance=QuestionResponse.Importance.MOST_IMPORTANT,
+            )
+            QuestionResponse.objects.filter(user=user, question=least_question).update(
+                importance=QuestionResponse.Importance.NOT_VERY_IMPORTANT,
+            )
+
+        analysis = calculate_compatibility_analysis(self.a, self.b)
+
+        self.assertEqual(len(analysis['categories']), 6)
+        self.assertEqual(analysis['most_important_similarity'], 100)
+        self.assertEqual(analysis['most_important_questions'][0]['question'], most_question.text)
+        self.assertEqual(analysis['least_important_similarity'], 100)
+        self.assertEqual(analysis['least_important_questions'][0]['question'], least_question.text)
+        self.assertNotIn('shared_interests', analysis)
+        self.assertNotIn('profile_factors', analysis)
+
+    def test_compatibility_api_returns_anonymous_analysis_not_profile_data(self):
+        question = Question.objects.filter(is_active=True).first()
+        QuestionResponse.objects.filter(
+            user__in=(self.a, self.b),
+            question=question,
+        ).update(importance=QuestionResponse.Importance.MOST_IMPORTANT)
+        client = APIClient()
+        client.force_authenticate(self.a)
+
+        response = client.get(f'/api/matches/{self.b.id}/compatibility/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('overall_score', response.data)
+        self.assertIn('most_important_questions', response.data)
+        self.assertEqual(
+            set(response.data['most_important_questions'][0]),
+            {'question', 'category', 'similarity', 'importance_weight'},
+        )
+        self.assertNotIn('shared_interests', response.data)
+        self.assertNotIn('profile_factors', response.data)
+        self.assertNotIn('display_name', response.data)
+        self.assertNotIn('profile_photo', response.data)
+
+    def test_compatibility_api_does_not_score_private_unconnected_profiles(self):
+        self.b.profile.is_public = False
+        self.b.profile.save(update_fields=('is_public',))
+        client = APIClient()
+        client.force_authenticate(self.a)
+
+        response = client.get(f'/api/matches/{self.b.id}/compatibility/')
+
+        self.assertEqual(response.status_code, 404)
 
     def test_all_match_categories_have_equal_weight(self):
         self.assertEqual(len(CATEGORY_WEIGHTS), 6)

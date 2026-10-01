@@ -34,6 +34,24 @@ class QuestionnaireAPITests(TestCase):
         self.assertContains(response, '/api/questionnaire/categories/')
         self.assertContains(response, 'Continue questionnaire')
 
+    def test_questions_page_shows_importance_choices(self):
+        page_client = Client()
+        page_client.force_login(self.user)
+        response = page_client.get('/questionnaire/questions/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Compatibility Profile')
+        self.assertContains(response, 'How important is this question to you?')
+        self.assertContains(response, 'Very Important')
+        self.assertContains(response, 'Somewhat Important')
+        self.assertContains(response, 'Not Important')
+        self.assertContains(response, 'Next Question')
+        self.assertContains(response, 'aria-label="Main navigation"')
+        self.assertContains(response, '>Home</span>')
+        self.assertContains(response, '>Matches</span>')
+        self.assertContains(response, '>Chat</span>')
+        self.assertContains(response, '>Profile</span>')
+
     def test_seed_is_idempotent(self):
         seed_questionnaire_data()
         self.assertEqual(Question.objects.count(), 12)
@@ -43,13 +61,17 @@ class QuestionnaireAPITests(TestCase):
         payload = {
             'question': str(self.question.id),
             'selected_option_ids': [str(self.option.id)],
+            'importance': 'MOST_IMPORTANT',
         }
         response = self.client.post('/api/questionnaire/responses/', payload, format='json')
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['importance'], 'MOST_IMPORTANT')
         self.assertEqual(QuestionResponse.objects.filter(user=self.user, question=self.question).count(), 1)
         response = self.client.post('/api/questionnaire/responses/', payload, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(QuestionResponse.objects.filter(user=self.user, question=self.question).count(), 1)
+        saved = QuestionResponse.objects.get(user=self.user, question=self.question)
+        self.assertEqual(saved.importance, 'MOST_IMPORTANT')
         progress = self.client.get('/api/questionnaire/progress/')
         self.assertEqual(progress.status_code, 200)
         self.assertEqual(progress.data['answered_questions'], 1)
@@ -59,6 +81,7 @@ class QuestionnaireAPITests(TestCase):
             'question': str(self.question.id),
             'selected_option_ids': [],
             'other_text': 'A custom single-choice answer',
+            'importance': 'NEUTRAL',
         }, format='json')
 
         self.assertEqual(response.status_code, 201)
@@ -69,6 +92,7 @@ class QuestionnaireAPITests(TestCase):
         response = self.client.get('/api/questionnaire/responses/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['other_text'], 'A custom single-choice answer')
+        self.assertEqual(response.data[0]['importance'], 'NEUTRAL')
 
     def test_multiple_choice_saves_regular_and_other_answers(self):
         self.question.question_type = 'MULTIPLE_CHOICE'
@@ -77,12 +101,25 @@ class QuestionnaireAPITests(TestCase):
             'question': str(self.question.id),
             'selected_option_ids': [str(self.option.id)],
             'other_text': 'A custom multiple-choice answer',
+            'importance': 'NOT_VERY_IMPORTANT',
         }, format='json')
 
         self.assertEqual(response.status_code, 201)
         saved = QuestionResponse.objects.get(user=self.user, question=self.question)
         self.assertEqual(saved.other_text, 'A custom multiple-choice answer')
         self.assertEqual(list(saved.selected_options.all()), [self.option])
+        self.assertEqual(saved.importance, 'NOT_VERY_IMPORTANT')
+
+    def test_importance_is_required_and_must_be_a_supported_choice(self):
+        payload = {
+            'question': str(self.question.id),
+            'selected_option_ids': [str(self.option.id)],
+        }
+        response = self.client.post('/api/questionnaire/responses/', payload, format='json')
+        self.assertEqual(response.status_code, 400)
+        payload['importance'] = 'VERY_IMPORTANT'
+        response = self.client.post('/api/questionnaire/responses/', payload, format='json')
+        self.assertEqual(response.status_code, 400)
 
     def test_other_answer_requires_a_description(self):
         for question_type in ('SINGLE_CHOICE', 'MULTIPLE_CHOICE'):
@@ -92,6 +129,7 @@ class QuestionnaireAPITests(TestCase):
                 'question': str(self.question.id),
                 'selected_option_ids': [],
                 'other_text': '   ',
+                'importance': 'NEUTRAL',
             }, format='json')
             self.assertEqual(response.status_code, 400)
 
@@ -101,6 +139,7 @@ class QuestionnaireAPITests(TestCase):
         response = self.client.post('/api/questionnaire/responses/', {
             'question': str(self.question.id),
             'selected_option_ids': [str(other_option.id)],
+            'importance': 'NEUTRAL',
         }, format='json')
         self.assertEqual(response.status_code, 400)
 

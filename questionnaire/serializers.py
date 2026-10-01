@@ -36,6 +36,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ResponseSerializer(serializers.ModelSerializer):
     value = serializers.CharField(required=False, allow_blank=True, default='')
     other_text = serializers.CharField(required=False, allow_blank=True, max_length=500, default='')
+    importance = serializers.ChoiceField(choices=QuestionResponse.Importance.choices)
     selected_option_ids = serializers.PrimaryKeyRelatedField(
         source='selected_options', many=True, queryset=QuestionOption.objects.all(),
         required=False,
@@ -43,7 +44,7 @@ class ResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QuestionResponse
-        fields = ('id', 'question', 'value', 'other_text', 'selected_option_ids', 'created_at')
+        fields = ('id', 'question', 'value', 'other_text', 'importance', 'selected_option_ids', 'created_at')
         read_only_fields = ('id', 'created_at')
 
     def validate(self, attrs):
@@ -90,6 +91,7 @@ class ResponseSerializer(serializers.ModelSerializer):
             defaults={
                 'value': validated_data.get('value', ''),
                 'other_text': validated_data.get('other_text', ''),
+                'importance': validated_data['importance'],
             },
         )
         response.selected_options.set(selected)
@@ -99,7 +101,8 @@ class ResponseSerializer(serializers.ModelSerializer):
         selected = validated_data.pop('selected_options', None)
         instance.value = validated_data.get('value', instance.value)
         instance.other_text = validated_data.get('other_text', instance.other_text)
-        instance.save(update_fields=('value', 'other_text'))
+        instance.importance = validated_data.get('importance', instance.importance)
+        instance.save(update_fields=('value', 'other_text', 'importance'))
         if selected is not None:
             instance.selected_options.set(selected)
         return instance

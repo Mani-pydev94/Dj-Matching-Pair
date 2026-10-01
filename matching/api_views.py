@@ -5,8 +5,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from connections.models import Connection
-from .compatibility import MIN_MATCH_SCORE
+from .compatibility import MIN_MATCH_SCORE, calculate_compatibility_analysis
 from .services import excluded_ids, is_discoverable, score_match
+from profiles.services import can_view_full_profile
 
 User = get_user_model()
 
@@ -81,4 +82,8 @@ class CompatibilityAPIView(APIView):
             return Response({'detail': 'Student not found.'}, status=404)
         if student.id in excluded_ids(request.user):
             return Response({'detail': 'Student not found.'}, status=404)
-        return Response(score_match(request.user, student))
+        if not can_view_full_profile(request.user, student) and (
+            not hasattr(student, 'profile') or not student.profile.is_public
+        ):
+            return Response({'detail': 'Student not found.'}, status=404)
+        return Response(calculate_compatibility_analysis(request.user, student))

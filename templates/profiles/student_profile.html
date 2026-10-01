@@ -3,35 +3,151 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{{ display_name }} — Campus Connect AI</title>
+  <title>{% if is_private_preview %}Compatibility Profile{% else %}{{ display_name }} — Campus Connect AI{% endif %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{--p:#7547F5;--pd:#6A3FE8;--ink:#171717;--muted:#737373;--line:#ECECF2;--soft:#F3EEFF;--page:#FAF9FF}
-    *{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif}.app{max-width:460px;min-height:100dvh;margin:auto;background:#fff;padding-bottom:32px}
-    header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line)}header h1{font-size:16px;margin:0;font-weight:700}.round{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;color:var(--ink);background:#fff;text-decoration:none;font-size:18px}
-    main{padding:24px 20px}.hero{text-align:center;padding:5px 0 24px}.avatar,.placeholder{width:112px;height:112px;border-radius:34px}.avatar{object-fit:cover;border:5px solid #F1ECFF;box-shadow:0 10px 26px #1e144615}.placeholder{display:inline-grid;place-items:center;background:var(--soft);color:var(--p);font-size:36px;font-weight:800}.hero h2{font-size:28px;letter-spacing:-.7px;margin:16px 0 6px}.sub{display:flex;justify-content:center;gap:6px;align-items:center;color:var(--muted);font-size:13px}.tags{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:13px}.tag{padding:7px 10px;border-radius:999px;background:#F8F8FA;color:#5b5b5b;font-size:11px;font-weight:600}.match{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:8px 12px;border-radius:999px;background:var(--soft);color:var(--p);font-size:12px;font-weight:700}
-    .card{border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 5px 18px #1e14460b}.card h3{font-size:15px;margin:0 0 12px}.bio{margin:0;color:#4f4f4f;font-size:13px;line-height:1.65}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{padding:12px;border-radius:13px;background:#FCFCFE}.label{display:block;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}.value{font-size:13px;font-weight:600;line-height:1.35}.insight{border:0;color:#fff;background:linear-gradient(135deg,var(--p),var(--pd));box-shadow:0 12px 25px #7547f536}.insight h3{color:#fff}.insight p{color:#fff;opacity:.9;line-height:1.6;font-size:13px;margin:0}.empty{color:var(--muted);font-size:13px;line-height:1.55;margin:0}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.btn{height:46px;border:0;border-radius:13px;display:grid;place-items:center;text-decoration:none;font-size:13px;font-weight:700;cursor:pointer}.primary{color:#fff;background:linear-gradient(135deg,var(--p),var(--pd));box-shadow:0 8px 18px #7547f52e}.secondary{color:var(--ink);border:1px solid var(--line);background:#fff}.toast{position:fixed;top:18px;right:18px;left:18px;z-index:50;max-width:394px;margin:auto;padding:13px 15px;border-radius:12px;background:#ECFDF3;color:#087443;font-size:12px;font-weight:700;box-shadow:0 8px 24px #14502d29}.toast.error{background:#FEF2F2;color:#B42318}@media (min-width:461px){body{padding:18px 0}.app{border-radius:24px;box-shadow:0 10px 40px #1e144612}}
+    *{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+    .app{max-width:460px;min-height:100dvh;margin:auto;background:#fff;padding-bottom:88px}
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line)}
+    header h1{font-size:16px;margin:0;font-weight:700}.round{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;color:var(--ink);background:#fff;text-decoration:none;font-size:18px}
+    main{padding:24px 20px}.hero{text-align:center;padding:5px 0 24px}.avatar,.placeholder{width:112px;height:112px;border-radius:34px}
+    .avatar{object-fit:cover;border:5px solid #F1ECFF;box-shadow:0 10px 26px #1e144615}
+    .placeholder{display:inline-grid;place-items:center;background:var(--soft);color:var(--p);font-size:36px;font-weight:800}
+    .hero h2{font-size:28px;letter-spacing:-.7px;margin:16px 0 6px}.sub{display:flex;justify-content:center;gap:6px;align-items:center;color:var(--muted);font-size:13px}
+    .tags{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:13px}.tag{padding:7px 10px;border-radius:999px;background:#F8F8FA;color:#5b5b5b;font-size:11px;font-weight:600}
+    .match{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:8px 12px;border-radius:999px;background:var(--soft);color:var(--p);font-size:12px;font-weight:700}
+    .card{border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 5px 18px #1e14460b}
+    .card h2,.card h3{font-size:15px;margin:0 0 12px}.bio{margin:0;color:#4f4f4f;font-size:13px;line-height:1.65}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{padding:12px;border-radius:13px;background:#FCFCFE}
+    .label{display:block;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+    .value{font-size:13px;font-weight:600;line-height:1.35}.insight{border:0;color:#fff;background:linear-gradient(135deg,var(--p),var(--pd));box-shadow:0 12px 25px #7547f536}
+    .insight h3{color:#fff}.insight p{color:#fff;opacity:.9;line-height:1.6;font-size:13px;margin:0}
+    .empty{color:var(--muted);font-size:13px;line-height:1.55;margin:0}.actions{display:flex;gap:10px;margin-top:18px}
+    .btn{min-height:46px;flex:1;border:0;border-radius:13px;display:grid;place-items:center;text-decoration:none;font-size:13px;font-weight:700;cursor:pointer}
+    .primary{color:#fff;background:linear-gradient(135deg,var(--p),var(--pd));box-shadow:0 8px 18px #7547f52e}
+    .secondary{color:var(--ink);border:1px solid var(--line);background:#fff}.btn:disabled{opacity:.65;cursor:wait}
+    .score-card{text-align:center;padding:22px;background:linear-gradient(145deg,#fff,#faf8ff)}
+    .score-value{display:block;color:var(--p);font-size:48px;line-height:1;font-weight:800;letter-spacing:-2px}
+    .score-caption{display:block;margin-top:8px;color:var(--muted);font-size:12px;font-weight:600}
+    .private-preview{display:block;}
+    .private-preview .score-card{background:linear-gradient(135deg,#f8f5ff 0%,#ffffff 100%);border:1px solid #efe9ff;border-radius:24px;box-shadow:0 16px 30px rgba(117,71,245,.08);padding:26px 18px 18px}
+    .private-preview .score-value{font-size:54px;letter-spacing:-2.5px}
+    .private-preview .score-caption{font-weight:700}
+    .private-preview .card{background:linear-gradient(180deg,#fff 0%,#fdfcff 100%);border:1px solid #f0ecff;box-shadow:0 14px 26px rgba(27,20,45,.04)}
+    .private-preview .match{background:#f3ecff;border:1px solid rgba(117,71,245,.08);font-weight:800}
+    .private-preview .category-row{margin:12px 0}
+    .private-preview .track{background:#f0ebfb}.private-preview .track span{background:linear-gradient(90deg,#9B7CFF,#6E4AE9)}
+    .private-preview .question-result{padding:12px 0;border-top:1px solid #efeaf8}
+    .category-row{margin:15px 0}.category-heading,.question-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .category-heading{font-size:12px;font-weight:600}.category-heading strong{color:var(--p)}
+    .track{height:8px;margin-top:8px;border-radius:999px;background:#eeeaf5;overflow:hidden}.track span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#8A65FF,#693DDE)}
+    .question-result{padding:13px 0;border-top:1px solid var(--line)}.question-result:first-of-type{border-top:0}
+    .question-heading{align-items:flex-start;color:var(--muted);font-size:11px}.question-heading strong{flex:none;color:var(--p);font-size:12px}
+    .question-text{margin:6px 0 0;font-size:13px;line-height:1.5}
+    .section-note{margin:-4px 0 12px;color:var(--muted);font-size:11px;line-height:1.5}
+    .toast{position:fixed;top:18px;right:18px;left:18px;z-index:50;max-width:394px;margin:auto;padding:13px 15px;border-radius:12px;background:#ECFDF3;color:#087443;font-size:12px;font-weight:700;box-shadow:0 8px 24px #14502d29}
+    .toast.error{background:#FEF2F2;color:#B42318}
+    @media (min-width:461px){body{padding:18px 0}.app{border-radius:24px;box-shadow:0 10px 40px #1e144612}}
   </style>
 </head>
-<body><div class="app">
-  <header><a class="round" href="{% url 'home' %}" aria-label="Back">←</a><h1>Student Profile</h1><span class="round" aria-hidden="true">⋯</span></header>
-  <main>
-    <section class="hero">
-      {% if is_connected and profile.photo %}<img class="avatar" src="{{ profile.photo.url }}" alt="{{ display_name }}">{% else %}<div class="placeholder">{% if is_private_preview %}🔒{% else %}{{ student.first_name|default:student.email|slice:":1"|upper }}{% endif %}</div>{% endif %}
-      <h2>{{ display_name }}</h2>
-      {% if is_connected %}<div class="sub">{% if profile.university %}<span>{{ profile.university }}</span>{% else %}<span>Campus Connect student</span>{% endif %}{% if profile.city %}<span>· {{ profile.city }}</span>{% endif %}</div><div class="tags">{% if profile.major %}<span class="tag">{{ profile.major }}</span>{% endif %}{% if profile.year %}<span class="tag">{{ profile.year }}</span>{% endif %}{% if profile.age %}<span class="tag">{{ profile.age }} years</span>{% endif %}</div>{% else %}<div class="sub"><span>Private profile · Connect to unlock</span></div><div class="tags"><span class="tag">Details hidden</span><span class="tag">Photo private</span></div>{% endif %}
-      {% if is_private_preview %}<div class="match">🔒 Profile locked · connect to unlock details</div>{% elif match %}<div class="match">✦ {{ match.compatibility_score|floatformat:0 }}% compatible with you</div>{% endif %}
-      <div class="actions">{% if is_connected %}<a class="btn primary" href="{% url 'chat_conversation' student.id %}">Message</a><button id="cancel-connection" class="btn secondary" data-connection="{{ connection.id }}">Cancel connection</button>{% elif connection and connection.status == 'PENDING' and connection.requester_id == request.user.id %}<button id="cancel-connection" class="btn secondary" data-connection="{{ connection.id }}">Cancel request</button>{% elif connection and connection.status == 'PENDING' %}<button id="accept-connection" class="btn primary" data-connection="{{ connection.id }}">Accept request</button><button id="reject-connection" class="btn secondary" data-connection="{{ connection.id }}">Reject</button>{% else %}<button id="connect" class="btn primary" data-user="{{ student.id }}">Connect</button>{% endif %}</div>
-    </section>
-    {% if insight and not is_private_preview %}<section class="card insight"><h3>Why you may connect</h3><p>{{ insight.insight_text }}</p></section>{% endif %}
-    <section class="card"><h3>About {% if is_private_preview %}this student{% else %}{{ student.first_name|default:"this student" }}{% endif %}</h3>{% if is_connected and profile.bio %}<p class="bio">{{ profile.bio }}</p>{% else %}<p class="empty">{% if is_private_preview %}🔒 This profile is private until you connect.{% else %}No bio added.{% endif %}</p>{% endif %}</section>
-    {% if is_connected %}<section class="card"><h3>Academic details</h3><div class="grid"><div class="item"><span class="label">University</span><span class="value">{{ profile.university|default:"Not added" }}</span></div><div class="item"><span class="label">Major</span><span class="value">{{ profile.major|default:"Not added" }}</span></div><div class="item"><span class="label">Year</span><span class="value">{{ profile.year|default:"Not added" }}</span></div><div class="item"><span class="label">Location</span><span class="value">{{ profile.city|default:"Not added" }}</span></div></div></section>{% else %}<section class="card"><h3>Private details</h3><p class="empty">University, location, studies and other personal details are hidden until this connection is accepted.</p></section>{% endif %}
-    {% if is_connected and profile.languages %}<section class="card"><h3>Languages</h3><p class="bio">{{ profile.languages }}</p></section>{% endif %}
-    {% if is_connected and profile.interests %}<section class="card"><h3>Interests</h3><p class="bio">{{ profile.interests }}</p></section>{% endif %}
+<body>
+<div class="app">
+  {% csrf_token %}
+  <header>
+    <a class="round" href="{% url 'home' %}" aria-label="Back">←</a>
+    <h1>{% if is_private_preview %}Compatibility Profile{% else %}Student Profile{% endif %}</h1>
+    <span class="round" aria-hidden="true">⋯</span>
+  </header>
+  <main {% if is_private_preview %}class="private-preview"{% endif %}>
+    {% if is_private_preview %}
+      {% if compatibility %}
+        <section class="card score-card">
+          <span class="score-value">{{ compatibility.overall_score }}%</span>
+          <span class="score-caption">Overall Similarity Score</span>
+          <div class="actions">
+            {% if connection and connection.status == 'PENDING' and connection.requester_id == request.user.id %}
+              <button id="cancel-connection" class="btn secondary" data-connection="{{ connection.id }}">Cancel request</button>
+            {% elif connection and connection.status == 'PENDING' %}
+              <button id="accept-connection" class="btn primary" data-connection="{{ connection.id }}">Accept request</button>
+              <button id="reject-connection" class="btn secondary" data-connection="{{ connection.id }}">Reject</button>
+            {% else %}
+              <button id="connect" class="btn primary" data-user="{{ student.id }}">Connect</button>
+            {% endif %}
+          </div>
+        </section>
+        <section class="card">
+          <h2>Category-wise Similarity</h2>
+          {% for category in compatibility.categories %}
+            <div class="category-row">
+              <div class="category-heading"><span>{{ category.name }}</span><strong>{{ category.score }}%</strong></div>
+              <div class="track" role="img" aria-label="{{ category.name }} similarity {{ category.score }} percent"><span style="width:{{ category.score }}%"></span></div>
+            </div>
+          {% endfor %}
+        </section>
+        <section class="card">
+          <h2>Similarity on Most Important Questions</h2>
+          <p class="section-note">Based on the average importance both people assigned.</p>
+          {% if compatibility.most_important_questions %}
+            <p class="match">{{ compatibility.most_important_similarity }}% similarity</p>
+            {% for item in compatibility.most_important_questions %}
+              <div class="question-result">
+                <div class="question-heading"><span>{{ item.category }}</span><strong>{{ item.similarity }}%</strong></div>
+                <p class="question-text">{{ item.question }}</p>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="empty">No shared answers were rated as most important.</p>
+          {% endif %}
+        </section>
+        <section class="card">
+          <h2>Similarity on Least Important Questions</h2>
+          <p class="section-note">Questions rated below neutral by the average of both importance ratings.</p>
+          {% if compatibility.least_important_questions %}
+            <p class="match">{{ compatibility.least_important_similarity }}% similarity</p>
+            {% for item in compatibility.least_important_questions %}
+              <div class="question-result">
+                <div class="question-heading"><span>{{ item.category }}</span><strong>{{ item.similarity }}%</strong></div>
+                <p class="question-text">{{ item.question }}</p>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="empty">No shared answers were rated below neutral.</p>
+          {% endif %}
+        </section>
+      {% else %}
+        <section class="card"><p class="empty">Compatibility details are unavailable for this private profile.</p></section>
+        {% if connection and connection.status == 'PENDING' and connection.requester_id == request.user.id %}
+          <button id="cancel-connection" class="btn secondary" data-connection="{{ connection.id }}">Cancel request</button>
+        {% elif connection and connection.status == 'PENDING' %}
+          <div class="actions">
+            <button id="accept-connection" class="btn primary" data-connection="{{ connection.id }}">Accept request</button>
+            <button id="reject-connection" class="btn secondary" data-connection="{{ connection.id }}">Reject</button>
+          </div>
+        {% else %}
+          <button id="connect" class="btn primary" data-user="{{ student.id }}">Connect</button>
+        {% endif %}
+      {% endif %}
+    {% else %}
+      <section class="hero">
+        {% if profile.photo %}<img class="avatar" src="{{ profile.photo.url }}" alt="{{ display_name }}">{% else %}<div class="placeholder">{{ student.first_name|default:student.email|slice:":1"|upper }}</div>{% endif %}
+        <h2>{{ display_name }}</h2>
+        <div class="sub">{% if profile.university %}<span>{{ profile.university }}</span>{% else %}<span>Campus Connect student</span>{% endif %}{% if profile.city %}<span>· {{ profile.city }}</span>{% endif %}</div>
+        <div class="tags">{% if profile.major %}<span class="tag">{{ profile.major }}</span>{% endif %}{% if profile.year %}<span class="tag">{{ profile.year }}</span>{% endif %}{% if profile.age %}<span class="tag">{{ profile.age }} years</span>{% endif %}</div>
+        {% if match %}<div class="match">✦ {{ match.compatibility_score|floatformat:0 }}% compatible with you</div>{% endif %}
+        <div class="actions"><a class="btn primary" href="{% url 'chat_conversation' student.id %}">Message</a><button id="cancel-connection" class="btn secondary" data-connection="{{ connection.id }}">Cancel connection</button></div>
+      </section>
+      {% if insight %}<section class="card insight"><h3>Why you may connect</h3><p>{{ insight.insight_text }}</p></section>{% endif %}
+      <section class="card"><h3>About {{ student.first_name|default:"this student" }}</h3>{% if profile.bio %}<p class="bio">{{ profile.bio }}</p>{% else %}<p class="empty">No bio added.</p>{% endif %}</section>
+      <section class="card"><h3>Academic details</h3><div class="grid"><div class="item"><span class="label">University</span><span class="value">{{ profile.university|default:"Not added" }}</span></div><div class="item"><span class="label">Major</span><span class="value">{{ profile.major|default:"Not added" }}</span></div><div class="item"><span class="label">Year</span><span class="value">{{ profile.year|default:"Not added" }}</span></div><div class="item"><span class="label">Location</span><span class="value">{{ profile.city|default:"Not added" }}</span></div></div></section>
+      {% if profile.languages %}<section class="card"><h3>Languages</h3><p class="bio">{{ profile.languages }}</p></section>{% endif %}
+      {% if profile.interests %}<section class="card"><h3>Interests</h3><p class="bio">{{ profile.interests }}</p></section>{% endif %}
+    {% endif %}
   </main>
-</div>{% include 'includes/bottom_nav.html' with active_nav='profile' %}<script>const b=document.getElementById('connect');if(b)b.onclick=()=>{b.disabled=true;fetch('/api/connections/request/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken:document.cookie.split('; ').find(x=>x.startsWith('csrftoken='))?.split('=')[1]||''},body:JSON.stringify({user_id:b.dataset.user})}).then(r=>r.json().then(d=>({ok:r.ok,d}))).then(x=>{b.textContent=x.ok?'Request pending':(x.d.detail||'Unavailable');if(!x.ok)b.disabled=false})}</script></body>
-{% csrf_token %}<script>
+</div>
+{% include 'includes/bottom_nav.html' with active_nav='profile' %}
+<script>
 const profileTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
 const profileToken = profileTokenElement ? profileTokenElement.value : '';
 function profileMessage(message, isError) {

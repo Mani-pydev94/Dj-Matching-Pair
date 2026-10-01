@@ -70,11 +70,21 @@ class QuestionOption(models.Model):
 
 
 class QuestionResponse(models.Model):
+    class Importance(models.TextChoices):
+        MOST_IMPORTANT = 'MOST_IMPORTANT', 'Most Important'
+        NEUTRAL = 'NEUTRAL', 'Neutral'
+        NOT_VERY_IMPORTANT = 'NOT_VERY_IMPORTANT', 'Not Very Important'
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='question_responses')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='responses')
     value = models.CharField(max_length=500)
     other_text = models.CharField(max_length=500, blank=True, default='')
+    importance = models.CharField(
+        max_length=24,
+        choices=Importance.choices,
+        default=Importance.NEUTRAL,
+    )
     selected_options = models.ManyToManyField(QuestionOption, blank=True, related_name='responses')
     created_at = models.DateTimeField(auto_now_add=True)
 

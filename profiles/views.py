@@ -7,6 +7,7 @@ from django.http import Http404
 from django.shortcuts import redirect, render
 
 from matching.models import Match
+from matching.compatibility import calculate_compatibility_analysis
 from connections.models import Connection
 from django.db.models import Q
 
@@ -77,8 +78,15 @@ def student_profile(request, user_id):
 
     profile = student.profile
     is_connected = can_view_full_profile(request.user, student)
+    is_private_preview = student != request.user and not is_connected
     visible_profile = profile
-    if student != request.user and not is_connected:
+    compatibility = None
+    if is_private_preview:
+        compatibility = (
+            calculate_compatibility_analysis(request.user, student)
+            if profile.is_public
+            else None
+        )
         visible_profile = copy(profile)
         for field in ('photo', 'age', 'city', 'gender', 'languages', 'bio', 'university', 'major', 'year', 'interests'):
             setattr(visible_profile, field, '' if field != 'photo' else None)
@@ -101,14 +109,15 @@ def student_profile(request, user_id):
         'student': student,
         'display_name': (
             '??? ???'
-            if student != request.user and not is_connected
+            if is_private_preview
             else student.get_full_name() or student.email
         ),
         'profile': visible_profile,
+        'compatibility': compatibility,
         'match': match,
         'insight': insight,
         'connection': connection,
         'is_connected': is_connected,
         'can_chat': is_connected,
-        'is_private_preview': student != request.user and not is_connected,
+        'is_private_preview': is_private_preview,
     })
