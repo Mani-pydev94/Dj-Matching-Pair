@@ -1,0 +1,287 @@
+[
+  {
+    "name": "Mindset & Worldview",
+    "slug": "mindset-worldview",
+    "description": "How you see life, reality, and the future.",
+    "icon": "brain",
+    "questions": [
+      {
+        "text": "If you could know the absolute truth about one thing, what would you choose?",
+        "options": [
+          "What happens after death",
+          "Whether God exists",
+          "Whether we're alone in the universe",
+          "Whether reality is actually a simulation"
+        ]
+      },
+      {
+        "text": "Which statement feels closest to how you see life?",
+        "options": [
+          "Things happen for a reason",
+          "We create meaning ourselves",
+          "Life is mostly chance and consequences",
+          "I don't think humans understand enough to know"
+        ]
+      },
+      {
+        "text": "You can see one thing from your future. What do you look at?",
+        "options": [
+          "Who I'm with",
+          "Where I'm living",
+          "What I've achieved",
+          "Nothing—I don't want to know"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Emotions & Relationships",
+    "slug": "emotions-relationships",
+    "description": "How relationships and emotions affect you.",
+    "icon": "heart",
+    "questions": [
+      {
+        "text": "Everyone has forgotten your birthday, including at midnight. What would genuinely affect you most?",
+        "options": [
+          "I'd feel surprisingly hurt",
+          "I'd wonder whether I matter to people as much as I thought",
+          "I'd probably joke about it and move on",
+          "Honestly, birthdays aren't important to me"
+        ]
+      },
+      {
+        "text": "You can permanently erase one embarrassing or painful memory. What do you choose?",
+        "options": [
+          "My most embarrassing moment",
+          "My biggest failure",
+          "The time someone seriously hurt me",
+          "Nothing—my memories made me who I am"
+        ]
+      },
+      {
+        "text": "You can know exactly what people feel about you, but can never ask why. Would you take it?",
+        "options": [
+          "Absolutely",
+          "Only for people I care about",
+          "No—the 'why' would drive me crazy",
+          "I'd rather judge people by how they treat me"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Values & Moral Choices",
+    "slug": "values-moral-choices",
+    "description": "The principles and trade-offs that matter to you.",
+    "icon": "scale",
+    "questions": [
+      {
+        "text": "Your dream career would require you to become someone you don't particularly like. The money and success are almost guaranteed. What feels closest to you?",
+        "options": [
+          "Take it—success requires adaptation",
+          "Take it, but try not to lose myself",
+          "Walk away; liking who I become matters more",
+          "I'd need to know exactly what I'm sacrificing first"
+        ]
+      },
+      {
+        "text": "You can secretly see one number above everyone's head. Which number would you choose?",
+        "options": [
+          "How trustworthy they are",
+          "How happy they really are",
+          "How intelligent they are",
+          "How many relationships they have"
+        ]
+      },
+      {
+        "text": "You can guarantee one sentence will be true about you at the end of your life. Which one?",
+        "options": [
+          "I experienced everything I could.",
+          "I built something that mattered.",
+          "I was deeply loved.",
+          "I stayed true to myself."
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Weird, Funny & Personality",
+    "slug": "weird-funny-personality",
+    "description": "Unexpected questions about your personality and imagination.",
+    "icon": "laugh",
+    "questions": [
+      {
+        "text": "You have to live as one animal for a year. Which life are you choosing?",
+        "options": [
+          "Eagle—absolute freedom",
+          "Dog—love, food & zero bills",
+          "Dolphin—ocean + friends + fun",
+          "Lion—I'm not explaining myself to anybody"
+        ]
+      },
+      {
+        "text": "Aliens arrive tomorrow and you have to show them one thing that explains humanity. What do you show them?",
+        "options": [
+          "A family dinner",
+          "The internet",
+          "A war documentary",
+          "A music concert"
+        ]
+      },
+      {
+        "text": "You're invisible for exactly 24 hours. What sounds most tempting?",
+        "options": [
+          "Explore places I'm never allowed into",
+          "Listen to what people really say about me",
+          "Pull harmless pranks",
+          "I'd genuinely rather not be invisible"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Friendship & Social Energy",
+    "slug": "friendship-social-energy",
+    "description": "How you connect with friends and other people.",
+    "icon": "users",
+    "questions": [
+      {
+        "text": "You walk alone into a party where you know nobody. Thirty minutes later, where are you?",
+        "options": [
+          "Talking to half the room",
+          "Deep in conversation with one person",
+          "Hanging around food until someone adopts me",
+          "Seriously considering going home"
+        ]
+      },
+      {
+        "text": "What makes someone become a real friend to you?",
+        "options": [
+          "We can talk about anything",
+          "They're there when things go wrong",
+          "We can have ridiculous fun together",
+          "Months can pass and nothing changes"
+        ]
+      },
+      {
+        "text": "Your closest friend hasn't contacted you for two months. What do you naturally think?",
+        "options": [
+          "Life happens—I'll message them",
+          "I'd wonder if something is wrong",
+          "I'd feel a little hurt",
+          "If they don't make an effort, neither will I"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Lifestyle & Experiences",
+    "slug": "lifestyle-experiences",
+    "description": "The experiences and ways of spending time you prefer.",
+    "icon": "globe",
+    "questions": [
+      {
+        "text": "Someone gives you a free ticket tonight. You must leave tomorrow. Where are you going?",
+        "options": [
+          "Tokyo—completely different world",
+          "Bali—switch my brain off",
+          "Switzerland—mountains & silence",
+          "Don't tell me the destination—surprise me"
+        ]
+      },
+      {
+        "text": "You unexpectedly get three months completely free with your salary still coming. What happens?",
+        "options": [
+          "Travel everywhere",
+          "Build something I've always wanted",
+          "Spend serious time with family and friends",
+          "Sleep first, figure life out later"
+        ]
+      },
+      {
+        "text": "You have AED 5,000 that you absolutely cannot save. What are you spending it on?",
+        "options": [
+          "Travel or an experience",
+          "Something I've wanted forever",
+          "An incredible meal or weekend with people I love",
+          "Learn a skill I've always wanted, shopping"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ambition, Money & Future",
+    "slug": "ambition-money-future",
+    "description": "Your ambitions, priorities, and hopes for the future.",
+    "icon": "rocket",
+    "questions": [
+      {
+        "text": "Two buttons. You must press one.",
+        "options": [
+          "Guaranteed AED 40K/month for life",
+          "30% chance of becoming extremely wealthy, 70% chance of starting again from zero"
+        ]
+      },
+      {
+        "text": "You're 45. Which situation would make you feel most successful?",
+        "options": [
+          "Financial freedom",
+          "A beautiful family and life",
+          "Building something people remember",
+          "Complete freedom over my time"
+        ]
+      },
+      {
+        "text": "AED 1 million unexpectedly lands in your account—legally yours. What is your first instinct?",
+        "options": [
+          "Invest most of it",
+          "Start or buy a business",
+          "Buy a home",
+          "Take some and create unforgettable experiences"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "The Curiosity Room",
+    "slug": "curiosity-room",
+    "description": "Unexpected what-if questions to see how other people think.",
+    "icon": "sparkles",
+    "questions": [
+      {
+        "text": "You wake up tomorrow and everyone on Earth has disappeared except 100 people. What is your first thought?",
+        "options": [
+          "Find my family and friends",
+          "Find the other 100 people",
+          "Figure out what happened",
+          "Explore everything I was never allowed to"
+        ]
+      },
+      {
+        "text": "A button gives you AED 10 million, but one random stranger somewhere loses AED 10 million. You will never know them. Do you press it?",
+        "options": [
+          "Yes, immediately",
+          "Probably yes",
+          "Probably not",
+          "Absolutely not"
+        ]
+      },
+      {
+        "text": "You can read people's minds, but you can never turn it off. Do you take the ability?",
+        "options": [
+          "Absolutely—I need to know",
+          "Yes, despite the consequences",
+          "No, some things are better unknown",
+          "Absolutely not—I'd go insane"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Visual Images",
+    "slug": "visual-images",
+    "description": "Questions based on images. New questions will be added later.",
+    "icon": "image",
+    "questions": []
+  }
+]

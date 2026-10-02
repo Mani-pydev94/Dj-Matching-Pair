@@ -6,7 +6,7 @@ from profiles.models import Profile
 from questionnaire.models import Question, QuestionResponse
 from questionnaire.services import seed_questionnaire_data
 from connections.models import Connection
-from .compatibility import CATEGORY_WEIGHTS, calculate_compatibility, calculate_compatibility_analysis
+from .compatibility import calculate_compatibility, calculate_compatibility_analysis
 from .services import is_discoverable, score_match
 
 
@@ -28,7 +28,7 @@ class CompatibilityTests(TestCase):
         self.assertEqual(first, second)
         self.assertGreaterEqual(first['overall_score'], 75)
 
-    def test_question_importance_weights_similarity_for_both_users(self):
+    def test_question_importance_does_not_change_equal_question_scores(self):
         question_a, question_b = list(
             Question.objects.filter(is_active=True).order_by('category', 'order')[:2]
         )
@@ -44,19 +44,34 @@ class CompatibilityTests(TestCase):
         mismatch_b.importance = QuestionResponse.Importance.MOST_IMPORTANT
         mismatch_a.save(update_fields=('importance',))
         mismatch_b.save(update_fields=('importance',))
-        high_priority_mismatch = calculate_compatibility(
-            self.a, self.b,
-        )['categories'][question_a.category_ref.slug]
+        high_importance_score = calculate_compatibility(self.a, self.b)
 
         mismatch_a.importance = QuestionResponse.Importance.NOT_VERY_IMPORTANT
         mismatch_b.importance = QuestionResponse.Importance.NOT_VERY_IMPORTANT
         mismatch_a.save(update_fields=('importance',))
         mismatch_b.save(update_fields=('importance',))
-        low_priority_mismatch = calculate_compatibility(
-            self.a, self.b,
-        )['categories'][question_a.category_ref.slug]
+        low_importance_score = calculate_compatibility(self.a, self.b)
 
-        self.assertGreater(low_priority_mismatch, high_priority_mismatch)
+        self.assertEqual(low_importance_score, high_importance_score)
+
+    def test_overall_score_averages_questions_not_categories(self):
+        questions = list(
+            Question.objects.filter(is_active=True).order_by('category_ref__display_order', 'order')
+        )
+        weighted_questions = questions[:4]
+        QuestionResponse.objects.filter(
+            user__in=(self.a, self.b),
+        ).exclude(question__in=weighted_questions).delete()
+
+        first_response = QuestionResponse.objects.get(user=self.b, question=weighted_questions[0])
+        first_response.selected_options.set([weighted_questions[0].options.last()])
+
+        score = calculate_compatibility(self.a, self.b)
+
+        self.assertEqual(score['overall_score'], 75)
+        self.assertEqual(len(score['categories']), 9)
+        self.assertEqual(score['categories']['mindset-worldview'], 67)
+        self.assertEqual(score['categories']['emotions-relationships'], 100)
 
     def test_compatibility_analysis_groups_question_scores_by_average_importance(self):
         questions = list(Question.objects.filter(is_active=True).order_by('category', 'order')[:2])
@@ -71,7 +86,7 @@ class CompatibilityTests(TestCase):
 
         analysis = calculate_compatibility_analysis(self.a, self.b)
 
-        self.assertEqual(len(analysis['categories']), 6)
+        self.assertEqual(len(analysis['categories']), 9)
         self.assertEqual(analysis['most_important_similarity'], 100)
         self.assertEqual(analysis['most_important_questions'][0]['question'], most_question.text)
         self.assertEqual(analysis['least_important_similarity'], 100)
@@ -111,11 +126,6 @@ class CompatibilityTests(TestCase):
         response = client.get(f'/api/matches/{self.b.id}/compatibility/')
 
         self.assertEqual(response.status_code, 404)
-
-    def test_all_match_categories_have_equal_weight(self):
-        self.assertEqual(len(CATEGORY_WEIGHTS), 6)
-        self.assertEqual(set(CATEGORY_WEIGHTS.values()), {1 / 6})
-        self.assertAlmostEqual(sum(CATEGORY_WEIGHTS.values()), 1)
 
     def test_matches_endpoint_excludes_self(self):
         client = APIClient()

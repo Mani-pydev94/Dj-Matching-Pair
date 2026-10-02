@@ -2,6 +2,7 @@
 Custom Django User model with UUID primary key for Campus Connect AI.
 """
 import uuid
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import BaseUserManager
 from django.db import models
@@ -55,3 +56,18 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class SignupOTP(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='signup_otp',
+    )
+    token_digest = models.CharField(max_length=64)
+    expires_at = models.DateTimeField()
+    last_sent_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+
+    def __str__(self):
+        return f'Signup OTP for {self.user.email}'

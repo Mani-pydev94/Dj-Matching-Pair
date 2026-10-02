@@ -100,3 +100,25 @@ class LoginForm(forms.Form):
             'autocomplete': 'current-password',
         })
     )
+
+
+class SignupOTPForm(forms.Form):
+    code = forms.CharField(
+        label='Email verification code',
+        min_length=6,
+        max_length=6,
+        widget=forms.TextInput(attrs={
+            'autocomplete': 'one-time-code',
+            'autocapitalize': 'characters',
+            'inputmode': 'text',
+            'pattern': '[A-Za-z0-9]{6}',
+            'placeholder': 'Enter 6-character code',
+            'required': True,
+        }),
+    )
+
+    def clean_code(self):
+        code = self.cleaned_data['code'].strip().upper()
+        if len(code) != 6 or not code.isascii() or not code.isalnum():
+            raise ValidationError(_('Enter the 6-character code from your email.'))
+        return code

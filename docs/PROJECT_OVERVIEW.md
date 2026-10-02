@@ -107,6 +107,8 @@ This supports:
 - category-based questions (values, learning style, communication, career goals, lifestyle, interests)
 - user importance voting (`MOST_IMPORTANT`, `NEUTRAL`, `NOT_VERY_IMPORTANT`)
 - per-question selected answers and open-text answers
+- optional image prompts on existing questions, with four single-choice options for visual questions
+- image questions are managed in the question editor and excluded from the standard questionnaire workbook import/export
 
 ### Match model / connection state
 

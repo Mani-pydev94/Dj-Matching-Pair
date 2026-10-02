@@ -17,7 +17,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Question
         fields = (
             'id', 'category', 'category_name', 'text', 'question_type',
-            'help_text', 'order', 'is_required', 'options',
+            'help_text', 'image', 'image_alt_text', 'order', 'is_required', 'options',
         )
 
     def get_category_name(self, obj):

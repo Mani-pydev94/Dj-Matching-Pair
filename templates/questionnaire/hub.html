@@ -23,36 +23,36 @@
     .hero-copy p{margin-top:7px;color:#ffffffd9;font-size:11px;line-height:1.5}
     .progress-ring{display:grid;flex:none;place-items:center;width:62px;height:62px;border:1px solid #ffffff50;border-radius:20px;background:#ffffff1c;text-align:center}
     .progress-ring strong{display:block;font-size:17px;line-height:1.1}
-    .progress-ring span{display:block;margin-top:3px;font-size:8px;opacity:.8}
+    .progress-ring span{display:block;margin-top:3px;font-size:10px;opacity:.8}
     .content{padding:20px 20px 0}
     .section-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
-    .section-head h2{font-size:15px;letter-spacing:-.2px}
-    .section-head p{margin-top:4px;color:var(--muted);font-size:10px}
-    .answered-summary{color:var(--purple);font-size:10px;font-weight:700;white-space:nowrap}
+    .section-head h2{font-size:18px;letter-spacing:-.2px}
+    .section-head p{margin-top:4px;color:var(--muted);font-size:13px}
+    .answered-summary{color:var(--purple);font-size:12px;font-weight:700;white-space:nowrap}
     .category-list{display:grid;gap:9px}
     .category-card{display:flex;align-items:center;gap:12px;min-height:76px;padding:12px;border:1px solid var(--line);border-radius:17px;background:#fff;color:inherit;text-decoration:none;box-shadow:0 4px 14px #1e144609;transition:border-color .16s,transform .16s,box-shadow .16s}
     .category-card:hover{transform:translateY(-1px);border-color:#d9ceff;box-shadow:0 8px 18px #1e144610}
     .category-icon{display:grid;flex:none;place-items:center;width:44px;height:44px;border-radius:15px;background:var(--soft);font-size:19px}
     .category-copy{min-width:0;flex:1}
-    .category-title{display:block;overflow:hidden;font-size:12px;font-weight:750;text-overflow:ellipsis;white-space:nowrap}
-    .category-description{display:block;overflow:hidden;margin-top:4px;color:var(--muted);font-size:9px;text-overflow:ellipsis;white-space:nowrap}
+    .category-title{display:block;font-size:15px;font-weight:750;line-height:1.35;overflow-wrap:anywhere}
+    .category-description{display:block;margin-top:4px;color:var(--muted);font-size:13px;line-height:1.4;overflow-wrap:anywhere}
     .category-progress{display:flex;align-items:center;gap:7px;margin-top:8px}
     .mini-track{height:4px;flex:1;overflow:hidden;border-radius:999px;background:#eeeaf5}
     .mini-fill{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--purple),var(--purple-dark));transition:width .25s}
-    .category-count{flex:none;color:#777481;font-size:9px;font-weight:600}
+    .category-count{flex:none;color:#777481;font-size:12px;font-weight:600}
     .category-end{display:grid;flex:none;place-items:center;width:28px;height:28px;border-radius:10px;background:#f8f6fc;color:#9894a1;font-size:15px}
     .category-card.complete .category-end{background:#eaf8f1;color:var(--green)}
     .category-card.complete .mini-fill{background:linear-gradient(90deg,#22b77c,#119b68)}
-    .notice{margin-top:13px;padding:12px 13px;border:1px solid #e8e0ff;border-radius:15px;background:#faf8ff;color:#777281;font-size:10px;line-height:1.5}
+    .notice{margin-top:13px;padding:12px 13px;border:1px solid #e8e0ff;border-radius:15px;background:#faf8ff;color:#777281;font-size:13px;line-height:1.5}
     .notice strong{color:#363241}
-    .loading,.error{padding:27px 16px;border:1px dashed #dcd5ef;border-radius:17px;background:#fcfaff;color:var(--muted);font-size:11px;line-height:1.5;text-align:center}
+    .loading,.error{padding:27px 16px;border:1px dashed #dcd5ef;border-radius:17px;background:#fcfaff;color:var(--muted);font-size:14px;line-height:1.5;text-align:center}
     .spinner{width:24px;height:24px;margin:0 auto 10px;border:3px solid #e8e1fb;border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .retry{margin-top:10px;padding:8px 13px;border:0;border-radius:10px;background:var(--soft);color:var(--purple);font:700 10px Inter,system-ui,sans-serif;cursor:pointer}
+    .retry{margin-top:10px;padding:8px 13px;border:0;border-radius:10px;background:var(--soft);color:var(--purple);font:700 12px Inter,system-ui,sans-serif;cursor:pointer}
     .footer{position:fixed;right:0;bottom:calc(66px + env(safe-area-inset-bottom));left:0;z-index:5;max-width:430px;margin:auto;padding:14px 20px 8px;background:linear-gradient(180deg,#ffffff00,#fff 22%)}
-    .continue{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:49px;border-radius:15px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;text-decoration:none;font-size:12px;font-weight:750;box-shadow:0 8px 18px #6d45f53d;transition:transform .16s,box-shadow .16s}
+    .continue{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border-radius:15px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;text-decoration:none;font-size:16px;font-weight:750;box-shadow:0 8px 18px #6d45f53d;transition:transform .16s,box-shadow .16s}
     .continue:hover{transform:translateY(-1px);box-shadow:0 11px 22px #6d45f54a}
-    .footer-note{margin-top:7px;color:#9995a2;font-size:9px;text-align:center}
+    .footer-note{margin-top:7px;color:#9995a2;font-size:12px;text-align:center}
     @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
   </style>
 </head>
@@ -99,12 +99,15 @@
     const overallPercent = document.getElementById('overall-percent');
     const answeredSummary = document.getElementById('answered-summary');
     const categoryIcons = {
+      brain: '🧠',
       heart: '💜',
-      'book-open': '📚',
-      'message-circle': '💬',
-      target: '🎯',
-      clock: '⏰',
+      scale: '⚖️',
+      laugh: '😂',
+      users: '🧑‍🤝‍🧑',
+      globe: '🌍',
+      rocket: '🚀',
       sparkles: '✨',
+      image: '🖼️',
     };
 
     function showError() {
@@ -138,7 +141,11 @@
 
         const link = document.createElement('a');
         link.className = `category-card${questionCount > 0 && answeredCount >= questionCount ? ' complete' : ''}`;
-        link.href = "{% url 'questionnaire_questions' %}";
+        if (questionCount > 0) {
+          link.href = `{% url 'questionnaire_questions' %}?category=${encodeURIComponent(category.slug)}`;
+        } else {
+          link.setAttribute('aria-disabled', 'true');
+        }
         link.setAttribute('aria-label', `${category.name}: ${answeredCount} of ${questionCount} questions answered`);
 
         const icon = document.createElement('span');

@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, Max, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
@@ -212,7 +212,7 @@ def questionnaire_category_edit(request, category_id=None):
 @dashboard_access
 def questionnaire_question_edit(request, question_id=None):
     question = get_object_or_404(Question, id=question_id) if question_id else None
-    form = QuestionForm(request.POST or None, instance=question)
+    form = QuestionForm(request.POST or None, request.FILES or None, instance=question)
     option_formset = OptionFormSet(
         request.POST or None,
         instance=question or Question(),
@@ -226,9 +226,22 @@ def questionnaire_question_edit(request, question_id=None):
                 while Question.objects.filter(question_key=f'Q{next_number:03d}').exists():
                     next_number += 1
                 saved_question.question_key = f'Q{next_number:03d}'
-            saved_question.save()
+            if form.cleaned_data['order'] is None:
+                category_questions = Question.objects.all()
+                if saved_question.pk:
+                    category_questions = category_questions.exclude(pk=saved_question.pk)
+                if saved_question.category_ref_id:
+                    category_questions = category_questions.filter(
+                        category_ref_id=saved_question.category_ref_id,
+                    )
+                else:
+                    category_questions = category_questions.filter(category=saved_question.category)
+                saved_question.order = (
+                    category_questions.aggregate(max_order=Max('order'))['max_order'] or -1
+                ) + 1
             option_formset.instance = saved_question
             if option_formset.is_valid():
+                saved_question.save()
                 protected_options = []
                 for deleted_form in option_formset.deleted_forms:
                     if deleted_form.instance.pk and deleted_form.instance.responses.exists():
@@ -337,26 +350,36 @@ def questionnaire_import_export(request):
     preview = None
     errors = []
     if request.method == 'POST' and request.POST.get('action') == 'preview':
+        request.session.pop('questionnaire_import_rows', None)
         parsed, errors = _parse_questionnaire_workbook(request.FILES.get('workbook'))
         if not errors:
-            request.session['questionnaire_import_rows'] = parsed
             keys = {item['question_key'] for item in parsed}
-            existing = set(Question.objects.filter(question_key__in=keys).values_list('question_key', flat=True))
-            preview = {
-                'questions': len(keys),
-                'new_questions': len(keys - existing),
-                'updates': len(keys & existing),
-                'options': len(parsed),
-                'rows': parsed,
-            }
+            visual_keys = _visual_question_keys(keys)
+            if visual_keys:
+                errors = [
+                    'Workbook import cannot create or update image questions: '
+                    + ', '.join(sorted(visual_keys))
+                ]
+            else:
+                request.session['questionnaire_import_rows'] = parsed
+                existing = set(Question.objects.filter(question_key__in=keys).values_list('question_key', flat=True))
+                preview = {
+                    'questions': len(keys),
+                    'new_questions': len(keys - existing),
+                    'updates': len(keys & existing),
+                    'options': len(parsed),
+                    'rows': parsed,
+                }
     elif request.method == 'POST' and request.POST.get('action') == 'import':
         rows = request.session.pop('questionnaire_import_rows', [])
         mode = request.POST.get('mode', 'update')
         if not rows:
             errors = ['Upload and preview a workbook before importing.']
-        elif mode == 'create' and Question.objects.filter(
-            question_key__in={row['question_key'] for row in rows},
-        ).exists():
+        elif _visual_question_keys({row['question_key'] for row in rows}):
+            errors = ['Workbook import cannot create or update image questions.']
+        elif mode == 'create' and Question.objects.filter(question_key__in={
+            row['question_key'] for row in rows
+        }).exists():
             errors = ['Create Only cannot import an existing question_key.']
         else:
             with transaction.atomic():
@@ -406,11 +429,22 @@ def _group_import_rows(rows):
     return grouped
 
 
+def _visual_question_keys(question_keys):
+    return set(
+        Question.objects.filter(
+            question_key__in=question_keys,
+            image__isnull=False,
+        ).exclude(image='').values_list('question_key', flat=True)
+    )
+
+
 @dashboard_access
 def export_questionnaire(request):
     from openpyxl import Workbook
 
-    questions = Question.objects.select_related('category_ref').prefetch_related('options').order_by('category', 'order')
+    questions = Question.objects.filter(
+        Q(image='') | Q(image__isnull=True),
+    ).select_related('category_ref').prefetch_related('options').order_by('category', 'order')
     category_id = request.GET.get('category')
     question_type = request.GET.get('question_type')
     status = request.GET.get('status')
@@ -429,8 +463,8 @@ def export_questionnaire(request):
     sheet.append(QUESTIONNAIRE_COLUMNS)
     if request.GET.get('template'):
         example_rows = [
-            ['Q001', 'Values', 'What matters most when working with a teammate?', 'SINGLE_CHOICE', 'Choose one', 1, 1.0, True, True, 1, 'Clear communication', 'communication', 5.0, True],
-            ['Q001', 'Values', 'What matters most when working with a teammate?', 'SINGLE_CHOICE', 'Choose one', 1, 1.0, True, True, 2, 'Technical expertise', 'technical_expertise', 4.0, True],
+            ['mindset-worldview-001', 'Mindset & Worldview', 'If you could know the absolute truth about one thing, what would you choose?', 'SINGLE_CHOICE', '', 0, 1.0, True, True, 0, 'What happens after death', 'answer-1', 1.0, True],
+            ['mindset-worldview-001', 'Mindset & Worldview', 'If you could know the absolute truth about one thing, what would you choose?', 'SINGLE_CHOICE', '', 0, 1.0, True, True, 1, 'Whether God exists', 'answer-2', 1.0, True],
         ]
         for row in example_rows:
             sheet.append(row)

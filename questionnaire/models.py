@@ -38,6 +38,8 @@ class Question(models.Model):
         default='SINGLE_CHOICE',
     )
     help_text = models.TextField(blank=True)
+    image = models.ImageField(upload_to='questionnaire/questions/', blank=True, null=True)
+    image_alt_text = models.CharField(max_length=255, blank=True)
     order = models.PositiveIntegerField(default=0)
     weight = models.FloatField(default=1.0)
     is_required = models.BooleanField(default=True)

@@ -1,8 +1,12 @@
-from collections import OrderedDict
+import json
+from pathlib import Path
 
+from django.db import transaction
 from django.db.models import Count
 
-from .models import Question, QuestionResponse, QuestionnaireCategory
+from profiles.models import Profile
+
+from .models import Question, QuestionOption, QuestionResponse, QuestionnaireCategory
 
 
 def questionnaire_progress(user):
@@ -33,57 +37,46 @@ def questionnaire_progress(user):
     }
 
 
+@transaction.atomic
 def seed_questionnaire_data():
-    categories = [
-        ('Values', 'values', 'Principles and priorities when working with others.', 'heart'),
-        ('Learning Style', 'learning-style', 'How you learn and solve problems.', 'book-open'),
-        ('Communication', 'communication', 'How you collaborate and communicate.', 'message-circle'),
-        ('Career Goals', 'career-goals', 'Your professional direction and motivation.', 'target'),
-        ('Lifestyle', 'lifestyle', 'Study habits and working preferences.', 'clock'),
-        ('Interests', 'interests', 'Technical, academic, and extracurricular interests.', 'sparkles'),
-    ]
-    created = 0
-    for order, (name, slug, description, icon) in enumerate(categories):
-        category, _ = QuestionnaireCategory.objects.update_or_create(
-            slug=slug,
-            defaults={'name': name, 'description': description, 'icon': icon, 'display_order': order},
+    data_path = Path(__file__).with_name('questionnaire_data.json')
+    with data_path.open(encoding='utf-8') as data_file:
+        categories_data = json.load(data_file)
+
+    Question.objects.all().delete()
+    QuestionnaireCategory.objects.all().delete()
+    Profile.objects.filter(questionnaire_completed=True).update(questionnaire_completed=False)
+
+    question_count = 0
+    for category_order, category_data in enumerate(categories_data):
+        category = QuestionnaireCategory.objects.create(
+            name=category_data['name'],
+            slug=category_data['slug'],
+            description=category_data['description'],
+            icon=category_data['icon'],
+            display_order=category_order,
         )
-        questions = {
-            'values': [
-                ('What matters most when working with a teammate?', 'SINGLE_CHOICE', ['Reliability', 'Creativity', 'Communication', 'Responsibility', 'Flexibility']),
-                ('How do you prefer to handle disagreements?', 'SINGLE_CHOICE', ['Discuss them directly', 'Take time to reflect', 'Ask a neutral teammate', 'Look for a compromise']),
-            ],
-            'learning-style': [
-                ('How do you prefer to learn a new technology?', 'SINGLE_CHOICE', ['Video tutorials', 'Documentation', 'Hands-on projects', 'Group discussion', 'Mentoring']),
-                ('What helps you understand a difficult concept?', 'SINGLE_CHOICE', ['Examples', 'Visual diagrams', 'Practice exercises', 'A detailed explanation']),
-            ],
-            'communication': [
-                ('How often do you prefer to communicate during a team project?', 'SINGLE_CHOICE', ['Only when necessary', 'Once a day', 'Several times a day', 'Frequent collaboration']),
-                ('Which communication style works best for you?', 'SINGLE_CHOICE', ['Concise messages', 'Detailed written notes', 'Voice or video calls', 'A mix depending on the situation']),
-            ],
-            'career-goals': [
-                ('What best describes your current career goal?', 'SINGLE_CHOICE', ['Software Engineering', 'Data Engineering', 'AI / ML', 'Cloud / DevOps', 'Research', 'Entrepreneurship']),
-                ('What motivates you most in a project?', 'SINGLE_CHOICE', ['Building useful products', 'Learning new skills', 'Solving challenging problems', 'Making a social impact']),
-            ],
-            'lifestyle': [
-                ('When do you prefer studying?', 'SINGLE_CHOICE', ['Early morning', 'Morning', 'Afternoon', 'Evening', 'Late night']),
-                ('What is your ideal study session?', 'SINGLE_CHOICE', ['Short focused blocks', 'One long session', 'Flexible sessions', 'Scheduled group work']),
-            ],
-            'interests': [
-                ('Which activities are you most interested in?', 'MULTIPLE_CHOICE', ['AI', 'Cloud', 'Coding', 'Hackathons', 'Startups', 'Open Source', 'Research', 'Sports', 'Design', 'Photography']),
-                ('Which projects would you enjoy collaborating on?', 'MULTIPLE_CHOICE', ['Mobile apps', 'Web platforms', 'Data visualizations', 'Robotics', 'Community projects', 'Creative tools']),
-            ],
-        }[slug]
-        for question_order, (text, question_type, options) in enumerate(questions):
-            question, _ = Question.objects.update_or_create(
-                category=slug, order=question_order,
-                defaults={'category_ref': category, 'text': text, 'question_type': question_type, 'is_active': True},
+        for question_order, question_data in enumerate(category_data['questions']):
+            question = Question.objects.create(
+                question_key=f"{category.slug}-{question_order + 1:03d}",
+                category=category.slug,
+                category_ref=category,
+                text=question_data['text'],
+                question_type='SINGLE_CHOICE',
+                order=question_order,
+                weight=1.0,
+                is_required=True,
+                is_active=True,
             )
-            for option_order, option_text in enumerate(options):
-                from .models import QuestionOption
-                QuestionOption.objects.update_or_create(
-                    question=question, option_value=option_text.lower().replace(' ', '-'),
-                    defaults={'option_text': option_text, 'display_order': option_order},
+            QuestionOption.objects.bulk_create([
+                QuestionOption(
+                    question=question,
+                    option_text=option_text,
+                    option_value=f'answer-{option_order + 1}',
+                    display_order=option_order,
                 )
-            created += 1
-    return created
+                for option_order, option_text in enumerate(question_data['options'])
+            ])
+            question_count += 1
+
+    return question_count

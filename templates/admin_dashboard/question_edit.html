@@ -2,26 +2,74 @@
 {% block title %}{{ title }}{% endblock %}
 {% block heading %}{{ title }}{% endblock %}
 {% block content %}
-<form method="post">
+<form method="post" enctype="multipart/form-data">
   {% csrf_token %}
   <div class="form-card">
     {{ form.non_field_errors }}
     {% for field in form %}<div class="field">{{ field.errors }}{{ field.label_tag }}{{ field }}</div>{% endfor %}
+    {% if form.instance.image %}
+      <div class="panel" style="margin:14px 0">
+        <strong>Current question image</strong>
+        <p><img src="{{ form.instance.image.url }}" alt="{{ form.instance.image_alt_text }}" style="display:block;max-width:100%;max-height:320px;margin-top:10px;border-radius:14px"></p>
+      </div>
+    {% endif %}
     {% if form.instance.question_type != 'SCALE' %}
       <h2>Answer Options</h2>
       {{ option_formset.management_form }}
       {{ option_formset.non_form_errors }}
       {% for option_form in option_formset %}
-        <div class="panel" style="margin:14px 0">
+        <div class="panel option-form" style="margin:14px 0">
           <strong>Option {{ forloop.counter }}</strong>
           {{ option_form.id }}
-          {% for field in option_form.visible_fields %}<div class="field">{{ field.errors }}{{ field.label_tag }}{{ field }}</div>{% endfor %}
-          {% if option_form.instance.pk %}<div class="field">{{ option_form.DELETE }} {{ option_form.DELETE.label }}</div>{% endif %}
+          {% for field in option_form.visible_fields %}{% if field.name != 'DELETE' %}<div class="field">{{ field.errors }}{{ field.label_tag }}{{ field }}</div>{% endif %}{% endfor %}
+          <div hidden>{{ option_form.DELETE }}</div>
+          <button class="btn secondary remove-option" type="button">Remove option</button>
         </div>
       {% endfor %}
-      <p class="muted">Add another option by completing the empty option card. Values must be unique for this question.</p>
+      <template id="empty-option-form">
+        <div class="panel option-form" style="margin:14px 0">
+          <strong>Option __number__</strong>
+          {{ option_formset.empty_form.id }}
+          {% for field in option_formset.empty_form.visible_fields %}{% if field.name != 'DELETE' %}<div class="field">{{ field.errors }}{{ field.label_tag }}{{ field }}</div>{% endif %}{% endfor %}
+          <div hidden>{{ option_formset.empty_form.DELETE }}</div>
+          <button class="btn secondary remove-option" type="button">Remove option</button>
+        </div>
+      </template>
+      <button class="btn secondary" id="add-option" type="button">+ Add option</button>
+      <p class="muted">Option values must be unique for this question.</p>
     {% endif %}
     <div class="actions"><button class="btn">Save question</button><a class="btn secondary" href="{{ back_url }}">Cancel</a></div>
   </div>
 </form>
+<script>
+  (() => {
+    const formContainer = document.querySelector('.form-card');
+    const template = document.getElementById('empty-option-form');
+    const addButton = document.getElementById('add-option');
+    const totalForms = document.getElementById('id_options-TOTAL_FORMS');
+    if (!formContainer || !template || !addButton || !totalForms) return;
+
+    addButton.addEventListener('click', () => {
+      const formIndex = Number(totalForms.value);
+      const html = template.innerHTML
+        .replace(/__prefix__/g, String(formIndex))
+        .replace(/__number__/g, String(formIndex + 1));
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = html.trim();
+      formContainer.insertBefore(wrapper.firstElementChild, addButton);
+      totalForms.value = String(formIndex + 1);
+    });
+
+    formContainer.addEventListener('click', event => {
+      const button = event.target.closest('.remove-option');
+      if (!button) return;
+      const optionForm = button.closest('.option-form');
+      const deleteInput = optionForm.querySelector('input[name$="-DELETE"]');
+      if (deleteInput) {
+        deleteInput.checked = true;
+        optionForm.hidden = true;
+      }
+    });
+  })();
+</script>
 {% endblock %}

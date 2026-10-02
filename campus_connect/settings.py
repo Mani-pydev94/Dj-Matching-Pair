@@ -148,8 +148,19 @@ SOCIALACCOUNT_PROVIDERS = {
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
 
-# Email backend for development
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Use the console backend locally; configure SMTP through environment variables
+# to deliver verification codes from a deployed environment.
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.console.EmailBackend',
+)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() == 'true'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Campus Connect AI <no-reply@localhost>')
 
 # Modern django-allauth settings
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -160,4 +171,3 @@ LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/auth/login/'
 SOCIALACCOUNT_LOGIN_ON_GET = True  # Bypasses intermediate confirmation page
-

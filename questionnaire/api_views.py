@@ -14,7 +14,13 @@ class QuestionnaireQuestionsAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        questions = Question.objects.filter(is_active=True).prefetch_related(
+        questions = Question.objects.filter(is_active=True)
+        category_slug = request.query_params.get('category')
+        if category_slug:
+            questions = questions.filter(category_ref__slug=category_slug)
+        questions = questions.order_by(
+            'category_ref__display_order', 'category_ref__name', 'order', 'id',
+        ).prefetch_related(
             Prefetch('options', queryset=QuestionOption.objects.filter(is_active=True)),
             'category_ref',
         )

@@ -1,6 +1,7 @@
 """campus_connect URL Configuration"""
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from questionnaire.urls import questionnaire_hub, questionnaire_intro, questionnaire_questions
@@ -11,6 +12,7 @@ urlpatterns = [
     path('admin-dashboard/', include('admin_dashboard.urls')),
     path('', include('core.urls')),
     path('auth/', include('accounts.urls')),
+    path('accounts/signup/', RedirectView.as_view(pattern_name='signup', permanent=False)),
     path('accounts/', include('allauth.urls')),
     path('profiles/', include('profiles.urls')),
     path('api/', include('profiles.api_urls')),

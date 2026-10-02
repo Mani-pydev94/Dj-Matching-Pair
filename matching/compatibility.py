@@ -2,14 +2,6 @@ from collections import defaultdict
 
 from questionnaire.models import QuestionResponse, QuestionnaireCategory
 
-CATEGORY_WEIGHTS = {
-    'values': 1 / 6,
-    'learning-style': 1 / 6,
-    'communication': 1 / 6,
-    'career-goals': 1 / 6,
-    'lifestyle': 1 / 6,
-    'interests': 1 / 6,
-}
 MIN_MATCH_SCORE = 75
 
 
@@ -51,38 +43,40 @@ def _importance_weight(first, second):
 def calculate_compatibility(user_a, user_b):
     first = _response_map(user_a)
     second = _response_map(user_b)
-    category_scores = defaultdict(lambda: {'weighted_total': 0.0, 'total_weight': 0.0})
+    category_scores = defaultdict(list)
+    question_similarities = []
     shared_interests = set()
     for question_id, response_a in first.items():
         response_b = second.get(question_id)
         if not response_b:
             continue
         category = response_a.question.category_ref.slug if response_a.question.category_ref else response_a.question.category
-        weight = _importance_weight(response_a, response_b)
-        category_scores[category]['weighted_total'] += _similarity(response_a, response_b) * weight
-        category_scores[category]['total_weight'] += weight
+        similarity = _similarity(response_a, response_b)
+        category_scores[category].append(similarity)
+        question_similarities.append(similarity)
     scores = {
-        category: round(values['weighted_total'] / values['total_weight'])
-        for category, values in category_scores.items()
-        if values['total_weight']
+        category: round(sum(similarities) / len(similarities))
+        for category, similarities in category_scores.items()
     }
-    overall = round(sum(scores.get(category, 0) * weight for category, weight in CATEGORY_WEIGHTS.items()))
+    overall = round(sum(question_similarities) / len(question_similarities)) if question_similarities else 0
     interests_a = {item.strip().lower() for item in user_a.profile.interests.split(',') if item.strip()} if hasattr(user_a, 'profile') else set()
     interests_b = {item.strip().lower() for item in user_b.profile.interests.split(',') if item.strip()} if hasattr(user_b, 'profile') else set()
     shared_interests = sorted(interests_a & interests_b)
     reasons = []
-    if scores.get('learning-style', 0) >= 75:
-        reasons.append('Similar learning style')
-    if scores.get('career-goals', 0) >= 75:
-        reasons.append('Aligned career goals')
+    for category in QuestionnaireCategory.objects.filter(is_active=True).order_by('display_order', 'name'):
+        if scores.get(category.slug, 0) >= 75:
+            reasons.append(f'Similar {category.name.casefold()}')
     if shared_interests:
         reasons.append(f"Shared interests: {', '.join(shared_interests[:3])}")
     return {
         'overall_score': max(0, min(100, overall)),
-        'categories': {key: scores.get(key, 0) for key in CATEGORY_WEIGHTS},
+        'categories': {
+            category.slug: scores.get(category.slug, 0)
+            for category in QuestionnaireCategory.objects.filter(is_active=True).order_by('display_order', 'name')
+        },
         'shared_interests': shared_interests,
         'reasons': reasons,
-        'importance_note': 'Question similarity is weighted by the average importance both people assigned.',
+        'importance_note': 'Every shared question contributes equally to the questionnaire score.',
     }
 
 
@@ -90,7 +84,7 @@ def calculate_compatibility_analysis(user_a, user_b):
     first = _response_map(user_a)
     second = _response_map(user_b)
     question_scores = []
-    category_scores = defaultdict(lambda: {'weighted_total': 0.0, 'total_weight': 0.0})
+    category_scores = defaultdict(list)
 
     for question_id, response_a in first.items():
         response_b = second.get(question_id)
@@ -99,9 +93,8 @@ def calculate_compatibility_analysis(user_a, user_b):
         category = response_a.question.category_ref
         category_key = category.slug if category else response_a.question.category
         similarity = _similarity(response_a, response_b)
+        category_scores[category_key].append(similarity)
         importance_weight = _importance_weight(response_a, response_b)
-        category_scores[category_key]['weighted_total'] += similarity * importance_weight
-        category_scores[category_key]['total_weight'] += importance_weight
         question_scores.append({
             'question': response_a.question.text,
             'category': category.name if category else response_a.question.category.replace('-', ' ').title(),
@@ -110,22 +103,15 @@ def calculate_compatibility_analysis(user_a, user_b):
         })
 
     scores = {
-        category: round(values['weighted_total'] / values['total_weight'])
-        for category, values in category_scores.items()
-        if values['total_weight']
-    }
-    category_names = {
-        category.slug: category.name
-        for category in QuestionnaireCategory.objects.filter(
-            slug__in=CATEGORY_WEIGHTS,
-        )
+        category: round(sum(similarities) / len(similarities))
+        for category, similarities in category_scores.items()
     }
     categories = [
         {
-            'name': category_names.get(key, key.replace('-', ' ').title()),
-            'score': scores.get(key, 0),
+            'name': category.name,
+            'score': scores.get(category.slug, 0),
         }
-        for key in CATEGORY_WEIGHTS
+        for category in QuestionnaireCategory.objects.filter(is_active=True).order_by('display_order', 'name')
     ]
     most_important = [
         item for item in question_scores if item['importance_weight'] > 1

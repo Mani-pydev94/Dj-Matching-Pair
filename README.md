@@ -16,7 +16,11 @@ migrations.
 
 ## Authentication
 
-The application currently uses traditional email/password authentication.
+Email/password sign-up requires a one-time email code before the account is
+activated. Codes contain six uppercase letters and digits, expire after ten
+minutes, and allow up to five verification attempts. During local development,
+the code is printed by Django's console email backend. Configure the `EMAIL_*`
+environment variables in `.env` to deliver codes through your SMTP provider.
 
 Create an administrator account with:
 

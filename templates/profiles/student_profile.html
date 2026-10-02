@@ -88,7 +88,7 @@
         </section>
         <section class="card">
           <h2>Similarity on Most Important Questions</h2>
-          <p class="section-note">Based on the average importance both people assigned.</p>
+          <p class="section-note">Questions contribute equally to the overall score. This section shows questions whose average importance rating was above neutral.</p>
           {% if compatibility.most_important_questions %}
             <p class="match">{{ compatibility.most_important_similarity }}% similarity</p>
             {% for item in compatibility.most_important_questions %}
@@ -103,7 +103,7 @@
         </section>
         <section class="card">
           <h2>Similarity on Least Important Questions</h2>
-          <p class="section-note">Questions rated below neutral by the average of both importance ratings.</p>
+          <p class="section-note">Questions contribute equally to the overall score. This section shows questions whose average importance rating was below neutral.</p>
           {% if compatibility.least_important_questions %}
             <p class="match">{{ compatibility.least_important_similarity }}% similarity</p>
             {% for item in compatibility.least_important_questions %}
