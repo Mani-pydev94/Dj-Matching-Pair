@@ -44,7 +44,7 @@ class ProfileSetupForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ('age', 'city', 'gender', 'university', 'major', 'year', 'bio', 'photo')
+        fields = ('age', 'city', 'gender', 'university', 'major', 'year', 'bio', 'interests', 'photo')
         widgets = {
             'city': forms.TextInput(attrs={'placeholder': 'Your city'}),
             'university': forms.TextInput(attrs={'placeholder': 'Your university'}),
@@ -61,6 +61,10 @@ class ProfileSetupForm(forms.ModelForm):
                 'placeholder': 'Tell students a little about yourself...',
                 'maxlength': 500,
                 'rows': 4,
+            }),
+            'interests': forms.TextInput(attrs={
+                'placeholder': 'e.g. Music, hiking, photography',
+                'maxlength': 300,
             }),
         }
 

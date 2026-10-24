@@ -189,7 +189,9 @@ class ProfileSetupTests(TestCase):
             'city': 'Bengaluru',
             'major': 'Computer Science',
             'year': '3rd Year',
+            'interests': 'Music, hiking',
         })
         self.assertEqual(response.status_code, 302)
         self.user.profile.refresh_from_db()
         self.assertTrue(self.user.profile.is_public)
+        self.assertEqual(self.user.profile.interests, 'Music, hiking')

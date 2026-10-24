@@ -58,6 +58,7 @@
       <div class="field"><label for="{{ form.gender.id_for_label }}">Gender</label>{{ form.gender }}</div>
       <div class="field"><label>Languages</label><div class="chips">{% for checkbox in form.languages %}<div class="chip">{{ checkbox.tag }}<label for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label></div>{% endfor %}</div></div>
       <div class="field"><label for="{{ form.bio.id_for_label }}">Short bio</label>{{ form.bio }}<p class="help">A short introduction helps people find common ground.</p></div>
+      <div class="field"><label for="{{ form.interests.id_for_label }}">Interests</label>{{ form.interests }}<p class="help">Share a few hobbies or topics you enjoy.</p>{% if form.interests.errors %}<div class="error">{{ form.interests.errors.0 }}</div>{% endif %}</div>
     </section>
     <section class="card">
       <h3><span class="icon">⌂</span>Academic information</h3>
