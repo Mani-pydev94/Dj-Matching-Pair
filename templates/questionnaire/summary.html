@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Your answer summary — Campus Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--p:#6D45F5;--pd:#6938D9;--ink:#171717;--muted:#7A7A7A;--line:#E8E8ED;--soft:#F3EEFF;--page:#F7F5FF}
+    *{box-sizing:border-box}
+    [hidden]{display:none!important}
+    body{min-height:100vh;margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    a{color:inherit}
+    .app-shell{position:relative;width:100%;max-width:430px;min-height:100dvh;margin:0 auto;padding-bottom:calc(145px + env(safe-area-inset-bottom));background:#fff}
+    .hero{position:relative;overflow:hidden;padding:19px 20px 24px;border-radius:0 0 28px 28px;background:linear-gradient(135deg,#7547f5,#6938d9);color:#fff;box-shadow:0 12px 28px #6d45f53b}
+    .hero:after{position:absolute;right:-62px;bottom:-115px;width:230px;height:230px;border:1px solid #ffffff2e;border-radius:50%;content:""}
+    .top,.hero-main{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
+    .back{display:grid;place-items:center;width:40px;height:40px;border:1px solid #ffffff38;border-radius:14px;background:#ffffff1c;color:#fff;text-decoration:none;font-size:25px;line-height:1}
+    .brand{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;opacity:.85}
+    .hero-main{margin-top:24px}
+    .hero-copy{max-width:330px}
+    .eyebrow{font-size:9px;font-weight:700;letter-spacing:1px;opacity:.77}
+    h1,h2,h3,p{margin-top:0}
+    h1{margin:5px 0 0;font-size:25px;font-weight:800;letter-spacing:-.7px;line-height:1.15}
+    .intro{margin:7px 0 0;color:#ffffffd9;font-size:12px;line-height:1.5}
+    .content{padding:22px 20px 24px}
+    .section{margin-top:0}
+    .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin-bottom:12px}
+    h2{margin:0;font-size:18px;font-weight:750;letter-spacing:-.2px;line-height:1.25}
+    .section-sub{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
+    .ai-status{margin:10px 0 0;color:#625D6D;font-size:12px;line-height:1.5}
+    .ai-status a{color:var(--p);font-weight:600}
+    .ai-retry{margin-top:8px;padding:8px 12px;border:0;border-radius:10px;background:var(--soft);color:var(--p);font:700 12px Inter,system-ui,sans-serif;cursor:pointer}
+    .category-list{display:grid;gap:9px}
+    .category{padding:12px;border:1px solid var(--line);border-radius:17px;background:#fff;box-shadow:0 4px 14px #1e144609}
+    .category-top{display:flex;align-items:center;gap:10px}
+    .category-icon{display:grid;place-items:center;flex:none;width:38px;height:38px;border:1px solid #ECE7FA;border-radius:12px;background:#F8F5FF;font-size:18px}
+    .category-title{min-width:0;flex:1}
+    .category-title h3{margin:0;font-size:14px;font-weight:700}
+    .category-reflection{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:#faf8ff;color:#625D6D;font-size:13px;line-height:1.5}
+    .footer{position:fixed;right:0;bottom:calc(66px + env(safe-area-inset-bottom));left:0;z-index:5;max-width:430px;margin:auto;padding:12px 20px 8px;background:linear-gradient(180deg,#ffffff00,#fff 22%)}
+    .matches-button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;border-radius:15px;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;text-decoration:none;font-size:15px;font-weight:750;box-shadow:0 8px 18px #6d45f53d}
+    .review-link{display:block;margin-top:9px;color:#898593;font-size:13px;font-weight:600;text-align:center;text-decoration:none}
+    .loading,.error,.empty{padding:22px;border:1px dashed #D9D1EE;border-radius:15px;background:#FCFAFF;color:var(--muted);font-size:13px;line-height:1.5;text-align:center}
+    .error{color:#B42318}
+    .spinner{width:22px;height:22px;margin:0 auto 10px;border:2px solid #E8E0FF;border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:380px){.hero{padding-right:16px;padding-left:16px}.content{padding-right:16px;padding-left:16px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="top">
+        <a class="back" href="{% url 'home' %}" aria-label="Back to home">‹</a>
+        <span class="brand">Campus Connect</span>
+        <span aria-hidden="true" style="width:40px"></span>
+      </div>
+      <div class="hero-main">
+        <div class="hero-copy">
+          <span class="eyebrow">YOUR ANSWERS</span>
+          <h1>A little about you</h1>
+          <p class="intro">Personal reflections, based on the choices you made.</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="section" aria-labelledby="categories-heading">
+        <div class="section-head">
+          <div>
+            <h2 id="categories-heading">What matters to you</h2>
+            <p class="section-sub">Personal reflections, based on your answers.</p>
+          </div>
+        </div>
+        <div id="summary-loading" class="loading" aria-live="polite"><div class="spinner" aria-hidden="true"></div>Loading your reflections…</div>
+        <p class="ai-status" id="ai-status" role="status" aria-live="polite" hidden></p>
+        <div id="categories" class="category-list" aria-live="polite"></div>
+        <div id="page-error" class="error" hidden></div>
+      </section>
+    </main>
+  </div>
+  <div class="footer">
+    <a class="matches-button" href="{% url 'explore_matches' %}">Explore my matches <span aria-hidden="true">→</span></a>
+    <a class="review-link" href="{% url 'questionnaire_questions' %}">Review my answers</a>
+  </div>
+  {% csrf_token %}
+  {% include 'includes/bottom_nav.html' with active_nav='matches' %}
+  <script>
+    const categoriesNode = document.getElementById('categories');
+    const loadingNode = document.getElementById('summary-loading');
+    const pageError = document.getElementById('page-error');
+    const aiStatus = document.getElementById('ai-status');
+    let isGenerating = false;
+    const icons = {
+      brain: '🧠', heart: '💜', scale: '⚖️', laugh: '😄',
+      users: '🧑‍🤝‍🧑', globe: '🌍', rocket: '🚀', sparkles: '✨', image: '🖼️'
+    };
+
+    function renderSummary(data) {
+      if (!data.has_answers || !Array.isArray(data.categories) || !data.categories.length) {
+        throw new Error('There are no completed answers to show yet.');
+      }
+      loadingNode.hidden = true;
+
+      const fragment = document.createDocumentFragment();
+      data.categories.forEach(category => {
+        const card = document.createElement('article');
+        card.className = 'category';
+        const top = document.createElement('div');
+        top.className = 'category-top';
+        const icon = document.createElement('span');
+        icon.className = 'category-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = icons[category.icon] || '✦';
+        const title = document.createElement('div');
+        title.className = 'category-title';
+        const heading = document.createElement('h3');
+        heading.textContent = category.name;
+        title.append(heading);
+        top.append(icon, title);
+        const reflection = document.createElement('p');
+        reflection.className = 'category-reflection';
+        reflection.textContent = category.summary_source === 'ai'
+          ? category.summary
+          : 'Your personal reflection will appear here.';
+        card.append(top, reflection);
+        fragment.appendChild(card);
+      });
+      categoriesNode.replaceChildren(fragment);
+      aiStatus.hidden = data.ai_generated;
+      aiStatus.textContent = data.ai_generated
+        ? 'Personal reflections generated from your answers.'
+        : '';
+    }
+
+    async function readApiResponse(response, fallbackMessage) {
+      if (!(response.headers.get('content-type') || '').includes('json')) {
+        if (response.redirected && response.url.includes('/auth/login')) {
+          throw new Error('Your session has expired. Please sign in and try again.');
+        }
+        throw new Error(`${fallbackMessage} The server returned an unexpected response (HTTP ${response.status}).`);
+      }
+      try {
+        return await response.json();
+      } catch {
+        throw new Error(`${fallbackMessage} The server returned invalid data.`);
+      }
+    }
+
+    async function loadSummary() {
+      try {
+        const response = await fetch('/api/questionnaire/summary/', {credentials: 'same-origin', cache: 'no-store'});
+        const data = await readApiResponse(response, 'We could not load your summary.');
+        if (!response.ok) throw new Error(data.detail || 'We could not load your summary.');
+        renderSummary(data);
+        if (data.ai_generated) return;
+        if (data.ai_consent && data.ai_configured) {
+          await generateReflections();
+        } else {
+          showAiNotice(
+            data.ai_consent
+              ? 'AI reflections are temporarily unavailable. Your answers were not sent.'
+              : 'AI reflections are off. Your answers were not sent to Gemini.',
+            !data.ai_consent,
+          );
+        }
+      } catch (error) {
+        loadingNode.hidden = true;
+        pageError.textContent = error.message || 'We could not load your summary. Please try again.';
+        pageError.hidden = false;
+      }
+    }
+
+    function showAiNotice(message, showConsentLink = false) {
+      aiStatus.replaceChildren(document.createTextNode(message));
+      if (showConsentLink) {
+        aiStatus.append(' ');
+        const link = document.createElement('a');
+        link.href = '{% url "questionnaire_intro" %}';
+        link.textContent = 'Change your choice.';
+        aiStatus.appendChild(link);
+      }
+      aiStatus.hidden = false;
+    }
+
+    async function generateReflections() {
+      if (isGenerating) return;
+      isGenerating = true;
+      aiStatus.hidden = false;
+      aiStatus.textContent = 'Writing your personal reflections…';
+      try {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const response = await fetch('/api/questionnaire/summary/insights/', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+          body: JSON.stringify({consent: true})
+        });
+        const data = await readApiResponse(response, 'Your reflections could not be generated.');
+        if (!response.ok) throw new Error(data.detail || 'Your reflections could not be generated.');
+        renderSummary(data);
+        aiStatus.hidden = false;
+        aiStatus.textContent = 'Personal reflections generated from your answers.';
+      } catch (error) {
+        showAiNotice(error.message || 'Your reflections could not be generated.');
+        const retry = document.createElement('button');
+        retry.className = 'ai-retry';
+        retry.type = 'button';
+        retry.textContent = 'Try again';
+        retry.addEventListener('click', generateReflections);
+        aiStatus.appendChild(document.createElement('br'));
+        aiStatus.appendChild(retry);
+      } finally {
+        isGenerating = false;
+      }
+    }
+
+    loadSummary();
+  </script>
+</body>
+</html>

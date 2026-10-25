@@ -34,10 +34,11 @@
     .privacy-icon{font-size:17px}
     .privacy p{color:#777281;font-size:13px;line-height:1.55}
     .privacy strong{color:#363241}
+    .consent-error{margin-top:12px;color:#B42318;font-size:12px;line-height:1.5}
     .footer{position:sticky;bottom:calc(68px + env(safe-area-inset-bottom));z-index:2;padding:13px 20px 6px;background:linear-gradient(180deg,#ffffff00 0%,#fff 22%)}
     .primary{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:50px;border-radius:15px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;text-decoration:none;font-size:16px;font-weight:750;box-shadow:0 8px 18px #6d45f53d;transition:transform .16s,box-shadow .16s}
     .primary:hover{transform:translateY(-1px);box-shadow:0 11px 22px #6d45f54a}
-    .later{display:block;margin-top:11px;color:#898593;text-align:center;text-decoration:none;font-size:13px;font-weight:600}
+    .later{display:block;width:100%;margin-top:11px;padding:8px;border:0;background:transparent;color:#898593;text-align:center;font:600 13px Inter,system-ui,sans-serif;cursor:pointer}
     @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
   </style>
 </head>
@@ -74,12 +75,17 @@
       </div>
       <aside class="privacy">
         <span class="privacy-icon" aria-hidden="true">🔒</span>
-        <p><strong>Your answers help power better matches.</strong> Your profile details stay private until you connect with someone.</p>
+        <p><strong>Your answers help power better matches.</strong> Your profile details stay private until you connect. If you allow AI reflections, your questionnaire answers will be sent to Google Gemini automatically when you finish. You can continue without AI.</p>
       </aside>
     </section>
 
     <div class="footer">
-      <a class="primary" href="{% url 'questionnaire_hub' %}">Start questionnaire <span aria-hidden="true">→</span></a>
+      <form method="post">
+        {% csrf_token %}
+        {% if consent_error %}<p class="consent-error" role="alert">{{ consent_error }}</p>{% endif %}
+        <button class="primary" type="submit" name="ai_consent" value="yes">Allow AI reflections and continue <span aria-hidden="true">→</span></button>
+        <button class="later" type="submit" name="ai_consent" value="no">Continue without AI</button>
+      </form>
       <a class="later" href="{% url 'home' %}">Maybe later</a>
     </div>
   </main>

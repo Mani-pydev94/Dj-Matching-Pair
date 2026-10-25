@@ -6,8 +6,13 @@ from rest_framework.views import APIView
 
 from .models import Question, QuestionOption, QuestionResponse, QuestionnaireCategory
 from .serializers import CategorySerializer, QuestionSerializer, ResponseSerializer
-from .services import questionnaire_progress
-from profiles.models import Profile
+from .services import mark_questionnaire_completed, questionnaire_progress
+from .summary import (
+    InsightGenerationError,
+    generate_category_summaries,
+    get_questionnaire_summary,
+    gemini_is_configured,
+)
 
 
 class QuestionnaireQuestionsAPIView(APIView):
@@ -70,14 +75,56 @@ class QuestionnaireCompleteAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        progress = questionnaire_progress(request.user)
-        if not progress['is_complete']:
+        if not mark_questionnaire_completed(request.user):
+            progress = questionnaire_progress(request.user)
             return Response({'detail': 'Complete all required questions first.', 'progress': progress}, status=status.HTTP_400_BAD_REQUEST)
-        profile, _ = Profile.objects.get_or_create(user=request.user)
-        profile.questionnaire_completed = True
-        update_fields = ['questionnaire_completed', 'updated_at']
-        if not profile.is_public:
-            profile.is_public = True
-            update_fields.append('is_public')
-        profile.save(update_fields=update_fields)
-        return Response({'completed': True, 'progress': progress})
+        return Response({
+            'completed': True,
+            'progress': questionnaire_progress(request.user),
+        })
+
+
+class QuestionnaireSummaryAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        if not questionnaire_progress(request.user)['is_complete']:
+            return Response(
+                {'detail': 'Complete all required questions to view your summary.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        summary = get_questionnaire_summary(request.user)
+        profile = getattr(request.user, 'profile', None)
+        summary['ai_consent'] = bool(
+            profile and profile.questionnaire_ai_consent
+        )
+        return Response(summary)
+
+
+class QuestionnaireSummaryInsightsAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        if request.data.get('consent') is not True:
+            return Response(
+                {'detail': 'Confirm before sending your answers to Gemini.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        profile = getattr(request.user, 'profile', None)
+        if not profile or profile.questionnaire_ai_consent is not True:
+            return Response(
+                {'detail': 'Opt in to AI reflections before sending your answers to Gemini.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        try:
+            result = generate_category_summaries(request.user)
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except InsightGenerationError as exc:
+            status_code = (
+                status.HTTP_503_SERVICE_UNAVAILABLE
+                if not gemini_is_configured()
+                else status.HTTP_502_BAD_GATEWAY
+            )
+            return Response({'detail': str(exc)}, status=status_code)
+        return Response(result)

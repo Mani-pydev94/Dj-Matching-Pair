@@ -34,3 +34,11 @@ without changing the existing profile data.
 ## Environment Variables
 
 Copy `.env.example` to `.env` and fill in values. Never commit `.env`.
+
+Optional AI-written questionnaire summaries use the Gemini API. Add
+`GEMINI_API_KEY` to `.env` on the server (never in browser code); optionally set
+`GEMINI_MODEL` to a model enabled for your API key. Without a key, the personal
+summary and answer snapshots still work. Users choose before starting whether
+to enable automatic AI reflections after completing the questionnaire. Answers
+are sent to Gemini only for users who opt in. Review Google's current Gemini
+API terms and free-tier data-use policy before enabling this for real users.

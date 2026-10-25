@@ -6,6 +6,8 @@ from .api_views import (
     QuestionnaireProgressAPIView,
     QuestionnaireQuestionsAPIView,
     QuestionnaireResponsesAPIView,
+    QuestionnaireSummaryAPIView,
+    QuestionnaireSummaryInsightsAPIView,
 )
 
 urlpatterns = [
@@ -15,4 +17,10 @@ urlpatterns = [
     path('progress/', QuestionnaireProgressAPIView.as_view(), name='api_questionnaire_progress'),
     path('responses/', QuestionnaireResponsesAPIView.as_view(), name='api_questionnaire_responses'),
     path('complete/', QuestionnaireCompleteAPIView.as_view(), name='api_questionnaire_complete'),
+    path('summary/', QuestionnaireSummaryAPIView.as_view(), name='api_questionnaire_summary'),
+    path(
+        'summary/insights/',
+        QuestionnaireSummaryInsightsAPIView.as_view(),
+        name='api_questionnaire_summary_insights',
+    ),
 ]
