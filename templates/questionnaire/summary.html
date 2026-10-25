@@ -29,6 +29,14 @@
     .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin-bottom:12px}
     h2{margin:0;font-size:18px;font-weight:750;letter-spacing:-.2px;line-height:1.25}
     .section-sub{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
+    .score-chart{display:flex;align-items:center;gap:18px;margin:0 0 22px;padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 4px 14px #1e144609}
+    .score-donut{display:block;flex:none;width:124px;height:124px}
+    .score-center{fill:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:12px;font-weight:700;text-anchor:middle}
+    .score-legend{display:grid;flex:1;gap:7px;min-width:0;margin:0;padding:0;list-style:none}
+    .score-legend li{display:flex;align-items:center;gap:7px;min-width:0;color:#625D6D;font-size:11px;line-height:1.3}
+    .score-swatch{flex:none;width:9px;height:9px;border-radius:50%}
+    .score-name{overflow:hidden;flex:1;text-overflow:ellipsis;white-space:nowrap}
+    .score-value{flex:none;color:var(--ink);font-weight:700}
     .ai-status{margin:10px 0 0;color:#625D6D;font-size:12px;line-height:1.5}
     .ai-status a{color:var(--p);font-weight:600}
     .ai-retry{margin-top:8px;padding:8px 12px;border:0;border-radius:10px;background:var(--soft);color:var(--p);font:700 12px Inter,system-ui,sans-serif;cursor:pointer}
@@ -68,6 +76,13 @@
     </header>
 
     <main class="content">
+      <div id="score-chart" class="score-chart" role="group" aria-label="Category percentages" hidden>
+        <svg class="score-donut" id="score-donut" viewBox="0 0 120 120" aria-hidden="true">
+          <text class="score-center" x="60" y="57">Category</text>
+          <text class="score-center" x="60" y="72">scores</text>
+        </svg>
+        <ul class="score-legend" id="score-legend" aria-label="Category percentages"></ul>
+      </div>
       <section class="section" aria-labelledby="categories-heading">
         <div class="section-head">
           <div>
@@ -93,7 +108,14 @@
     const loadingNode = document.getElementById('summary-loading');
     const pageError = document.getElementById('page-error');
     const aiStatus = document.getElementById('ai-status');
+    const scoreChart = document.getElementById('score-chart');
+    const scoreDonut = document.getElementById('score-donut');
+    const scoreLegend = document.getElementById('score-legend');
     let isGenerating = false;
+    const chartColors = [
+      '#6D45F5', '#EF6C8F', '#2F9E8F', '#F2A541',
+      '#4A84E8', '#A05AC7', '#D45D45', '#71813E', '#8C72C9'
+    ];
     const icons = {
       brain: '🧠', heart: '💜', scale: '⚖️', laugh: '😄',
       users: '🧑‍🤝‍🧑', globe: '🌍', rocket: '🚀', sparkles: '✨', image: '🖼️'
@@ -104,6 +126,7 @@
         throw new Error('There are no completed answers to show yet.');
       }
       loadingNode.hidden = true;
+      renderScoreChart(data.categories);
 
       const fragment = document.createDocumentFragment();
       data.categories.forEach(category => {
@@ -134,6 +157,76 @@
       aiStatus.textContent = data.ai_generated
         ? 'Personal reflections generated from your answers.'
         : '';
+    }
+
+    function describeArc(startAngle, endAngle, radius) {
+      const toPoint = angle => {
+        const radians = (angle - 90) * Math.PI / 180;
+        return {
+          x: 60 + radius * Math.cos(radians),
+          y: 60 + radius * Math.sin(radians),
+        };
+      };
+      const start = toPoint(startAngle);
+      const end = toPoint(endAngle);
+      const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+      return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArc} 1 ${end.x} ${end.y}`;
+    }
+
+    function renderScoreChart(categories) {
+      const gap = 2;
+      const slotSize = 360 / categories.length;
+      const radius = 44;
+      const trackColor = '#EEEAF5';
+      const paths = document.createDocumentFragment();
+      const legend = document.createDocumentFragment();
+
+      categories.forEach((category, index) => {
+        const startAngle = -slotSize / 2 + index * slotSize + gap / 2;
+        const endAngle = startAngle + slotSize - gap;
+        const score = Math.max(0, Math.min(100, Number(category.score) || 0));
+        const pathAttributes = {
+          fill: 'none',
+          'stroke-width': '13',
+          'stroke-linecap': 'butt',
+        };
+        const track = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        Object.entries(pathAttributes).forEach(([name, value]) => track.setAttribute(name, value));
+        track.setAttribute('d', describeArc(startAngle, endAngle, radius));
+        track.setAttribute('stroke', trackColor);
+        paths.appendChild(track);
+
+        if (score > 0) {
+          const progress = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          Object.entries(pathAttributes).forEach(([name, value]) => progress.setAttribute(name, value));
+          progress.setAttribute('d', describeArc(
+            startAngle,
+            startAngle + (endAngle - startAngle) * score / 100,
+            radius,
+          ));
+          progress.setAttribute('stroke', chartColors[index % chartColors.length]);
+          paths.appendChild(progress);
+        }
+
+        const item = document.createElement('li');
+        const swatch = document.createElement('span');
+        swatch.className = 'score-swatch';
+        swatch.setAttribute('aria-hidden', 'true');
+        swatch.style.backgroundColor = chartColors[index % chartColors.length];
+        const name = document.createElement('span');
+        name.className = 'score-name';
+        name.textContent = category.name;
+        const value = document.createElement('span');
+        value.className = 'score-value';
+        value.textContent = `${score}%`;
+        item.append(swatch, name, value);
+        legend.appendChild(item);
+      });
+
+      scoreDonut.querySelectorAll('path').forEach(path => path.remove());
+      scoreDonut.insertBefore(paths, scoreDonut.querySelector('text'));
+      scoreLegend.replaceChildren(legend);
+      scoreChart.hidden = false;
     }
 
     async function readApiResponse(response, fallbackMessage) {

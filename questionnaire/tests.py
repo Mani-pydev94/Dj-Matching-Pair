@@ -314,6 +314,8 @@ class QuestionnaireSummaryTests(TestCase):
         self.assertNotContains(response, 'What does this percentage mean?')
         self.assertContains(response, 'Explore my matches')
         self.assertContains(response, 'Personal reflections, based on your answers.')
+        self.assertContains(response, 'id="score-chart"')
+        self.assertContains(response, 'id="score-legend"')
         self.assertContains(response, 'generateReflections()')
         self.assertContains(response, 'data.ai_consent && data.ai_configured')
         self.assertNotContains(response, 'Generate my reflections')
