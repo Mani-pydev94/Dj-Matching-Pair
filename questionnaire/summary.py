@@ -135,7 +135,7 @@ def get_questionnaire_summary(user):
     }
 
 
-def _validated_ai_summaries(response_json, expected_slugs):
+def validate_ai_summaries(response_json, expected_slugs):
     try:
         text = response_json['candidates'][0]['content']['parts'][0]['text']
         decoded = json.loads(text)
@@ -257,7 +257,7 @@ def generate_category_summaries(user):
             'Gemini returned an unreadable response. Please try again later.'
         ) from exc
 
-    summaries = _validated_ai_summaries(response_json, expected_slugs)
+    summaries = validate_ai_summaries(response_json, expected_slugs)
     QuestionnaireInsight.objects.update_or_create(
         user=user,
         defaults={

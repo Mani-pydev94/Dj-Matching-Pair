@@ -80,6 +80,29 @@ def calculate_compatibility(user_a, user_b):
     }
 
 
+def _category_reflection(name, score, has_shared_answers=True):
+    topic = name.casefold()
+    if not has_shared_answers:
+        return (
+            f"There is not enough shared questionnaire data about {topic} to "
+            'compare yet. More completed answers can make this picture clearer.'
+        )
+    if score >= 80:
+        return (
+            f"You have strong common ground in {topic}. Compare what that shared "
+            'ground means to each of you and where your individual perspectives add something new.'
+        )
+    if score >= 55:
+        return (
+            f"You share some common ground in {topic}, with room to discover "
+            'more. A thoughtful conversation can reveal what matters most to each of you.'
+        )
+    return (
+        f"Your perspectives on {topic} may differ. That makes curiosity and "
+        'open conversation especially valuable as you get to know each other.'
+    )
+
+
 def calculate_compatibility_analysis(user_a, user_b):
     first = _response_map(user_a)
     second = _response_map(user_b)
@@ -108,8 +131,14 @@ def calculate_compatibility_analysis(user_a, user_b):
     }
     categories = [
         {
+            'slug': category.slug,
             'name': category.name,
             'score': scores.get(category.slug, 0),
+            'reflection': _category_reflection(
+                category.name,
+                scores.get(category.slug, 0),
+                has_shared_answers=category.slug in category_scores,
+            ),
         }
         for category in QuestionnaireCategory.objects.filter(is_active=True).order_by('display_order', 'name')
     ]

@@ -1,3 +1,7 @@
+import json
+import os
+from unittest.mock import Mock, patch
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -94,6 +98,21 @@ class CompatibilityTests(TestCase):
         self.assertNotIn('shared_interests', analysis)
         self.assertNotIn('profile_factors', analysis)
 
+    def test_category_without_shared_answers_is_not_described_as_a_mismatch(self):
+        category = Question.objects.filter(is_active=True).first().category_ref
+        QuestionResponse.objects.filter(
+            user=self.b,
+            question__category_ref=category,
+        ).delete()
+
+        result = calculate_compatibility_analysis(self.a, self.b)
+
+        category_result = next(
+            item for item in result['categories'] if item['slug'] == category.slug
+        )
+        self.assertEqual(category_result['score'], 0)
+        self.assertIn('not enough shared questionnaire data', category_result['reflection'])
+
     def test_compatibility_api_returns_anonymous_analysis_not_profile_data(self):
         question = Question.objects.filter(is_active=True).first()
         QuestionResponse.objects.filter(
@@ -126,6 +145,69 @@ class CompatibilityTests(TestCase):
         response = client.get(f'/api/matches/{self.b.id}/compatibility/')
 
         self.assertEqual(response.status_code, 404)
+
+    def test_compatibility_insights_require_explicit_one_time_consent(self):
+        client = APIClient()
+        client.force_authenticate(self.a)
+
+        response = client.post(
+            f'/api/matches/{self.b.id}/compatibility/insights/',
+            {'consent': False},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    @patch.dict(os.environ, {'GEMINI_API_KEY': 'test-key'})
+    @patch('questionnaire.summary.requests.post')
+    def test_compatibility_insights_send_only_category_scores_to_ai(self, post):
+        categories = calculate_compatibility_analysis(self.a, self.b)['categories']
+        post_response = Mock()
+        post_response.raise_for_status.return_value = None
+        post_response.json.return_value = {
+            'candidates': [{
+                'content': {
+                    'parts': [{
+                        'text': json.dumps({
+                            'summaries': [
+                                {
+                                    'slug': category['slug'],
+                                    'summary': f'You share strong alignment in {category["name"]}.',
+                                }
+                                for category in categories
+                            ],
+                        }),
+                    }],
+                },
+            }],
+        }
+        post.return_value = post_response
+        client = APIClient()
+        client.force_authenticate(self.a)
+
+        response = client.post(
+            f'/api/matches/{self.b.id}/compatibility/insights/',
+            {'consent': True},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['categories']), len(categories))
+        prompt = post.call_args.kwargs['json']['contents'][0]['parts'][0]['text']
+        prompt_data = json.loads(prompt.split('\n\n', 1)[1])
+        self.assertEqual(
+            prompt_data['categories'],
+            [
+                {
+                    'slug': category['slug'],
+                    'name': category['name'],
+                    'similarity_percent': category['score'],
+                }
+                for category in categories
+            ],
+        )
+        self.assertNotIn('question', prompt_data)
+        self.assertNotIn('answer', prompt_data)
 
     def test_matches_endpoint_excludes_self(self):
         client = APIClient()

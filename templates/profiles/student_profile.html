@@ -49,11 +49,71 @@
     .section-note{margin:-4px 0 12px;color:var(--muted);font-size:11px;line-height:1.5}
     .toast{position:fixed;top:18px;right:18px;left:18px;z-index:50;max-width:394px;margin:auto;padding:13px 15px;border-radius:12px;background:#ECFDF3;color:#087443;font-size:12px;font-weight:700;box-shadow:0 8px 24px #14502d29}
     .toast.error{background:#FEF2F2;color:#B42318}
+    .app-preview{max-width:960px}
+    .app-preview header{padding:16px 28px}
+    .private-preview{display:grid;gap:18px;padding:24px 28px 30px}
+    .private-preview .compatibility-hero{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 230px;grid-template-areas:"copy score" "actions score" "privacy score";align-items:center;gap:4px 24px;overflow:hidden;padding:30px 34px;border:0;border-radius:28px;background:radial-gradient(circle at 82% 12%,#ffffff24 0 1px,transparent 2px),linear-gradient(135deg,#7147ed 0%,#5832bf 100%);color:#fff;box-shadow:0 18px 44px rgba(80,48,170,.23)}
+    .compatibility-hero:before,.compatibility-hero:after{position:absolute;width:230px;height:230px;border:1px solid #ffffff20;border-radius:50%;content:"";pointer-events:none}
+    .compatibility-hero:before{top:-155px;right:95px}.compatibility-hero:after{right:-132px;bottom:-160px;width:300px;height:300px}
+    .hero-copy{position:relative;z-index:1;grid-area:copy}
+    .preview-kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid #ffffff38;border-radius:999px;background:#ffffff16;color:#fff;font-size:10px;font-weight:700;letter-spacing:.055em;text-transform:uppercase}
+    .preview-kicker span{width:7px;height:7px;border-radius:50%;background:#baf3d0;box-shadow:0 0 0 3px #ffffff24}
+    .compatibility-title{max-width:470px;margin:18px 0 8px;font-size:clamp(24px,4vw,36px);line-height:1.13;letter-spacing:-1px}
+    .compatibility-intro{max-width:480px;margin:0;color:#ffffffd9;font-size:14px;line-height:1.65}
+    .overall-score-ring{position:relative;z-index:1;grid-area:score;display:grid;place-items:center;width:196px;height:196px;justify-self:center;padding:11px;border-radius:50%;background:conic-gradient(#fff 0 var(--score),#ffffff36 var(--score) 100%)}
+    .ring-inner{display:grid;align-content:center;justify-items:center;width:100%;height:100%;border-radius:50%;background:#fff;text-align:center}
+    .overall-score-ring .score-value{color:#663cda;font-size:50px;letter-spacing:-2px}
+    .overall-score-ring .score-caption{margin-top:6px;color:#777481;font-size:11px;font-weight:700}
+    .preview-summary{margin:0;color:#ffffffed;font-size:12px;font-weight:600;line-height:1.5}
+    .compatibility-hero .actions{position:relative;z-index:1;grid-area:actions;max-width:430px;margin:14px 0 0}
+    .compatibility-hero .btn{min-height:50px;border-radius:15px;font-size:14px}
+    .compatibility-hero .primary{color:#6035D0;background:#fff;box-shadow:0 7px 18px #30137a36}
+    .compatibility-hero .secondary{color:#fff;border-color:#ffffff5c;background:#ffffff17}
+    .privacy-note{position:relative;z-index:1;grid-area:privacy;max-width:500px;margin:10px 0 0;color:#ffffffc9;font-size:11px;line-height:1.5}
+    .category-section{padding:24px}
+    .section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:5px}
+    .section-heading h2{margin:0;font-size:22px;letter-spacing:-.5px}
+    .section-heading span{padding:7px 10px;border-radius:999px;background:#f3eeff;color:#6b45db;font-size:9px;font-weight:800;letter-spacing:.07em}
+    .section-description{margin:6px 0 18px;color:var(--muted);font-size:13px;line-height:1.55}
+    .ai-controls{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 16px;padding:14px 16px;border:1px solid #e8e0ff;border-radius:17px;background:linear-gradient(110deg,#faf8ff,#fff)}
+    .ai-controls-copy{display:flex;align-items:flex-start;gap:11px;color:#625d6d;font-size:11px;line-height:1.55}
+    .ai-sparkle{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:12px;background:#eee8ff;color:#683fe1;font-size:17px}
+    .ai-controls-copy strong{display:block;margin-bottom:2px;color:#302b3d;font-size:12px}
+    .ai-generate{flex:none;min-height:40px;padding:0 14px;border:0;border-radius:12px;background:linear-gradient(135deg,#7547F5,#6338D6);color:#fff;font:700 11px Inter,system-ui,sans-serif;box-shadow:0 6px 14px #6d45f52e;cursor:pointer}
+    .ai-generate:disabled{opacity:.65;cursor:wait}
+    .ai-insights-status{margin:0 0 14px;padding:11px 13px;border:1px solid #e8e0ff;border-radius:13px;background:#faf8ff;color:#625d6d;font-size:11px;line-height:1.5}
+    .category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .category-card{min-width:0;padding:17px;border:1px solid #eee9f7;border-radius:20px;background:linear-gradient(145deg,#fff,#fdfbff);box-shadow:0 6px 18px #1e144608;transition:transform .18s ease,box-shadow .18s ease}
+    .category-card:hover{transform:translateY(-2px);box-shadow:0 12px 25px #1e144610}
+    .category-top{display:flex;align-items:center;gap:12px}
+    .category-icon{display:grid;place-items:center;flex:none;width:40px;height:40px;border:1px solid #eee8ff;border-radius:14px;background:#f7f3ff;color:#6d45f5;font-size:16px;font-weight:800}
+    .category-copy{min-width:0;flex:1}
+    .category-copy h3{margin:0;color:#282435;font-size:14px;line-height:1.3}
+    .category-caption{display:block;margin-top:4px;color:#898593;font-size:10px}
+    .category-ring{display:grid;place-items:center;flex:none;width:68px;height:68px;padding:5px;border-radius:50%;background:conic-gradient(#7547F5 0 var(--score),#eeeaf6 var(--score) 100%)}
+    .category-ring .ring-inner{background:#fff}
+    .category-ring strong{color:#6D45F5;font-size:14px;letter-spacing:-.3px}
+    .category-insight{min-height:58px;margin:13px 0 0;padding:12px 13px;border-radius:14px;background:#f8f5ff;color:#5e586b;font-size:12px;line-height:1.6}
+    .category-card[data-source="ai"] .category-insight{border:1px solid #e8e0ff;background:linear-gradient(135deg,#f8f5ff,#fff)}
+    .insight-label{display:block;margin-bottom:4px;color:#7547F5;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+    .question-details{padding:0;overflow:hidden}
+    .question-details summary{padding:17px 20px;color:#302b3d;font-size:13px;font-weight:700;cursor:pointer;list-style:none}
+    .question-details summary::-webkit-details-marker{display:none}
+    .question-details summary:after{float:right;color:var(--p);content:"+"}
+    .question-details[open] summary:after{content:"−"}
+    .question-details .details-content{padding:0 20px 17px}
+    .question-details .section-note{margin:0 0 10px}
+    .question-details .match{margin:0 0 8px}
+    .question-details .question-result:first-of-type{border-top:1px solid var(--line)}
+    .ai-retry{margin:8px 0 0;padding:7px 10px;border:0;border-radius:9px;background:#eee8ff;color:#6038d8;font:700 11px Inter,system-ui,sans-serif;cursor:pointer}
+    @media(max-width:680px){.app-preview{max-width:460px}.app-preview header{padding:16px 20px}.private-preview{gap:14px;padding:18px 16px 26px}.private-preview .compatibility-hero{grid-template-columns:minmax(0,1fr) 118px;grid-template-areas:"copy score" "actions actions" "privacy privacy";gap:6px 10px;padding:22px 18px;border-radius:24px}.compatibility-title{font-size:22px;letter-spacing:-.6px}.compatibility-intro{font-size:11px}.overall-score-ring{width:112px;height:112px;padding:7px}.overall-score-ring .score-value{font-size:31px;letter-spacing:-1px}.overall-score-ring .score-caption{font-size:8px}.preview-summary{font-size:10px}.compatibility-hero .actions{margin-top:12px}.compatibility-hero .btn{min-height:46px;font-size:12px}.privacy-note{font-size:10px}.category-section{padding:19px 15px}.section-heading h2{font-size:19px}.section-description{font-size:11px}.ai-controls{align-items:flex-start;padding:12px}.ai-controls-copy{font-size:10px}.ai-generate{min-height:38px;padding:0 11px;font-size:10px}.category-grid{grid-template-columns:1fr;gap:9px}.category-card{padding:14px;border-radius:17px}.category-insight{min-height:0;font-size:11px}.category-ring{width:62px;height:62px}.question-details summary{padding:15px 16px}.question-details .details-content{padding:0 16px 15px}}
+    @media(max-width:380px){.private-preview .compatibility-hero{grid-template-columns:minmax(0,1fr) 94px;padding:20px 14px}.overall-score-ring{width:92px;height:92px}.overall-score-ring .score-value{font-size:26px}.compatibility-title{font-size:20px}.ai-controls{display:grid}.ai-generate{width:100%}}
     @media (min-width:461px){body{padding:18px 0}.app{border-radius:24px;box-shadow:0 10px 40px #1e144612}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
   </style>
 </head>
 <body>
-<div class="app">
+<div class="app{% if is_private_preview %} app-preview{% endif %}">
   {% csrf_token %}
   <header>
     <a class="round" href="{% url 'home' %}" aria-label="Back">←</a>
@@ -63,9 +123,18 @@
   <main {% if is_private_preview %}class="private-preview"{% endif %}>
     {% if is_private_preview %}
       {% if compatibility %}
-        <section class="card score-card">
-          <span class="score-value">{{ compatibility.overall_score }}%</span>
-          <span class="score-caption">Overall Similarity Score</span>
+        <section class="card compatibility-hero">
+          <div class="hero-copy">
+            <span class="preview-kicker"><span aria-hidden="true"></span>Private compatibility preview</span><br><br>
+            <h2 class="compatibility-title">Meaningful connections start with understanding.</h2>
+            <p class="compatibility-intro">See where your perspectives meet, and explore what each category score could mean for getting to know one another.</p>
+          </div>
+          <div class="overall-score-ring" role="img" aria-label="Overall similarity score: {{ compatibility.overall_score }} percent" style="--score:{{ compatibility.overall_score }}%">
+            <div class="ring-inner">
+              <span class="score-value">{{ compatibility.overall_score }}%</span>
+              <span class="score-caption">Overall Similarity Score</span>
+            </div>
+          </div>
           <div class="actions">
             {% if connection and connection.status == 'PENDING' and connection.requester_id == request.user.id %}
               <button id="cancel-connection" class="btn secondary" data-connection="{{ connection.id }}">Cancel request</button>
@@ -76,46 +145,77 @@
               <button id="connect" class="btn primary" data-user="{{ student.id }}">Connect</button>
             {% endif %}
           </div>
+          <p class="privacy-note">Their name and personal profile details stay private until the connection is accepted.</p>
         </section>
-        <section class="card">
-          <h2>Category-wise Similarity</h2>
-          {% for category in compatibility.categories %}
-            <div class="category-row">
-              <div class="category-heading"><span>{{ category.name }}</span><strong>{{ category.score }}%</strong></div>
-              <div class="track" role="img" aria-label="{{ category.name }} similarity {{ category.score }} percent"><span style="width:{{ category.score }}%"></span></div>
+        <section class="card category-section" aria-labelledby="category-similarity-heading">
+          <div class="section-heading">
+            <h2 id="category-similarity-heading">Category-wise Similarity</h2>
+            <span>{{ compatibility.categories|length }} AREAS</span>
+          </div>
+          <p class="section-description">These scores compare shared questionnaire answers. Each reflection offers a conversation starter—not a prediction of how well you’ll get along.</p>
+          <div class="ai-controls">
+            <div class="ai-controls-copy">
+              <span class="ai-sparkle" aria-hidden="true">✦</span>
+              <div>
+                <strong>Want a personalized AI perspective?</strong>
+                Generate reflections from category names and scores only. Your answers, names, and profile details are not sent to Gemini.
+              </div>
             </div>
-          {% endfor %}
-        </section>
-        <section class="card">
-          <h2>Similarity on Most Important Questions</h2>
-          <p class="section-note">Questions contribute equally to the overall score. This section shows questions whose average importance rating was above neutral.</p>
-          {% if compatibility.most_important_questions %}
-            <p class="match">{{ compatibility.most_important_similarity }}% similarity</p>
-            {% for item in compatibility.most_important_questions %}
-              <div class="question-result">
-                <div class="question-heading"><span>{{ item.category }}</span><strong>{{ item.similarity }}%</strong></div>
-                <p class="question-text">{{ item.question }}</p>
-              </div>
+            <button type="button" class="ai-generate" id="generate-ai-insights" data-endpoint="{% url 'api_compatibility_insights' student.id %}">Generate AI insights</button>
+          </div>
+          <p class="ai-insights-status" id="ai-insights-status" role="status" aria-live="polite" hidden></p>
+          <div class="category-grid">
+            {% for category in compatibility.categories %}
+              <article class="category-card" data-category-slug="{{ category.slug }}" data-source="score">
+                <div class="category-top">
+                  <span class="category-icon" aria-hidden="true">✦</span>
+                  <div class="category-copy">
+                    <h3>{{ category.name }}</h3>
+                    <span class="category-caption">Shared-answer similarity</span>
+                  </div>
+                  <div class="category-ring" role="img" aria-label="{{ category.name }} similarity: {{ category.score }} percent" style="--score:{{ category.score }}%">
+                    <div class="ring-inner"><strong>{{ category.score }}%</strong></div>
+                  </div>
+                </div>
+                <p class="category-insight"><span class="insight-label">Score-based reflection</span><span data-insight-for="{{ category.slug }}">{{ category.reflection }}</span></p>
+              </article>
             {% endfor %}
-          {% else %}
-            <p class="empty">No shared answers were rated as most important.</p>
-          {% endif %}
+          </div>
         </section>
-        <section class="card">
-          <h2>Similarity on Least Important Questions</h2>
-          <p class="section-note">Questions contribute equally to the overall score. This section shows questions whose average importance rating was below neutral.</p>
-          {% if compatibility.least_important_questions %}
-            <p class="match">{{ compatibility.least_important_similarity }}% similarity</p>
-            {% for item in compatibility.least_important_questions %}
-              <div class="question-result">
-                <div class="question-heading"><span>{{ item.category }}</span><strong>{{ item.similarity }}%</strong></div>
-                <p class="question-text">{{ item.question }}</p>
-              </div>
-            {% endfor %}
-          {% else %}
-            <p class="empty">No shared answers were rated below neutral.</p>
-          {% endif %}
-        </section>
+        <details class="card question-details">
+          <summary>Similarity on Most Important Questions</summary>
+          <div class="details-content">
+            <p class="section-note">Questions contribute equally to the overall score. This section shows questions whose average importance rating was above neutral.</p>
+            {% if compatibility.most_important_questions %}
+              <p class="match">{{ compatibility.most_important_similarity }}% similarity</p>
+              {% for item in compatibility.most_important_questions %}
+                <div class="question-result">
+                  <div class="question-heading"><span>{{ item.category }}</span><strong>{{ item.similarity }}%</strong></div>
+                  <p class="question-text">{{ item.question }}</p>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="empty">No shared answers were rated as most important.</p>
+            {% endif %}
+          </div>
+        </details>
+        <details class="card question-details">
+          <summary>Similarity on Least Important Questions</summary>
+          <div class="details-content">
+            <p class="section-note">Questions contribute equally to the overall score. This section shows questions whose average importance rating was below neutral.</p>
+            {% if compatibility.least_important_questions %}
+              <p class="match">{{ compatibility.least_important_similarity }}% similarity</p>
+              {% for item in compatibility.least_important_questions %}
+                <div class="question-result">
+                  <div class="question-heading"><span>{{ item.category }}</span><strong>{{ item.similarity }}%</strong></div>
+                  <p class="question-text">{{ item.question }}</p>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="empty">No shared answers were rated below neutral.</p>
+            {% endif %}
+          </div>
+        </details>
       {% else %}
         <section class="card"><p class="empty">Compatibility details are unavailable for this private profile.</p></section>
         {% if connection and connection.status == 'PENDING' and connection.requester_id == request.user.id %}
@@ -150,6 +250,52 @@
 <script>
 const profileTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
 const profileToken = profileTokenElement ? profileTokenElement.value : '';
+const generateInsightsButton = document.getElementById('generate-ai-insights');
+const insightsStatus = document.getElementById('ai-insights-status');
+if (generateInsightsButton && insightsStatus) {
+  const generateInsights = function() {
+    generateInsightsButton.disabled = true;
+    generateInsightsButton.textContent = 'Writing reflections…';
+    insightsStatus.hidden = false;
+    insightsStatus.textContent = 'Gemini is preparing a short reflection for each category. Your score-based reflections remain available below.';
+    fetch(generateInsightsButton.dataset.endpoint, {
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'Content-Type':'application/json','X-CSRFToken':profileToken},
+      body:JSON.stringify({consent:true})
+    }).then(function(response) {
+      return response.json().then(function(data) {
+        return {ok:response.ok, data:data};
+      });
+    }).then(function(result) {
+      if (!result.ok) throw new Error(result.data.detail || 'AI compatibility reflections could not be generated.');
+      if (!Array.isArray(result.data.categories)) throw new Error('The AI response was incomplete.');
+      const receivedSlugs = new Set(result.data.categories.map(function(category) { return category.slug; }));
+      const cards = Array.from(document.querySelectorAll('.category-card'));
+      if (receivedSlugs.size !== cards.length || cards.some(function(card) {
+        return !receivedSlugs.has(card.dataset.categorySlug);
+      })) throw new Error('Gemini did not return a reflection for every category.');
+      result.data.categories.forEach(function(category) {
+        const reflection = Array.from(document.querySelectorAll('[data-insight-for]')).find(function(node) {
+          return node.dataset.insightFor === category.slug;
+        });
+        if (reflection && typeof category.summary === 'string') {
+          reflection.textContent = category.summary;
+          reflection.closest('.category-card').dataset.source = 'ai';
+          reflection.previousElementSibling.textContent = 'AI compatibility reflection';
+        }
+      });
+      insightsStatus.textContent = 'AI reflections are ready for every category. They’re based on category names and similarity scores only.';
+      generateInsightsButton.textContent = 'Refresh AI insights';
+      generateInsightsButton.disabled = false;
+    }).catch(function(error) {
+      insightsStatus.textContent = (error.message || 'AI compatibility reflections could not be generated.') + ' Score-based reflections are still shown for every category.';
+      generateInsightsButton.textContent = 'Try AI insights again';
+      generateInsightsButton.disabled = false;
+    });
+  };
+  generateInsightsButton.addEventListener('click', generateInsights);
+}
 function profileMessage(message, isError) {
   const toast = document.createElement('div');
   toast.className = 'toast' + (isError ? ' error' : '');

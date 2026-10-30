@@ -5,7 +5,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from connections.models import Connection
+from questionnaire.summary import InsightGenerationError, gemini_is_configured
 from .compatibility import MIN_MATCH_SCORE, calculate_compatibility_analysis
+from .insights import generate_compatibility_summaries
 from .services import excluded_ids, is_discoverable, score_match
 from profiles.services import can_view_full_profile
 
@@ -87,3 +89,39 @@ class CompatibilityAPIView(APIView):
         ):
             return Response({'detail': 'Student not found.'}, status=404)
         return Response(calculate_compatibility_analysis(request.user, student))
+
+
+class CompatibilityInsightsAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, user_id):
+        student = User.objects.filter(
+            id=user_id,
+            is_active=True,
+        ).select_related('profile').first()
+        if (
+            not student
+            or student == request.user
+            or student.id in excluded_ids(request.user)
+            or not hasattr(student, 'profile')
+            or not student.profile.is_public
+            or can_view_full_profile(request.user, student)
+        ):
+            return Response({'detail': 'Student not found.'}, status=404)
+        if request.data.get('consent') is not True:
+            return Response(
+                {'detail': 'Confirm before sending compatibility scores to Gemini.'},
+                status=400,
+            )
+        analysis = calculate_compatibility_analysis(request.user, student)
+        try:
+            summaries = generate_compatibility_summaries(analysis['categories'])
+        except InsightGenerationError as exc:
+            status_code = 503 if not gemini_is_configured() else 502
+            return Response({'detail': str(exc)}, status=status_code)
+        return Response({
+            'categories': [
+                {'slug': category['slug'], 'summary': summaries[category['slug']]}
+                for category in analysis['categories']
+            ],
+        })
