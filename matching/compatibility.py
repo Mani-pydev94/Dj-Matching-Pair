@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from questionnaire.models import QuestionResponse, QuestionnaireCategory
 
-MIN_MATCH_SCORE = 75
+MIN_MATCH_SCORE = 10
 
 
 def _response_map(user):

@@ -15,19 +15,45 @@ IMPORTANCE_SCORES = {
     QuestionResponse.Importance.NEUTRAL: 50,
     QuestionResponse.Importance.MOST_IMPORTANT: 100,
 }
-GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-3.1-flash-lite')
-GEMINI_API_URL = (
-    'https://generativelanguage.googleapis.com/v1beta/models/'
-    f'{GEMINI_MODEL}:generateContent'
-)
+GROQ_MODEL = os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile')
+GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+GROQ_PROVIDER = 'groq'
 
 
 class InsightGenerationError(Exception):
     pass
 
 
-def gemini_is_configured():
-    return bool(os.environ.get('GEMINI_API_KEY'))
+def groq_is_configured():
+    return bool(os.environ.get('GROQ_API_KEY'))
+
+
+def has_groq_ai_consent(profile):
+    return bool(
+        profile
+        and profile.questionnaire_ai_consent is True
+        and profile.questionnaire_ai_consent_provider == GROQ_PROVIDER
+    )
+
+
+def groq_chat_completion(system_prompt, user_prompt):
+    response = requests.post(
+        GROQ_API_URL,
+        headers={
+            'Authorization': f"Bearer {os.environ['GROQ_API_KEY']}",
+        },
+        json={
+            'model': GROQ_MODEL,
+            'messages': [
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_prompt},
+            ],
+            'response_format': {'type': 'json_object'},
+        },
+        timeout=20,
+    )
+    response.raise_for_status()
+    return response.json()
 
 
 def _category_data(user):
@@ -129,7 +155,7 @@ def get_questionnaire_summary(user):
             'score': strongest['score'],
         } if strongest else None,
         'categories': categories,
-        'ai_configured': gemini_is_configured(),
+        'ai_configured': groq_is_configured(),
         'ai_generated': ai_generated,
         'has_answers': bool(categories),
     }
@@ -137,7 +163,7 @@ def get_questionnaire_summary(user):
 
 def validate_ai_summaries(response_json, expected_slugs):
     try:
-        text = response_json['candidates'][0]['content']['parts'][0]['text']
+        text = response_json['choices'][0]['message']['content']
         decoded = json.loads(text)
         summaries = decoded['summaries']
         if not isinstance(summaries, list):
@@ -164,7 +190,7 @@ def validate_ai_summaries(response_json, expected_slugs):
         return result
     except (KeyError, IndexError, TypeError, ValueError) as exc:
         raise InsightGenerationError(
-            'Gemini returned summaries in an unexpected format.'
+            'Groq returned summaries in an unexpected format.'
         ) from exc
 
 
@@ -172,9 +198,8 @@ def generate_category_summaries(user):
     progress = questionnaire_progress(user)
     if not progress['is_complete']:
         raise ValueError('Complete all required questions before generating insights.')
-    api_key = os.environ.get('GEMINI_API_KEY')
-    if not api_key:
-        raise InsightGenerationError('Gemini is not configured yet.')
+    if not groq_is_configured():
+        raise InsightGenerationError('Groq is not configured yet.')
 
     categories, answers, fingerprint = _category_data(user)
     if not categories:
@@ -200,7 +225,7 @@ def generate_category_summaries(user):
         }
         for category in categories
     ]
-    prompt = (
+    system_prompt = (
         'Write one short, warm, plain-language personal reflection for each '
         'category, based on the pattern across all supplied question-and-answer '
         'pairs in that category. Do not base the reflection on only one answer or '
@@ -208,53 +233,23 @@ def generate_category_summaries(user):
         'not diagnose, judge, infer protected traits, or invent facts. Address the '
         'student directly, and keep each reflection under 25 words. Return JSON '
         'with a "summaries" array of objects containing "slug" and "summary".\n\n'
-        + json.dumps(
-            {'categories': category_context},
-            ensure_ascii=False,
-            separators=(',', ':'),
-        )
     )
-    payload = {
-        'contents': [{'parts': [{'text': prompt}]}],
-        'generationConfig': {
-            'responseMimeType': 'application/json',
-            'responseSchema': {
-                'type': 'OBJECT',
-                'properties': {
-                    'summaries': {
-                        'type': 'ARRAY',
-                        'items': {
-                            'type': 'OBJECT',
-                            'properties': {
-                                'slug': {'type': 'STRING'},
-                                'summary': {'type': 'STRING'},
-                            },
-                            'required': ['slug', 'summary'],
-                        },
-                    },
-                },
-                'required': ['summaries'],
-            },
-        },
-    }
+    user_prompt = json.dumps(
+        {'categories': category_context},
+        ensure_ascii=False,
+        separators=(',', ':'),
+    )
     try:
-        response = requests.post(
-            GEMINI_API_URL,
-            headers={'x-goog-api-key': api_key},
-            json=payload,
-            timeout=20,
-        )
-        response.raise_for_status()
-        response_json = response.json()
+        response_json = groq_chat_completion(system_prompt, user_prompt)
     except requests.RequestException as exc:
-        logger.warning('Gemini summary request failed: %s', exc)
+        logger.warning('Groq summary request failed: %s', exc)
         raise InsightGenerationError(
-            'Gemini could not generate summaries right now. Please try again later.'
+            'Groq could not generate summaries right now. Please try again later.'
         ) from exc
     except ValueError as exc:
-        logger.warning('Gemini returned invalid JSON: %s', exc)
+        logger.warning('Groq returned invalid JSON: %s', exc)
         raise InsightGenerationError(
-            'Gemini returned an unreadable response. Please try again later.'
+            'Groq returned an unreadable response. Please try again later.'
         ) from exc
 
     summaries = validate_ai_summaries(response_json, expected_slugs)

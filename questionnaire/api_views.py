@@ -11,7 +11,8 @@ from .summary import (
     InsightGenerationError,
     generate_category_summaries,
     get_questionnaire_summary,
-    gemini_is_configured,
+    groq_is_configured,
+    has_groq_ai_consent,
 )
 
 
@@ -95,9 +96,7 @@ class QuestionnaireSummaryAPIView(APIView):
             )
         summary = get_questionnaire_summary(request.user)
         profile = getattr(request.user, 'profile', None)
-        summary['ai_consent'] = bool(
-            profile and profile.questionnaire_ai_consent
-        )
+        summary['ai_consent'] = has_groq_ai_consent(profile)
         return Response(summary)
 
 
@@ -107,13 +106,13 @@ class QuestionnaireSummaryInsightsAPIView(APIView):
     def post(self, request):
         if request.data.get('consent') is not True:
             return Response(
-                {'detail': 'Confirm before sending your answers to Gemini.'},
+                {'detail': 'Confirm before sending your answers to Groq.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         profile = getattr(request.user, 'profile', None)
-        if not profile or profile.questionnaire_ai_consent is not True:
+        if not has_groq_ai_consent(profile):
             return Response(
-                {'detail': 'Opt in to AI reflections before sending your answers to Gemini.'},
+                {'detail': 'Opt in to Groq AI reflections before sending your answers.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
         try:
@@ -123,7 +122,7 @@ class QuestionnaireSummaryInsightsAPIView(APIView):
         except InsightGenerationError as exc:
             status_code = (
                 status.HTTP_503_SERVICE_UNAVAILABLE
-                if not gemini_is_configured()
+                if not groq_is_configured()
                 else status.HTTP_502_BAD_GATEWAY
             )
             return Response({'detail': str(exc)}, status=status_code)

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from profiles.models import Profile
+from .summary import GROQ_PROVIDER, has_groq_ai_consent
 from .services import mark_questionnaire_completed
 
 
@@ -16,7 +17,12 @@ def questionnaire_intro(request):
             })
         profile, _ = Profile.objects.get_or_create(user=request.user)
         profile.questionnaire_ai_consent = consent == 'yes'
-        profile.save(update_fields=('questionnaire_ai_consent', 'updated_at'))
+        profile.questionnaire_ai_consent_provider = GROQ_PROVIDER if consent == 'yes' else ''
+        profile.save(update_fields=(
+            'questionnaire_ai_consent',
+            'questionnaire_ai_consent_provider',
+            'updated_at',
+        ))
         return redirect('questionnaire_hub')
     return render(request, 'questionnaire/intro.html')
 
@@ -26,7 +32,14 @@ def questionnaire_hub(request):
     if mark_questionnaire_completed(request.user):
         return redirect('questionnaire_summary')
     profile = getattr(request.user, 'profile', None)
-    if not profile or profile.questionnaire_ai_consent is None:
+    if (
+        not profile
+        or profile.questionnaire_ai_consent is None
+        or (
+            profile.questionnaire_ai_consent
+            and not has_groq_ai_consent(profile)
+        )
+    ):
         return redirect('questionnaire_intro')
     return render(request, 'questionnaire/hub.html')
 
@@ -34,7 +47,14 @@ def questionnaire_hub(request):
 @login_required
 def questionnaire_questions(request):
     profile = getattr(request.user, 'profile', None)
-    if not profile or profile.questionnaire_ai_consent is None:
+    if (
+        not profile
+        or profile.questionnaire_ai_consent is None
+        or (
+            profile.questionnaire_ai_consent
+            and not has_groq_ai_consent(profile)
+        )
+    ):
         return redirect('questionnaire_intro')
     return render(request, 'questionnaire/questions.html')
 

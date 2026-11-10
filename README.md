@@ -35,10 +35,13 @@ without changing the existing profile data.
 
 Copy `.env.example` to `.env` and fill in values. Never commit `.env`.
 
-Optional AI-written questionnaire summaries use the Gemini API. Add
-`GEMINI_API_KEY` to `.env` on the server (never in browser code); optionally set
-`GEMINI_MODEL` to a model enabled for your API key. Without a key, the personal
+Optional AI-written questionnaire and compatibility reflections use the Groq
+API. Add `GROQ_API_KEY` to `.env` on the server (never in browser code);
+optionally set `GROQ_MODEL` to a model enabled for your API key. The default is
+`llama-3.3-70b-versatile`. Without a key, the personal
 summary and answer snapshots still work. Users choose before starting whether
 to enable automatic AI reflections after completing the questionnaire. Answers
-are sent to Gemini only for users who opt in. Review Google's current Gemini
-API terms and free-tier data-use policy before enabling this for real users.
+are sent to Groq only for users who opt in. Existing opt-ins to the previous
+provider do not carry over; users must choose again before their answers are
+sent to Groq. Review Groq's current API terms and data-use policy before
+enabling this for real users.

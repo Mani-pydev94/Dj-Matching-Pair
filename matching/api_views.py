@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from connections.models import Connection
-from questionnaire.summary import InsightGenerationError, gemini_is_configured
+from questionnaire.summary import InsightGenerationError, groq_is_configured
 from .compatibility import MIN_MATCH_SCORE, calculate_compatibility_analysis
 from .insights import generate_compatibility_summaries
 from .services import excluded_ids, is_discoverable, score_match
@@ -110,14 +110,14 @@ class CompatibilityInsightsAPIView(APIView):
             return Response({'detail': 'Student not found.'}, status=404)
         if request.data.get('consent') is not True:
             return Response(
-                {'detail': 'Confirm before sending compatibility scores to Gemini.'},
+                {'detail': 'Confirm before sending compatibility scores to Groq.'},
                 status=400,
             )
         analysis = calculate_compatibility_analysis(request.user, student)
         try:
             summaries = generate_compatibility_summaries(analysis['categories'])
         except InsightGenerationError as exc:
-            status_code = 503 if not gemini_is_configured() else 502
+            status_code = 503 if not groq_is_configured() else 502
             return Response({'detail': str(exc)}, status=status_code)
         return Response({
             'categories': [

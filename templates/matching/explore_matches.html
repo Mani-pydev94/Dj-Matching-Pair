@@ -30,7 +30,7 @@
   <section class="result-head"><div><h2 id="result-title">Compatible students</h2><p id="result-subtitle">Matches at 70% or higher</p></div><span class="result-count" id="result-count">—</span></section>
   <div id="results" class="results"><div class="card skeleton"></div><div class="card skeleton"></div></div>
 </main>
-<div class="sheet-backdrop" id="filter-sheet"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="filter-title"><h2 id="filter-title">Filter matches</h2><div class="sheet-row"><label for="threshold">Minimum compatibility</label><select id="threshold"><option value="70" selected>70% or higher</option><option value="75">75% or higher</option><option value="80">80% or higher</option><option value="90">90% or higher</option></select></div><div class="sheet-row"><label for="university">College or university</label><input id="university" placeholder="Any college"></div><div class="sheet-actions"><button class="btn secondary" id="filter-reset" type="button">Reset</button><button class="btn primary" id="filter-apply" type="button">Apply filters</button></div></section></div>
+<div class="sheet-backdrop" id="filter-sheet"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="filter-title"><h2 id="filter-title">Filter matches</h2><div class="sheet-row"><label for="threshold">Minimum compatibility</label><select id="threshold"><option value="10" selected>10% or higher</option><option value="75">75% or higher</option><option value="80">80% or higher</option><option value="90">90% or higher</option></select></div><div class="sheet-row"><label for="university">College or university</label><input id="university" placeholder="Any college"></div><div class="sheet-actions"><button class="btn secondary" id="filter-reset" type="button">Reset</button><button class="btn primary" id="filter-apply" type="button">Apply filters</button></div></section></div>
 {% csrf_token %}
 {% include 'includes/bottom_nav.html' with active_nav='matches' %}
 <script>
@@ -54,7 +54,7 @@ function searchable(match) {
 }
 function visibleMatches() {
   const query = search.value.trim().toLowerCase();
-  const minScore = Math.max(70, Number(document.getElementById('threshold').value) || 70);
+  const minScore = Math.max(10, Number(document.getElementById('threshold').value) || 10);
   return allMatches.filter(match => {
     if (Number(match.overall_score) < minScore) return false;
     const textMatch = !query || searchable(match).includes(query);
@@ -69,7 +69,7 @@ function visibleMatches() {
 }
 function renderMatches() {
   const matches = visibleMatches();
-  const minScore = Math.max(70, Number(document.getElementById('threshold').value) || 70);
+  const minScore = Math.max(10, Number(document.getElementById('threshold').value) || 10);
   count.textContent = `${matches.length} found`;
   title.textContent = matches.length
     ? `${matches.length} Compatible Student${matches.length === 1 ? '' : 's'} Found`
@@ -154,7 +154,7 @@ async function cancelRequest(event) {
 }
 async function loadMatches() {
   try {
-    const threshold = Math.max(70, Number(document.getElementById('threshold').value) || 70);
+    const threshold = Math.max(10, Number(document.getElementById('threshold').value) || 10);
     const university = document.getElementById('university').value.trim();
     const params = new URLSearchParams({min_score: threshold}); if (university) params.set('university', university);
     const response = await fetch(`/api/matches/?${params}`);
@@ -169,7 +169,7 @@ async function loadMatches() {
 search.addEventListener('input', renderMatches);
 document.querySelectorAll('.chip').forEach(chip => chip.addEventListener('click', () => {document.querySelectorAll('.chip').forEach(item => item.classList.remove('active')); chip.classList.add('active'); activeFilter = chip.dataset.filter; renderMatches();}));
 document.getElementById('filter-open').addEventListener('click', () => sheet.classList.add('open'));
-document.getElementById('filter-reset').addEventListener('click', () => {document.getElementById('threshold').value='70'; document.getElementById('university').value='';});
+document.getElementById('filter-reset').addEventListener('click', () => {document.getElementById('threshold').value='10'; document.getElementById('university').value='';});
 document.getElementById('filter-apply').addEventListener('click', () => {sheet.classList.remove('open'); loadMatches();});
 sheet.addEventListener('click', event => {if (event.target === sheet) sheet.classList.remove('open');});
 loadMatches();

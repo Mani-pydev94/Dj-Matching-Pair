@@ -158,7 +158,7 @@
               <span class="ai-sparkle" aria-hidden="true">✦</span>
               <div>
                 <strong>Want a personalized AI perspective?</strong>
-                Generate reflections from category names and scores only. Your answers, names, and profile details are not sent to Gemini.
+                Generate reflections from category names and scores only. Your answers, names, and profile details are not sent to Groq.
               </div>
             </div>
             <button type="button" class="ai-generate" id="generate-ai-insights" data-endpoint="{% url 'api_compatibility_insights' student.id %}">Generate AI insights</button>
@@ -257,7 +257,7 @@ if (generateInsightsButton && insightsStatus) {
     generateInsightsButton.disabled = true;
     generateInsightsButton.textContent = 'Writing reflections…';
     insightsStatus.hidden = false;
-    insightsStatus.textContent = 'Gemini is preparing a short reflection for each category. Your score-based reflections remain available below.';
+    insightsStatus.textContent = 'Groq is preparing a short reflection for each category. Your score-based reflections remain available below.';
     fetch(generateInsightsButton.dataset.endpoint, {
       method:'POST',
       credentials:'same-origin',
@@ -274,7 +274,7 @@ if (generateInsightsButton && insightsStatus) {
       const cards = Array.from(document.querySelectorAll('.category-card'));
       if (receivedSlugs.size !== cards.length || cards.some(function(card) {
         return !receivedSlugs.has(card.dataset.categorySlug);
-      })) throw new Error('Gemini did not return a reflection for every category.');
+      })) throw new Error('Groq did not return a reflection for every category.');
       result.data.categories.forEach(function(category) {
         const reflection = Array.from(document.querySelectorAll('[data-insight-for]')).find(function(node) {
           return node.dataset.insightFor === category.slug;

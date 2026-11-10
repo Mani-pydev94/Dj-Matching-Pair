@@ -296,7 +296,11 @@ class QuestionnaireSummaryTests(TestCase):
 
     def test_summary_api_reports_saved_ai_opt_in(self):
         self.user.profile.questionnaire_ai_consent = True
-        self.user.profile.save(update_fields=('questionnaire_ai_consent',))
+        self.user.profile.questionnaire_ai_consent_provider = 'groq'
+        self.user.profile.save(update_fields=(
+            'questionnaire_ai_consent',
+            'questionnaire_ai_consent_provider',
+        ))
 
         response = self.client.get('/api/questionnaire/summary/')
 
@@ -326,19 +330,21 @@ class QuestionnaireSummaryTests(TestCase):
         response = page_client.get('/questionnaire/intro/')
         self.assertContains(response, 'Allow AI reflections and continue')
         self.assertContains(response, 'Continue without AI')
-        self.assertContains(response, 'Google Gemini')
+        self.assertContains(response, 'Groq')
 
         response = page_client.post('/questionnaire/intro/', {'ai_consent': 'yes'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/questionnaire/hub/')
         self.user.profile.refresh_from_db()
         self.assertIs(self.user.profile.questionnaire_ai_consent, True)
+        self.assertEqual(self.user.profile.questionnaire_ai_consent_provider, 'groq')
 
         response = page_client.post('/questionnaire/intro/', {'ai_consent': 'no'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/questionnaire/hub/')
         self.user.profile.refresh_from_db()
         self.assertIs(self.user.profile.questionnaire_ai_consent, False)
+        self.assertEqual(self.user.profile.questionnaire_ai_consent_provider, '')
 
     def test_questionnaire_pages_require_a_saved_consent_choice(self):
         QuestionResponse.objects.filter(user=self.user).first().delete()
@@ -355,6 +361,28 @@ class QuestionnaireSummaryTests(TestCase):
             page_client.get('/questionnaire/questions/'),
             '/questionnaire/intro/',
         )
+
+    def test_previous_provider_consent_must_be_confirmed_for_groq(self):
+        self.user.profile.questionnaire_ai_consent = True
+        self.user.profile.questionnaire_ai_consent_provider = 'gemini'
+        self.user.profile.save(update_fields=(
+            'questionnaire_ai_consent',
+            'questionnaire_ai_consent_provider',
+        ))
+        page_client = Client()
+        page_client.force_login(self.user)
+
+        self.assertRedirects(
+            page_client.get('/questionnaire/questions/'),
+            '/questionnaire/intro/',
+        )
+        response = self.client.post(
+            '/api/questionnaire/summary/insights/',
+            {'consent': True},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 403)
 
     def test_summary_api_rejects_incomplete_questionnaire(self):
         QuestionResponse.objects.filter(user=self.user).first().delete()
@@ -407,9 +435,13 @@ class QuestionnaireSummaryTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
     @patch.dict(os.environ, {}, clear=True)
-    def test_ai_insights_report_missing_gemini_configuration(self):
+    def test_ai_insights_report_missing_groq_configuration(self):
         self.user.profile.questionnaire_ai_consent = True
-        self.user.profile.save(update_fields=('questionnaire_ai_consent',))
+        self.user.profile.questionnaire_ai_consent_provider = 'groq'
+        self.user.profile.save(update_fields=(
+            'questionnaire_ai_consent',
+            'questionnaire_ai_consent_provider',
+        ))
         response = self.client.post(
             '/api/questionnaire/summary/insights/',
             {'consent': True},
@@ -419,11 +451,15 @@ class QuestionnaireSummaryTests(TestCase):
         self.assertEqual(response.status_code, 503)
         self.assertIn('not configured', response.data['detail'])
 
-    @patch.dict(os.environ, {'GEMINI_API_KEY': 'test-key'})
+    @patch.dict(os.environ, {'GROQ_API_KEY': 'test-key'})
     @patch('questionnaire.summary.requests.post')
     def test_ai_insights_are_validated_and_cached(self, post):
         self.user.profile.questionnaire_ai_consent = True
-        self.user.profile.save(update_fields=('questionnaire_ai_consent',))
+        self.user.profile.questionnaire_ai_consent_provider = 'groq'
+        self.user.profile.save(update_fields=(
+            'questionnaire_ai_consent',
+            'questionnaire_ai_consent_provider',
+        ))
         post_response = Mock()
         post_response.raise_for_status.return_value = None
         summaries = [
@@ -435,12 +471,8 @@ class QuestionnaireSummaryTests(TestCase):
             if category.questions.filter(is_active=True, responses__user=self.user).exists()
         ]
         post_response.json.return_value = {
-            'candidates': [{
-                'content': {
-                    'parts': [{
-                        'text': json.dumps({'summaries': summaries}),
-                    }],
-                },
+            'choices': [{
+                'message': {'content': json.dumps({'summaries': summaries})},
             }],
         }
         post.return_value = post_response
@@ -459,12 +491,21 @@ class QuestionnaireSummaryTests(TestCase):
         )
         post.assert_called_once()
         self.assertEqual(
-            post.call_args.kwargs['headers']['x-goog-api-key'],
-            'test-key',
+            post.call_args.args[0],
+            'https://api.groq.com/openai/v1/chat/completions',
         )
-        prompt = post.call_args.kwargs['json']['contents'][0]['parts'][0]['text']
-        prompt_data = json.loads(prompt.split('\n\n', 1)[1])
-        self.assertIn('pattern across all supplied question-and-answer pairs', prompt)
+        self.assertEqual(
+            post.call_args.kwargs['headers']['Authorization'],
+            'Bearer test-key',
+        )
+        payload = post.call_args.kwargs['json']
+        self.assertEqual(payload['response_format'], {'type': 'json_object'})
+        self.assertEqual(payload['model'], 'llama-3.3-70b-versatile')
+        self.assertIn(
+            'pattern across all supplied question-and-answer pairs',
+            payload['messages'][0]['content'],
+        )
+        prompt_data = json.loads(payload['messages'][1]['content'])
         self.assertEqual(len(prompt_data['categories']), 8)
         self.assertTrue(all(
             set(answer) == {'question', 'answer'}

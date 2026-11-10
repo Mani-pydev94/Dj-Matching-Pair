@@ -158,17 +158,16 @@ class CompatibilityTests(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    @patch.dict(os.environ, {'GEMINI_API_KEY': 'test-key'})
+    @patch.dict(os.environ, {'GROQ_API_KEY': 'test-key'})
     @patch('questionnaire.summary.requests.post')
     def test_compatibility_insights_send_only_category_scores_to_ai(self, post):
         categories = calculate_compatibility_analysis(self.a, self.b)['categories']
         post_response = Mock()
         post_response.raise_for_status.return_value = None
         post_response.json.return_value = {
-            'candidates': [{
-                'content': {
-                    'parts': [{
-                        'text': json.dumps({
+            'choices': [{
+                'message': {
+                    'content': json.dumps({
                             'summaries': [
                                 {
                                     'slug': category['slug'],
@@ -176,8 +175,7 @@ class CompatibilityTests(TestCase):
                                 }
                                 for category in categories
                             ],
-                        }),
-                    }],
+                    }),
                 },
             }],
         }
@@ -193,8 +191,8 @@ class CompatibilityTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['categories']), len(categories))
-        prompt = post.call_args.kwargs['json']['contents'][0]['parts'][0]['text']
-        prompt_data = json.loads(prompt.split('\n\n', 1)[1])
+        prompt = post.call_args.kwargs['json']['messages']
+        prompt_data = json.loads(prompt[1]['content'])
         self.assertEqual(
             prompt_data['categories'],
             [
