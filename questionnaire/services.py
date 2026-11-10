@@ -37,6 +37,24 @@ def questionnaire_progress(user):
     }
 
 
+def mark_questionnaire_completed(user):
+    progress = questionnaire_progress(user)
+    if not progress['is_complete']:
+        return False
+
+    profile, _ = Profile.objects.get_or_create(user=user)
+    update_fields = []
+    if not profile.questionnaire_completed:
+        profile.questionnaire_completed = True
+        update_fields.append('questionnaire_completed')
+    if not profile.is_public:
+        profile.is_public = True
+        update_fields.append('is_public')
+    if update_fields:
+        profile.save(update_fields=(*update_fields, 'updated_at'))
+    return True
+
+
 @transaction.atomic
 def seed_questionnaire_data():
     data_path = Path(__file__).with_name('questionnaire_data.json')

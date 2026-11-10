@@ -20,6 +20,8 @@ class Profile(models.Model):
     photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
     is_public = models.BooleanField(default=True)
     questionnaire_completed = models.BooleanField(default=False)
+    questionnaire_ai_consent = models.BooleanField(null=True, blank=True, default=None)
+    questionnaire_ai_consent_provider = models.CharField(max_length=30, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
