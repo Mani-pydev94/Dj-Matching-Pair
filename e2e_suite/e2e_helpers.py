@@ -184,15 +184,20 @@ def login(e2e, email, password="Str0ng!Pass9x"):
 
 
 def dump_user_ids():
-    """Refresh /tmp/user_ids.json with all current users (post-signup)."""
-    import subprocess, os
+    """Refresh /tmp/user_ids.json with all current users (post-signup).
+
+    Inherits the caller's environment (PYTHONPATH, DJANGO_SETTINGS_MODULE, etc.)
+    and runs `manage.py shell` from the CC_PROJECT directory (default: cwd).
+    """
+    import subprocess, os, json
+    cwd = os.environ.get("CC_PROJECT", os.getcwd())
     env = dict(os.environ)
-    env["PYTHONPATH"] = "/tmp/linpkg"
-    env["DJANGO_SECRET_KEY"] = "e2e-test-secret-key"
-    env["EMAIL_BACKEND"] = "django.core.mail.backends.console.EmailBackend"
-    subprocess.run(["python3", "manage.py", "shell", "-c",
+    cmd = [
+        "python3", "manage.py", "shell", "-c",
         "import json;from django.contrib.auth import get_user_model;U=get_user_model();"
-        "open('/tmp/user_ids.json','w').write(json.dumps({u.email:str(u.id) for u in U.objects.all()}))"],
-        cwd="/tmp/ccproj", env=env, capture_output=True, text=True, timeout=120)
-    import json as _json
-    return _json.load(open("/tmp/user_ids.json"))
+        "open('/tmp/user_ids.json','w').write(json.dumps({u.email:str(u.id) for u in U.objects.all()}))",
+    ]
+    proc = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True, timeout=120)
+    if proc.returncode != 0 or not os.path.exists("/tmp/user_ids.json"):
+        raise RuntimeError(f"dump_user_ids failed (rc={proc.returncode}): {proc.stderr.strip()[:400]}")
+    return json.load(open("/tmp/user_ids.json"))
