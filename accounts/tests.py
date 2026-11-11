@@ -117,3 +117,34 @@ class SignupEmailOTPTests(TestCase):
         response = self.client.get('/accounts/signup/')
 
         self.assertRedirects(response, reverse('signup'))
+
+
+class LoginErrorVisibilityTests(TestCase):
+    """Regression: a failed login must show a visible error on the page.
+
+    The login view flashes 'Invalid email or password.' via the messages
+    framework; the template once ignored it, so failures were silent.
+    """
+
+    def test_wrong_password_shows_visible_error_message(self):
+        user = User.objects.create_user('login-test@example.com', password='Strong-password-123!')
+
+        response = self.client.post(reverse('login'), {
+            'username': user.email,
+            'password': 'Definitely-wrong-pass',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Invalid email or password.')
+        self.assertFalse(self.client.session.get('_auth_user_id'))
+
+    def test_correct_password_logs_in_and_no_error_shown(self):
+        User.objects.create_user('login-test2@example.com', password='Strong-password-123!')
+
+        response = self.client.post(reverse('login'), {
+            'username': 'login-test2@example.com',
+            'password': 'Strong-password-123!',
+        })
+
+        self.assertRedirects(response, reverse('home'))
+        self.assertTrue(self.client.session.get('_auth_user_id'))

@@ -8,18 +8,19 @@ User = get_user_model()
 
 class ProfileSerializer(serializers.ModelSerializer):
     display_name = serializers.CharField(source='user.get_full_name', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
     languages = serializers.SerializerMethodField()
     profile_photo = serializers.ImageField(source='photo', read_only=True)
 
     class Meta:
         model = Profile
         fields = (
-            'id', 'display_name', 'profile_photo', 'age', 'city', 'gender',
+            'id', 'display_name', 'email', 'profile_photo', 'age', 'city', 'gender',
             'languages', 'bio', 'university', 'major', 'year', 'interests',
             'is_public', 'created_at', 'updated_at',
         )
         read_only_fields = (
-            'id', 'display_name', 'profile_photo', 'is_public',
+            'id', 'display_name', 'email', 'profile_photo', 'is_public',
             'created_at', 'updated_at',
         )
 

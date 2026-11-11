@@ -169,10 +169,13 @@ def main():
     record("matching", "divya's profile page shows full details to mani after acceptance",
            r.status_code == 200 and "Data Science" in r.text and "Campus Connect University" in r.text,
            str(r.status_code))
-    # unconnected profile page stays partial (no interests/university leak)
+    # unconnected profile page stays partial: detail page renders the
+    # "Compatibility Profile" private preview with all personal fields blanked
+    # ('??? ???' appears in the API match list, already asserted above).
     r = mani.get(f"/profiles/{vikram_id}/")
-    record("matching", "unconnected profile page stays partial ('??? ???', interests/university hidden)",
-           r.status_code == 200 and "???" in r.text and "Gaming" not in r.text,
+    record("matching", "unconnected profile page stays partial ('Compatibility Profile' preview, interests/university hidden)",
+           r.status_code == 200 and "Compatibility Profile" in r.text
+           and "Gaming" not in r.text and "Hyderabad" not in r.text,
            f"status={r.status_code}")
 
     # ================= PHASE 4: CHAT =============
@@ -187,7 +190,10 @@ def main():
     # ================= PHASE 5: COMMUNITIES / EVENTS / NOTIFICATIONS =============
     phase("PHASE 5 — COMMUNITIES, EVENTS, NOTIFICATIONS")
     r = mani.get("/communities/")
-    record("communities", "communities home lists 5 demo communities", r.status_code == 200 and "AI & Machine Learning" in r.text, r.status_code)
+    # NOTE: Django HTML-escapes "&" to "&amp;" in rendered templates, so the
+    # seeded community "AI & Machine Learning" appears as "AI &amp; Machine Learning".
+    record("communities", "communities home lists 5 demo communities",
+           r.status_code == 200 and "AI &amp; Machine Learning" in r.text, r.status_code)
     # join a community
     import re as _re
     cid = _re.search(r'/communities/(\d+)/', r.text)
@@ -199,6 +205,7 @@ def main():
                r.status_code in (302,303), str(r2.status_code))
     r = mani.get("/events/")
     record("events", "events home lists demo events", r.status_code == 200 and "Campus Hack Night" in r.text, r.status_code)
+    events_home_text = r.text  # keep for the second-event lookup below
     eid = _re.search(r'/events/(\d+)/', r.text)
     if eid:
         en = eid.group(1)
@@ -206,9 +213,20 @@ def main():
         r2 = mani.get("/notifications/")
         ev_notif = any("registered for" in n["message"].lower() for n in r2.json()["results"])
         record("events", "mani registers for event -> success notification", ev_notif, r.text[:200])
-        # invalid phone rejected
-        r = mani.post_form(f"/events/{en}/register/", {"name":"X","email":"x@y.z","phone_number":"12"}, follow=False)
-        record("events", "event registration with short phone rejected", r.status_code == 200 and "valid phone" in r.text.lower(), r.text[:200])
+        # invalid phone rejected: use a DIFFERENT event, because the view's
+        # "already registered" guard runs before form validation, so a
+        # duplicate POST to the same event would short-circuit on that.
+        # (Read the event IDs from the saved home page, NOT from `r`, which
+        # now holds the POST-redirect response.)
+        all_event_ids = _re.findall(r'/events/(\d+)/', events_home_text)
+        en2 = next((e for e in all_event_ids if e != en), en)
+        # the view always 302-redirects to /home/ and flashes an error
+        # message, so follow the redirect and read the message from the page.
+        r = mani.post_form(f"/events/{en2}/register/", {"name":"X","email":"x@y.z","phone_number":"12"}, follow=True)
+        body = r.text.lower()
+        record("events", "event registration with short phone rejected (flashed error on redirected page)",
+               "valid name, email" in body or "valid phone" in body,
+               f"final status={r.status_code} url={r.url} en2={en2}")
     r = mani.get("/notifications/inbox/")
     record("notifications", "notifications inbox renders", r.status_code == 200, r.status_code)
 
@@ -218,10 +236,22 @@ def main():
     record("questionnaire", "summary available after completion", r.status_code == 200, f"{r.status_code} {r.text[:150]}")
     r = mani.get("/questionnaire/summary/")
     record("questionnaire", "summary page renders", r.status_code == 200, r.status_code)
-    # AI insights without GROQ key -> graceful 503
-    r = mani.post_json(f"/api/matches/{divya_id}/compatibility/insights/", {"consent": True})
-    record("questionnaire", "AI compatibility insights degrade gracefully without GROQ key (503 + message, not crash)",
-           r.status_code in (503, 502) and "config" in r.text.lower(), f"{r.status_code} {r.text[:150]}")
+    # AI insights graceful behavior: the insights endpoint is for UNCONNECTED
+    # public profiles (connected pairs get a 404 by design — their reflections
+    # live on the profile page), so target sara, who is public and unconnected
+    # to mani. The outcome depends on Groq availability:
+    #   - 200  : a real key is reachable -> summaries actually generated
+    #   - 503  : no GROQ_API_KEY set     -> "not configured"
+    #   - 502  : key set but call failed -> friendly "try again" message
+    # The key assertion is that it NEVER crashes (no 500 / HTML error page).
+    r = mani.post_json(f"/api/matches/{sara_id}/compatibility/insights/", {"consent": True})
+    low = r.text.lower()
+    no_crash = r.status_code in (200, 502, 503) and (
+        "could not generate" in low or "not configured" in low or low.startswith("{") or "categories" in low
+    )
+    record("questionnaire", "AI compatibility insights behave correctly for unconnected public profile (200/502/503, no crash)",
+           no_crash,
+           f"{r.status_code} {r.text[:150]}")
 
     # ================= finalize =============
     passed = sum(1 for _,_,ok,_ in RESULTS if ok)
@@ -230,8 +260,8 @@ def main():
     print(f"E2E SUMMARY: {passed}/{total} checks passed, {total-passed} failed")
     for ph,t,ok,d in RESULTS:
         if not ok:
-            print(f"  FAIL [{ph}] {t} :: {d[:200]}")
-    json.dump([{"phase":p,"test":t,"ok":o,"detail":d} for p,t,o,d in RESULTS],
+            print(f"  FAIL [{ph}] {t} :: {str(d)[:200]}")
+    json.dump([{"phase":p,"test":t,"ok":o,"detail":str(d)} for p,t,o,d in RESULTS],
               open("/tmp/e2e_results.json","w"), indent=2)
     print("\nresults written to /tmp/e2e_results.json")
 

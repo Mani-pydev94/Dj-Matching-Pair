@@ -44,10 +44,20 @@ class ProfileAPITests(TestCase):
         self.client.force_authenticate(self.user)
         response = self.client.get('/api/profile/me/')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['email'], self.user.email)
         response = self.client.patch('/api/profile/me/', {'city': 'Hyderabad', 'gender': 'Male'}, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['city'], 'Hyderabad')
         self.assertEqual(response.data['gender'], 'Male')
+        self.assertEqual(response.data['email'], self.user.email)
+
+    def test_my_profile_page_displays_email_as_read_only(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('profiles:my_profile'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<span class="label">Email</span>', html=True)
+        self.assertContains(response, self.user.email)
+        self.assertNotContains(response, 'name="email"')
 
     def test_partial_update_does_not_clear_other_fields(self):
         profile = self.user.profile

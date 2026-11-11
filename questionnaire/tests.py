@@ -452,6 +452,7 @@ class QuestionnaireSummaryTests(TestCase):
         self.assertIn('not configured', response.data['detail'])
 
     @patch.dict(os.environ, {'GROQ_API_KEY': 'test-key'})
+    @patch('questionnaire.summary.GROQ_MODEL', 'llama-3.3-70b-versatile')
     @patch('questionnaire.summary.requests.post')
     def test_ai_insights_are_validated_and_cached(self, post):
         self.user.profile.questionnaire_ai_consent = True

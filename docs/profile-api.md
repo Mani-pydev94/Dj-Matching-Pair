@@ -8,7 +8,8 @@ All endpoints below require a logged-in Django session. JSON requests use
 ### `GET /api/profile/me/`
 
 Returns the authenticated user's profile. The response includes `languages` as
-an array and a `profile_photo` URL when a photo exists.
+an array, the user's `email`, and a `profile_photo` URL when a photo exists.
+The email is read-only.
 
 ### `POST /api/profile/me/`
 

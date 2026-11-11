@@ -1,0 +1,53 @@
+Watching for file changes with StatReloader
+[10/Nov/2026 03:30:13] "GET /auth/signup/ HTTP/1.1" 200 18570
+Internal Server Error: /auth/signup/
+Traceback (most recent call last):
+  File "/tmp/linpkg/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/tmp/linpkg/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: disk I/O error
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/tmp/linpkg/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/tmp/linpkg/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/sessions/fervent-gracious-albattani/mnt/DJ Project AI/accounts/views.py", line 109, in signup_view
+    if form.is_valid():
+  File "/tmp/linpkg/django/forms/forms.py", line 206, in is_valid
+    return self.is_bound and not self.errors
+  File "/tmp/linpkg/django/forms/forms.py", line 201, in errors
+    self.full_clean()
+  File "/tmp/linpkg/django/forms/forms.py", line 337, in full_clean
+    self._clean_fields()
+  File "/tmp/linpkg/django/forms/forms.py", line 347, in _clean_fields
+    value = getattr(self, "clean_%s" % name)()
+  File "/sessions/fervent-gracious-albattani/mnt/DJ Project AI/accounts/forms.py", line 52, in clean_email
+    if User.objects.filter(email=email).exists():
+  File "/tmp/linpkg/django/db/models/query.py", line 1296, in exists
+    return self.query.has_results(using=self.db)
+  File "/tmp/linpkg/django/db/models/sql/query.py", line 674, in has_results
+    return compiler.has_results()
+  File "/tmp/linpkg/django/db/models/sql/compiler.py", line 1591, in has_results
+    return bool(self.execute_sql(SINGLE))
+  File "/tmp/linpkg/django/db/models/sql/compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+  File "/tmp/linpkg/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+  File "/tmp/linpkg/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/tmp/linpkg/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/tmp/linpkg/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/tmp/linpkg/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/tmp/linpkg/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/tmp/linpkg/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: disk I/O error
+[10/Nov/2026 03:30:14] "POST /auth/signup/ HTTP/1.1" 500 147756
