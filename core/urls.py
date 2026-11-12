@@ -9,6 +9,9 @@ def landing_view(request):
         return redirect('home')
     return render(request, 'pages/landing.html')
 
+def privacy_policy_view(request):
+    return render(request, 'pages/privacy_policy.html')
+
 @login_required
 def home_view(request):
     profile_pct = get_profile_completion(request.user)
@@ -87,4 +90,5 @@ def home_view(request):
 urlpatterns = [
     path('', landing_view, name='landing'),
     path('home/', home_view, name='home'),
+    path('privacy/', privacy_policy_view, name='privacy_policy'),
 ]

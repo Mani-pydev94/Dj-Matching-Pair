@@ -124,6 +124,9 @@
   .login-link span { color: #777780; }
   .login-link a { color: var(--purple); text-decoration: none; }
   .login-link a:hover { text-decoration: underline; }
+  .site-footer { padding: 28px 0 8px; text-align: center; font-size: 12px; color: var(--gray); }
+  .site-footer a { color: var(--purple); font-weight: 600; text-decoration: none; }
+  .site-footer a:hover { text-decoration: underline; }
   @media (prefers-reduced-motion: reduce) {
     .student-img, .floating-icon { animation: none !important; }
     .cta-btn { transition: none; }
@@ -174,6 +177,7 @@
       <p class="login-link"><span>Already have an account?</span> <a href="/auth/login/">Login</a></p>
     </section>
   </main>
+  <footer class="site-footer"><a href="{% url 'privacy_policy' %}">Privacy Policy</a></footer>
 </div>
 </body>
 </html>
