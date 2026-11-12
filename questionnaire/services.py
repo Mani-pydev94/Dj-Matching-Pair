@@ -8,6 +8,8 @@ from profiles.models import Profile
 
 from .models import Question, QuestionOption, QuestionResponse, QuestionnaireCategory
 
+DEFAULT_QUESTION_SCORE_TYPE = Question.ScoreType.SIMILARITY
+
 
 def questionnaire_progress(user):
     questions = Question.objects.filter(is_active=True, is_required=True)
@@ -81,6 +83,11 @@ def seed_questionnaire_data():
                 category_ref=category,
                 text=question_data['text'],
                 question_type='SINGLE_CHOICE',
+                score_type=(
+                    question_data.get('score_type')
+                    or category_data.get('score_type')
+                    or DEFAULT_QUESTION_SCORE_TYPE
+                ),
                 order=question_order,
                 weight=1.0,
                 is_required=True,

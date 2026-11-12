@@ -8,6 +8,8 @@ from .api_views import (
     QuestionnaireResponsesAPIView,
     QuestionnaireSummaryAPIView,
     QuestionnaireSummaryInsightsAPIView,
+    VibeCardAPIView,
+    VibeCardGenerateAPIView,
 )
 
 urlpatterns = [
@@ -22,5 +24,11 @@ urlpatterns = [
         'summary/insights/',
         QuestionnaireSummaryInsightsAPIView.as_view(),
         name='api_questionnaire_summary_insights',
+    ),
+    path('vibe-card/', VibeCardAPIView.as_view(), name='api_vibe_card'),
+    path(
+        'vibe-card/generate/',
+        VibeCardGenerateAPIView.as_view(),
+        name='api_vibe_card_generate',
     ),
 ]

@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .api_views import (
+    ClickStoryAPIView,
     CompatibilityAPIView,
     CompatibilityInsightsAPIView,
     MatchesAPIView,
@@ -8,6 +9,7 @@ from .api_views import (
 
 urlpatterns = [
     path('', MatchesAPIView.as_view(), name='api_matches'),
+    path('<uuid:user_id>/click-story/', ClickStoryAPIView.as_view(), name='api_click_story'),
     path(
         '<uuid:user_id>/compatibility/insights/',
         CompatibilityInsightsAPIView.as_view(),

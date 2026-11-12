@@ -8,6 +8,7 @@ from django.shortcuts import redirect, render
 
 from matching.models import Match
 from matching.compatibility import calculate_compatibility_analysis
+from matching.click_story import build_click_story
 from connections.models import Connection
 from django.db.models import Q
 
@@ -95,6 +96,10 @@ def student_profile(request, user_id):
         Q(requester=student, recipient=request.user)
     ).first()
 
+    click_story = None
+    if is_private_preview and compatibility:
+        click_story = build_click_story(request.user, student, compatibility, use_ai=False)
+
     match = None
     insight = None
     if is_connected:
@@ -114,6 +119,7 @@ def student_profile(request, user_id):
         ),
         'profile': visible_profile,
         'compatibility': compatibility,
+        'click_story': click_story,
         'match': match,
         'insight': insight,
         'connection': connection,

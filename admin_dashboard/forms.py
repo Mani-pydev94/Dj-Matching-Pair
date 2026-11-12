@@ -63,7 +63,7 @@ class QuestionForm(forms.ModelForm):
         fields = (
             'question_key', 'category_ref', 'text', 'question_type', 'help_text',
             'image', 'image_alt_text', 'order',
-            'weight', 'is_required', 'is_active',
+            'weight', 'score_type', 'is_required', 'is_active',
         )
 
     def __init__(self, *args, **kwargs):

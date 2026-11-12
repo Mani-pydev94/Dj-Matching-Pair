@@ -7,295 +7,400 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{--p:#7547F5;--pd:#6A3FE8;--ink:#171717;--muted:#737373;--line:#ECECF2;--soft:#F3EEFF;--page:#FAF9FF}
-    *{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif}
-    .app{max-width:460px;min-height:100dvh;margin:auto;background:#fff;padding-bottom:88px}
-    header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line)}
+    :root{--p:#6D45F5;--pd:#5A3BE0;--pink:#D855CF;--ink:#1E1B2E;--muted:#8B8798;--line:#ECE8F6;--soft:#F3EEFF;--page:#F7F5FD}
+    *{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    .app{width:100%;max-width:430px;min-height:100dvh;margin:auto;background:#fff;padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+    /* ---------- public profile (connected) ---------- */
+    header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);background:#fff}
     header h1{font-size:16px;margin:0;font-weight:700}.round{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;color:var(--ink);background:#fff;text-decoration:none;font-size:18px}
-    main{padding:24px 20px}.hero{text-align:center;padding:5px 0 24px}.avatar,.placeholder{width:112px;height:112px;border-radius:34px}
+    main{padding:22px 18px calc(40px + env(safe-area-inset-bottom))}.hero{text-align:center;padding:6px 0 20px}.avatar,.placeholder{width:110px;height:110px;margin:0 auto;border-radius:34px}
     .avatar{object-fit:cover;border:5px solid #F1ECFF;box-shadow:0 10px 26px #1e144615}
-    .placeholder{display:inline-grid;place-items:center;background:var(--soft);color:var(--p);font-size:36px;font-weight:800}
-    .hero h2{font-size:28px;letter-spacing:-.7px;margin:16px 0 6px}.sub{display:flex;justify-content:center;gap:6px;align-items:center;color:var(--muted);font-size:13px}
-    .tags{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:13px}.tag{padding:7px 10px;border-radius:999px;background:#F8F8FA;color:#5b5b5b;font-size:11px;font-weight:600}
-    .match{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:8px 12px;border-radius:999px;background:var(--soft);color:var(--p);font-size:12px;font-weight:700}
-    .card{border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 5px 18px #1e14460b}
-    .card h2,.card h3{font-size:15px;margin:0 0 12px}.bio{margin:0;color:#4f4f4f;font-size:13px;line-height:1.65}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{padding:12px;border-radius:13px;background:#FCFCFE}
+    .placeholder{display:grid;place-items:center;background:var(--soft);color:var(--p);font-size:36px;font-weight:800}
+    .hero h2{font-size:26px;letter-spacing:-.7px;margin:14px 0 6px}.sub{display:flex;justify-content:center;gap:6px;align-items:center;color:var(--muted);font-size:13px}
+    .tags{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:12px}.tag{padding:7px 10px;border-radius:999px;background:#F4F1FB;color:#5b5b5b;font-size:11px;font-weight:600}
+    .match{display:inline-flex;align-items:center;gap:6px;margin:14px auto 0;padding:8px 13px;border-radius:999px;background:var(--soft);color:var(--p);font-size:12px;font-weight:700}
+    .card{border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:13px;background:#fff;box-shadow:0 5px 14px rgba(60,40,120,.05)}
+    .card h2,.card h3{font-size:14px;margin:0 0 11px;font-weight:800}.bio{margin:0;color:#54506a;font-size:13px;line-height:1.65}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{padding:12px;border-radius:13px;background:#FBFAFE}
     .label{display:block;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
-    .value{font-size:13px;font-weight:600;line-height:1.35}.insight{border:0;color:#fff;background:linear-gradient(135deg,var(--p),var(--pd));box-shadow:0 12px 25px #7547f536}
+    .value{font-size:13px;font-weight:600;line-height:1.35}.insight{border:0;color:#fff;background:linear-gradient(135deg,var(--p),var(--pink));box-shadow:0 12px 25px #7547f536}
     .insight h3{color:#fff}.insight p{color:#fff;opacity:.9;line-height:1.6;font-size:13px;margin:0}
-    .empty{color:var(--muted);font-size:13px;line-height:1.55;margin:0}.actions{display:flex;gap:10px;margin-top:18px}
-    .btn{min-height:46px;flex:1;border:0;border-radius:13px;display:grid;place-items:center;text-decoration:none;font-size:13px;font-weight:700;cursor:pointer}
-    .primary{color:#fff;background:linear-gradient(135deg,var(--p),var(--pd));box-shadow:0 8px 18px #7547f52e}
+    .empty{color:var(--muted);font-size:13px;line-height:1.55;margin:0}.actions{display:flex;gap:10px;margin-top:16px}
+    .btn{min-height:46px;flex:1;border:0;border-radius:14px;display:grid;place-items:center;text-decoration:none;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,system-ui,sans-serif}
+    .primary{color:#fff;background:linear-gradient(135deg,var(--p),#9443E8);box-shadow:0 8px 18px #7547f52e}
     .secondary{color:var(--ink);border:1px solid var(--line);background:#fff}.btn:disabled{opacity:.65;cursor:wait}
-    .score-card{text-align:center;padding:22px;background:linear-gradient(145deg,#fff,#faf8ff)}
-    .score-value{display:block;color:var(--p);font-size:48px;line-height:1;font-weight:800;letter-spacing:-2px}
-    .score-caption{display:block;margin-top:8px;color:var(--muted);font-size:12px;font-weight:600}
-    .private-preview{display:block;}
-    .private-preview .score-card{background:linear-gradient(135deg,#f8f5ff 0%,#ffffff 100%);border:1px solid #efe9ff;border-radius:24px;box-shadow:0 16px 30px rgba(117,71,245,.08);padding:26px 18px 18px}
-    .private-preview .score-value{font-size:54px;letter-spacing:-2.5px}
-    .private-preview .score-caption{font-weight:700}
-    .private-preview .card{background:linear-gradient(180deg,#fff 0%,#fdfcff 100%);border:1px solid #f0ecff;box-shadow:0 14px 26px rgba(27,20,45,.04)}
-    .private-preview .match{background:#f3ecff;border:1px solid rgba(117,71,245,.08);font-weight:800}
-    .private-preview .category-row{margin:12px 0}
-    .private-preview .track{background:#f0ebfb}.private-preview .track span{background:linear-gradient(90deg,#9B7CFF,#6E4AE9)}
-    .private-preview .question-result{padding:12px 0;border-top:1px solid #efeaf8}
-    .category-row{margin:15px 0}.category-heading,.question-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .category-heading{font-size:12px;font-weight:600}.category-heading strong{color:var(--p)}
-    .track{height:8px;margin-top:8px;border-radius:999px;background:#eeeaf5;overflow:hidden}.track span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#8A65FF,#693DDE)}
-    .question-result{padding:13px 0;border-top:1px solid var(--line)}.question-result:first-of-type{border-top:0}
-    .question-heading{align-items:flex-start;color:var(--muted);font-size:11px}.question-heading strong{flex:none;color:var(--p);font-size:12px}
-    .question-text{margin:6px 0 0;font-size:13px;line-height:1.5}
-    .section-note{margin:-4px 0 12px;color:var(--muted);font-size:11px;line-height:1.5}
     .toast{position:fixed;top:18px;right:18px;left:18px;z-index:50;max-width:394px;margin:auto;padding:13px 15px;border-radius:12px;background:#ECFDF3;color:#087443;font-size:12px;font-weight:700;box-shadow:0 8px 24px #14502d29}
     .toast.error{background:#FEF2F2;color:#B42318}
-    .app-preview{max-width:960px}
-    .app-preview header{padding:16px 28px}
-    .private-preview{display:grid;gap:18px;padding:24px 28px 30px}
-    .private-preview .compatibility-hero{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 230px;grid-template-areas:"copy score" "actions score" "privacy score";align-items:center;gap:4px 24px;overflow:hidden;padding:30px 34px;border:0;border-radius:28px;background:radial-gradient(circle at 82% 12%,#ffffff24 0 1px,transparent 2px),linear-gradient(135deg,#7147ed 0%,#5832bf 100%);color:#fff;box-shadow:0 18px 44px rgba(80,48,170,.23)}
-    .compatibility-hero:before,.compatibility-hero:after{position:absolute;width:230px;height:230px;border:1px solid #ffffff20;border-radius:50%;content:"";pointer-events:none}
-    .compatibility-hero:before{top:-155px;right:95px}.compatibility-hero:after{right:-132px;bottom:-160px;width:300px;height:300px}
-    .hero-copy{position:relative;z-index:1;grid-area:copy}
-    .preview-kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid #ffffff38;border-radius:999px;background:#ffffff16;color:#fff;font-size:10px;font-weight:700;letter-spacing:.055em;text-transform:uppercase}
-    .preview-kicker span{width:7px;height:7px;border-radius:50%;background:#baf3d0;box-shadow:0 0 0 3px #ffffff24}
-    .compatibility-title{max-width:470px;margin:18px 0 8px;font-size:clamp(24px,4vw,36px);line-height:1.13;letter-spacing:-1px}
-    .compatibility-intro{max-width:480px;margin:0;color:#ffffffd9;font-size:14px;line-height:1.65}
-    .overall-score-ring{position:relative;z-index:1;grid-area:score;display:grid;place-items:center;width:196px;height:196px;justify-self:center;padding:11px;border-radius:50%;background:conic-gradient(#fff 0 var(--score),#ffffff36 var(--score) 100%)}
-    .ring-inner{display:grid;align-content:center;justify-items:center;width:100%;height:100%;border-radius:50%;background:#fff;text-align:center}
-    .overall-score-ring .score-value{color:#663cda;font-size:50px;letter-spacing:-2px}
-    .overall-score-ring .score-caption{margin-top:6px;color:#777481;font-size:11px;font-weight:700}
-    .preview-summary{margin:0;color:#ffffffed;font-size:12px;font-weight:600;line-height:1.5}
-    .compatibility-hero .actions{position:relative;z-index:1;grid-area:actions;max-width:430px;margin:14px 0 0}
-    .compatibility-hero .btn{min-height:50px;border-radius:15px;font-size:14px}
-    .compatibility-hero .primary{color:#6035D0;background:#fff;box-shadow:0 7px 18px #30137a36}
-    .compatibility-hero .secondary{color:#fff;border-color:#ffffff5c;background:#ffffff17}
-    .privacy-note{position:relative;z-index:1;grid-area:privacy;max-width:500px;margin:10px 0 0;color:#ffffffc9;font-size:11px;line-height:1.5}
-    .category-section{padding:24px}
-    .section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:5px}
-    .section-heading h2{margin:0;font-size:22px;letter-spacing:-.5px}
-    .section-heading span{padding:7px 10px;border-radius:999px;background:#f3eeff;color:#6b45db;font-size:9px;font-weight:800;letter-spacing:.07em}
-    .section-description{margin:6px 0 18px;color:var(--muted);font-size:13px;line-height:1.55}
-    .ai-controls{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 16px;padding:14px 16px;border:1px solid #e8e0ff;border-radius:17px;background:linear-gradient(110deg,#faf8ff,#fff)}
-    .ai-controls-copy{display:flex;align-items:flex-start;gap:11px;color:#625d6d;font-size:11px;line-height:1.55}
-    .ai-sparkle{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:12px;background:#eee8ff;color:#683fe1;font-size:17px}
-    .ai-controls-copy strong{display:block;margin-bottom:2px;color:#302b3d;font-size:12px}
-    .ai-generate{flex:none;min-height:40px;padding:0 14px;border:0;border-radius:12px;background:linear-gradient(135deg,#7547F5,#6338D6);color:#fff;font:700 11px Inter,system-ui,sans-serif;box-shadow:0 6px 14px #6d45f52e;cursor:pointer}
+
+    /* ---------- private preview: new reference design ---------- */
+    .app-preview{max-width:430px}
+    .pp-page{display:grid;gap:12px;padding:14px 14px calc(110px + env(safe-area-inset-bottom))}
+    .pp-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border:1px solid #ffffff42;border-radius:999px;background:#ffffff1f;color:#fff;font-size:11.5px;font-weight:700;width:fit-content}
+    .pp-hero{position:relative;overflow:hidden;padding:18px 18px 20px;border-radius:26px;background:linear-gradient(150deg,#5B3DF0 0%,#8A4BF0 48%,#D855CF 100%);color:#fff;box-shadow:0 14px 30px rgba(109,69,245,.22)}
+    .pp-hero:after{position:absolute;right:-70px;bottom:-110px;width:230px;height:230px;border:1px solid #ffffff2a;border-radius:50%;content:""}
+    .pp-hero>*,.pp-hero:before{position:relative;z-index:1}
+    .pp-hero .pp-pill{background:#ffffff16}
+    .pp-duo-title{display:flex;align-items:center;justify-content:center;gap:9px;margin:14px 0 0;font-size:22px;font-weight:800;letter-spacing:-.5px}
+    .pp-ring{display:grid;place-items:center;width:118px;height:118px;margin:16px auto 12px;padding:9px;border-radius:50%;background:conic-gradient(#fff 0 var(--score),#ffffff3a var(--score) 100%)}
+    .pp-ring .ring-inner{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:#fff;text-align:center}
+    .pp-ring .pp-score{color:var(--pd);font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1}
+    .pp-ring .pp-score-cap{margin-top:3px;color:#9a93ad;font-size:9.5px;font-weight:700}
+    .pp-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:2px}
+    .pp-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid #ffffff40;border-radius:999px;background:#ffffff1c;color:#fff;font-size:11px;font-weight:600}
+    .pp-privacy{margin:12px 0 0;color:#ffffffc4;font-size:11px;line-height:1.5}
+    /* white section cards */
+    .pp-card{border:1px solid var(--line);border-radius:19px;padding:15px 15px;background:#fff;box-shadow:0 5px 14px rgba(60,40,120,.05)}
+    .pp-card h3{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:14px;font-weight:800;letter-spacing:-.2px}
+    .pp-card .pp-sub{margin:0 0 10px;color:var(--muted);font-size:11.5px;line-height:1.45}
+    .pp-line{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-top:1px solid #F3F0FA;font-size:12.5px;line-height:1.5;color:#3E3952}
+    .pp-line:first-of-type{border-top:0;padding-top:2px}
+    .pp-line .line-dot{flex:none;width:7px;height:7px;margin-top:6px;border-radius:50%;background:var(--p)}
+    .pp-line .line-dot.green{background:#0E7C6B}
+    .pp-line strong{color:#282435}
+    .pp-cat{display:block;color:#9a8fbb;font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+    .pp-cat.purple{color:var(--p)}
+    /* mystery */
+    .pp-mystery{border:1.5px dashed #D9CCFF;border-radius:16px;background:#fff;padding:6px}
+    .mystery-btn{margin:0;width:100%;padding:14px;border:0;border-radius:12px;background:transparent;color:var(--p);font:700 12.5px Inter,system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+    .mystery-btn.open{color:#0E7C6B}
+    .mystery-reveal{margin:10px 10px 12px;padding:12px 14px;border-radius:13px;background:#F4FBF8;border:1px solid #CDE9DF;font-size:12.5px;line-height:1.55;color:#0E6A5B}
+    .mystery-reveal strong{color:#0E7C6B}
+    /* starters */
+    .starter-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+    .starter{display:flex;align-items:center;gap:10px;padding:12px 13px;border:1px solid var(--line);border-radius:13px;background:#FBFAFE}
+    .starter .starter-text{flex:1;min-width:0;font-size:12px;color:#3E3952;line-height:1.45}
+    .starter button{flex:none;border:0;background:var(--p);color:#fff;font:700 10px Inter,system-ui,sans-serif;padding:8px 13px;border-radius:999px;cursor:pointer}
+    /* guess game */
+    .guess-q{font-size:13px;font-weight:700;margin:0 0 11px;color:#282435}
+    .guess-opts{display:flex;flex-wrap:wrap;gap:8px}
+    .guess-opt{padding:10px 14px;border:1px solid var(--line);border-radius:999px;background:#FBFAFE;font-size:12px;font-weight:600;color:#3E3952;cursor:pointer;text-align:left;font-family:Inter,system-ui,sans-serif}
+    .guess-opt[disabled]{cursor:default}
+    .guess-opt.correct{border-color:#0E7C6B;background:#F2FBF8;color:#0E6A5B}
+    .guess-opt.wrong{border-color:#B42318;background:#FFF5F4;color:#B42318}
+    .guess-feedback{margin:11px 0 0;padding:11px 13px;border-radius:12px;background:#F6F1FF;font-size:12px;line-height:1.5;color:#5A4A86}
+    .guess-feedback b{color:var(--p)}
+    /* AI controls */
+    .ai-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:14px;border:1px solid #E8E0FF;border-radius:16px;background:linear-gradient(110deg,#FAF8FF,#fff)}
+    .ai-controls-copy{display:flex;align-items:flex-start;gap:10px;color:#6B6780;font-size:10.5px;line-height:1.5}
+    .ai-sparkle{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:11px;background:#EEE8FF;color:#683FE1;font-size:16px}
+    .ai-controls-copy strong{display:block;margin-bottom:2px;color:#302B3D;font-size:11.5px}
+    .ai-generate{flex:none;min-height:38px;padding:0 13px;border:0;border-radius:12px;background:linear-gradient(135deg,#7547F5,#6338D6);color:#fff;font:700 11px Inter,system-ui,sans-serif;box-shadow:0 6px 14px #6d45f52e;cursor:pointer}
     .ai-generate:disabled{opacity:.65;cursor:wait}
-    .ai-insights-status{margin:0 0 14px;padding:11px 13px;border:1px solid #e8e0ff;border-radius:13px;background:#faf8ff;color:#625d6d;font-size:11px;line-height:1.5}
-    .category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .category-card{min-width:0;padding:17px;border:1px solid #eee9f7;border-radius:20px;background:linear-gradient(145deg,#fff,#fdfbff);box-shadow:0 6px 18px #1e144608;transition:transform .18s ease,box-shadow .18s ease}
-    .category-card:hover{transform:translateY(-2px);box-shadow:0 12px 25px #1e144610}
-    .category-top{display:flex;align-items:center;gap:12px}
-    .category-icon{display:grid;place-items:center;flex:none;width:40px;height:40px;border:1px solid #eee8ff;border-radius:14px;background:#f7f3ff;color:#6d45f5;font-size:16px;font-weight:800}
-    .category-copy{min-width:0;flex:1}
-    .category-copy h3{margin:0;color:#282435;font-size:14px;line-height:1.3}
-    .category-caption{display:block;margin-top:4px;color:#898593;font-size:10px}
-    .category-ring{display:grid;place-items:center;flex:none;width:68px;height:68px;padding:5px;border-radius:50%;background:conic-gradient(#7547F5 0 var(--score),#eeeaf6 var(--score) 100%)}
-    .category-ring .ring-inner{background:#fff}
-    .category-ring strong{color:#6D45F5;font-size:14px;letter-spacing:-.3px}
-    .category-insight{min-height:58px;margin:13px 0 0;padding:12px 13px;border-radius:14px;background:#f8f5ff;color:#5e586b;font-size:12px;line-height:1.6}
-    .category-card[data-source="ai"] .category-insight{border:1px solid #e8e0ff;background:linear-gradient(135deg,#f8f5ff,#fff)}
-    .insight-label{display:block;margin-bottom:4px;color:#7547F5;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
-    .question-details{padding:0;overflow:hidden}
-    .question-details summary{padding:17px 20px;color:#302b3d;font-size:13px;font-weight:700;cursor:pointer;list-style:none}
-    .question-details summary::-webkit-details-marker{display:none}
-    .question-details summary:after{float:right;color:var(--p);content:"+"}
-    .question-details[open] summary:after{content:"−"}
-    .question-details .details-content{padding:0 20px 17px}
-    .question-details .section-note{margin:0 0 10px}
-    .question-details .match{margin:0 0 8px}
-    .question-details .question-result:first-of-type{border-top:1px solid var(--line)}
-    .ai-retry{margin:8px 0 0;padding:7px 10px;border:0;border-radius:9px;background:#eee8ff;color:#6038d8;font:700 11px Inter,system-ui,sans-serif;cursor:pointer}
-    @media(max-width:680px){.app-preview{max-width:460px}.app-preview header{padding:16px 20px}.private-preview{gap:14px;padding:18px 16px 26px}.private-preview .compatibility-hero{grid-template-columns:minmax(0,1fr) 118px;grid-template-areas:"copy score" "actions actions" "privacy privacy";gap:6px 10px;padding:22px 18px;border-radius:24px}.compatibility-title{font-size:22px;letter-spacing:-.6px}.compatibility-intro{font-size:11px}.overall-score-ring{width:112px;height:112px;padding:7px}.overall-score-ring .score-value{font-size:31px;letter-spacing:-1px}.overall-score-ring .score-caption{font-size:8px}.preview-summary{font-size:10px}.compatibility-hero .actions{margin-top:12px}.compatibility-hero .btn{min-height:46px;font-size:12px}.privacy-note{font-size:10px}.category-section{padding:19px 15px}.section-heading h2{font-size:19px}.section-description{font-size:11px}.ai-controls{align-items:flex-start;padding:12px}.ai-controls-copy{font-size:10px}.ai-generate{min-height:38px;padding:0 11px;font-size:10px}.category-grid{grid-template-columns:1fr;gap:9px}.category-card{padding:14px;border-radius:17px}.category-insight{min-height:0;font-size:11px}.category-ring{width:62px;height:62px}.question-details summary{padding:15px 16px}.question-details .details-content{padding:0 16px 15px}}
-    @media(max-width:380px){.private-preview .compatibility-hero{grid-template-columns:minmax(0,1fr) 94px;padding:20px 14px}.overall-score-ring{width:92px;height:92px}.overall-score-ring .score-value{font-size:26px}.compatibility-title{font-size:20px}.ai-controls{display:grid}.ai-generate{width:100%}}
-    @media (min-width:461px){body{padding:18px 0}.app{border-radius:24px;box-shadow:0 10px 40px #1e144612}}
+    .ai-insights-status{margin:0;padding:11px 13px;border:1px solid #E8E0FF;border-radius:13px;background:#FAF8FF;color:#6B6780;font-size:11px;line-height:1.5}
+    .pp-note{margin:0;padding:0 4px;color:#9a8fbb;font-size:10.5px;line-height:1.5}
+    /* fixed CTA above bottom nav */
+    .pp-cta{position:fixed;right:0;bottom:calc(62px + env(safe-area-inset-bottom));left:0;z-index:5;max-width:430px;margin:auto;padding:12px 14px 8px;background:linear-gradient(180deg,#F7F5FD00,var(--page) 32%)}
+    .pp-cta .btn{min-height:52px;border-radius:16px;font-size:14.5px}
+    .pp-cta .row{display:flex;gap:9px}
+    @media(max-width:380px){.pp-page{padding:10px 10px calc(108px + env(safe-area-inset-bottom))}.pp-ring{width:104px;height:104px}.pp-ring .pp-score{font-size:26px}.pp-duo-title{font-size:20px}}
+    @media (min-width:461px){body{padding:16px 0}.app{border-radius:24px;box-shadow:0 10px 40px #1e144612;max-width:430px}}
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
   </style>
 </head>
 <body>
 <div class="app{% if is_private_preview %} app-preview{% endif %}">
   {% csrf_token %}
-  <header>
-    <a class="round" href="{% url 'home' %}" aria-label="Back">←</a>
-    <h1>{% if is_private_preview %}Compatibility Profile{% else %}Student Profile{% endif %}</h1>
-    <span class="round" aria-hidden="true">⋯</span>
-  </header>
-  <main {% if is_private_preview %}class="private-preview"{% endif %}>
-    {% if is_private_preview %}
+  {% if is_private_preview %}
+    <main class="pp-page">
       {% if compatibility %}
-        <section class="card compatibility-hero">
-          <div class="hero-copy">
-            <span class="preview-kicker"><span aria-hidden="true"></span>Private compatibility preview</span><br><br>
-            <h2 class="compatibility-title">Meaningful connections start with understanding.</h2>
-            <p class="compatibility-intro">See where your perspectives meet, and explore what each category score could mean for getting to know one another.</p>
-          </div>
-          <div class="overall-score-ring" role="img" aria-label="Overall similarity score: {{ compatibility.overall_score }} percent" style="--score:{{ compatibility.overall_score }}%">
+        <section class="pp-hero">
+          <span class="pp-pill">👤 You&nbsp; + &nbsp;🎭 Anonymous match</span>
+          {% if click_story %}
+            <h2 class="pp-duo-title"><span id="duo-emoji" aria-hidden="true">{{ click_story.duo_emoji }}</span><span id="duo-name-label">{{ click_story.duo_name }}</span></h2>
+          {% endif %}
+          <div class="pp-ring" role="img" aria-label="Overall similarity score: {{ compatibility.overall_score }} percent" style="--score:{{ compatibility.overall_score }}%">
             <div class="ring-inner">
-              <span class="score-value">{{ compatibility.overall_score }}%</span>
-              <span class="score-caption">Overall Similarity Score</span>
+              <span class="pp-score">{{ compatibility.overall_score }}%</span>
+              <span class="pp-score-cap">match</span>
             </div>
           </div>
-          <div class="actions">
-            {% if connection and connection.status == 'PENDING' and connection.requester_id == request.user.id %}
-              <button id="cancel-connection" class="btn secondary" data-connection="{{ connection.id }}">Cancel request</button>
-            {% elif connection and connection.status == 'PENDING' %}
-              <button id="accept-connection" class="btn primary" data-connection="{{ connection.id }}">Accept request</button>
-              <button id="reject-connection" class="btn secondary" data-connection="{{ connection.id }}">Reject</button>
-            {% else %}
-              <button id="connect" class="btn primary" data-user="{{ student.id }}">Connect</button>
-            {% endif %}
-          </div>
-          <p class="privacy-note">Their name and personal profile details stay private until the connection is accepted.</p>
+          {% if click_story %}
+            <div class="pp-chips">
+              <span class="pp-chip">🤝 Same wavelength {{ click_story.ring.same_wavelength }}%</span>
+              <span class="pp-chip">⚖️ Balance each other {{ click_story.ring.balance_each_other }}%</span>
+            </div>
+          {% endif %}
+          <p class="pp-privacy">Their name and personal details stay private until the connection is accepted.</p>
         </section>
-        <section class="card category-section" aria-labelledby="category-similarity-heading">
-          <div class="section-heading">
-            <h2 id="category-similarity-heading">Category-wise Similarity</h2>
-            <span>{{ compatibility.categories|length }} AREAS</span>
-          </div>
-          <p class="section-description">These scores compare shared questionnaire answers. Each reflection offers a conversation starter—not a prediction of how well you’ll get along.</p>
-          <div class="ai-controls">
+
+        {% if click_story %}
+          <section class="pp-card" aria-labelledby="dna-heading">
+            <h3 id="dna-heading">🧬 Shared DNA</h3>
+            <div id="dna-rows">
+              {% if click_story.shared_dna %}
+                {% for item in click_story.shared_dna %}
+                  <div class="pp-line story-row">
+                    <span class="line-dot" aria-hidden="true"></span>
+                    <div class="row-body">
+                      <span class="pp-cat">{{ item.category }}</span>
+                      <p class="line-text">{{ item.question|truncatechars:110 }}</p>
+                      {% if item.answers %}<p class="line-text"><strong>Both picked:</strong> {{ item.answers|join:", " }}</p>{% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="pp-line"><span class="line-dot" aria-hidden="true"></span><div class="row-body"><p class="line-text">No shared answers unlocked yet.</p></div></div>
+              {% endif %}
+            </div>
+          </section>
+
+          {% if click_story.sparks %}
+            <!-- <section class="pp-card" aria-labelledby="spark-heading">
+              <h3 id="spark-heading">⚡ Spark differences</h3>
+              <p class="pp-sub">Different, not wrong — a little friction that makes a good story.</p>
+              <div id="spark-rows">
+                {% for item in click_story.sparks %}
+                  <div class="pp-line story-row">
+                    <span class="line-dot" aria-hidden="true"></span>
+                    <div class="row-body">
+                      <span class="pp-cat purple">{{ item.category }} · {{ item.balance }}% balance</span>
+                      <p class="line-text">{{ item.question|truncatechars:110 }}</p>
+                      {% if item.your_answer %}<p class="line-text"><strong>You picked:</strong> {{ item.your_answer|join:", " }}</p>{% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </section> -->
+          {% endif %}
+
+          {% if click_story.mystery %}
+            <section class="pp-mystery" aria-labelledby="mystery-heading">
+              <h3 style="padding:0 6px 4px">🎁 Mystery match</h3>
+              <button type="button" class="mystery-btn" id="mystery-btn">Tap to reveal your surprise in common</button>
+              <p class="mystery-reveal" id="mystery-reveal" hidden>
+                <strong>Surprising shared thread:</strong> you both said
+                “{{ click_story.mystery.answers|join:" · " }}” when asked “{{ click_story.mystery.question|truncatechars:120 }}”.
+              </p>
+            </section>
+          {% endif %}
+
+          {% if click_story.starters %}
+            <section class="pp-card" aria-labelledby="starters-heading">
+              <h3 id="starters-heading">💬 Start with one of these</h3>
+              <ul class="starter-list" id="starter-list">
+                {% for item in click_story.starters %}
+                  <li class="starter">
+                    <span class="starter-text" data-starter-for="{{ item.question|truncatechars:120 }}">“{{ item.question|truncatechars:120 }}”</span>
+                    <button type="button" data-copy-starter>Use</button>
+                  </li>
+                {% endfor %}
+              </ul>
+            </section>
+          {% endif %}
+
+          {% if click_story.guess_game %}
+            <section class="pp-card" aria-labelledby="guess-heading">
+              <h3 id="guess-heading">🎯 Guess their answer</h3>
+              <div class="guess-game" id="guess-game" data-correct="{{ click_story.guess_game.their_index }}">
+                <p class="guess-q">{{ click_story.guess_game.question|truncatechars:140 }}</p>
+                <div class="guess-opts">
+                  {% for option in click_story.guess_game.options %}
+                    <button type="button" class="guess-opt" data-index="{{ forloop.counter0 }}">{{ option }}</button>
+                  {% endfor %}
+                </div>
+                <p class="guess-feedback" id="guess-feedback" hidden></p>
+              </div>
+            </section>
+          {% endif %}
+
+          <section class="ai-controls">
             <div class="ai-controls-copy">
               <span class="ai-sparkle" aria-hidden="true">✦</span>
               <div>
-                <strong>Want a personalized AI perspective?</strong>
-                Generate reflections from category names and scores only. Your answers, names, and profile details are not sent to Groq.
+                <strong>Want the duo written by AI?</strong>
+                Groq writes your duo lines from your shared answers only.
               </div>
             </div>
-            <button type="button" class="ai-generate" id="generate-ai-insights" data-endpoint="{% url 'api_compatibility_insights' student.id %}">Generate AI insights</button>
-          </div>
-          <p class="ai-insights-status" id="ai-insights-status" role="status" aria-live="polite" hidden></p>
-          <div class="category-grid">
-            {% for category in compatibility.categories %}
-              <article class="category-card" data-category-slug="{{ category.slug }}" data-source="score">
-                <div class="category-top">
-                  <span class="category-icon" aria-hidden="true">✦</span>
-                  <div class="category-copy">
-                    <h3>{{ category.name }}</h3>
-                    <span class="category-caption">Shared-answer similarity</span>
-                  </div>
-                  <div class="category-ring" role="img" aria-label="{{ category.name }} similarity: {{ category.score }} percent" style="--score:{{ category.score }}%">
-                    <div class="ring-inner"><strong>{{ category.score }}%</strong></div>
-                  </div>
-                </div>
-                <p class="category-insight"><span class="insight-label">Score-based reflection</span><span data-insight-for="{{ category.slug }}">{{ category.reflection }}</span></p>
-              </article>
-            {% endfor %}
-          </div>
-        </section>
-        <details class="card question-details">
-          <summary>Similarity on Most Important Questions</summary>
-          <div class="details-content">
-            <p class="section-note">Questions contribute equally to the overall score. This section shows questions whose average importance rating was above neutral.</p>
-            {% if compatibility.most_important_questions %}
-              <p class="match">{{ compatibility.most_important_similarity }}% similarity</p>
-              {% for item in compatibility.most_important_questions %}
-                <div class="question-result">
-                  <div class="question-heading"><span>{{ item.category }}</span><strong>{{ item.similarity }}%</strong></div>
-                  <p class="question-text">{{ item.question }}</p>
-                </div>
-              {% endfor %}
-            {% else %}
-              <p class="empty">No shared answers were rated as most important.</p>
-            {% endif %}
-          </div>
-        </details>
-        <details class="card question-details">
-          <summary>Similarity on Least Important Questions</summary>
-          <div class="details-content">
-            <p class="section-note">Questions contribute equally to the overall score. This section shows questions whose average importance rating was below neutral.</p>
-            {% if compatibility.least_important_questions %}
-              <p class="match">{{ compatibility.least_important_similarity }}% similarity</p>
-              {% for item in compatibility.least_important_questions %}
-                <div class="question-result">
-                  <div class="question-heading"><span>{{ item.category }}</span><strong>{{ item.similarity }}%</strong></div>
-                  <p class="question-text">{{ item.question }}</p>
-                </div>
-              {% endfor %}
-            {% else %}
-              <p class="empty">No shared answers were rated below neutral.</p>
-            {% endif %}
-          </div>
-        </details>
+            <button type="button" class="ai-generate" id="generate-click-story" data-endpoint="{% url 'api_click_story' student.id %}">Generate</button>
+          </section>
+          <p class="ai-insights-status" id="click-story-status" role="status" aria-live="polite" hidden></p>
+          <p class="pp-note">Match = 60% same-wavelength similarity + 40% complementary balance.</p>
+        {% else %}
+          <section class="pp-card"><p class="empty">Compatibility details are unavailable for this private profile.</p></section>
+        {% endif %}
       {% else %}
-        <section class="card"><p class="empty">Compatibility details are unavailable for this private profile.</p></section>
+        <section class="pp-card"><p class="empty">Compatibility details are unavailable for this private profile.</p></section>
+      {% endif %}
+
+      <div class="pp-cta">
         {% if connection and connection.status == 'PENDING' and connection.requester_id == request.user.id %}
-          <button id="cancel-connection" class="btn secondary" data-connection="{{ connection.id }}">Cancel request</button>
+          <div class="row">
+            <button id="cancel-connection" class="btn secondary" data-connection="{{ connection.id }}">Cancel request</button>
+          </div>
         {% elif connection and connection.status == 'PENDING' %}
-          <div class="actions">
+          <div class="row">
             <button id="accept-connection" class="btn primary" data-connection="{{ connection.id }}">Accept request</button>
             <button id="reject-connection" class="btn secondary" data-connection="{{ connection.id }}">Reject</button>
           </div>
         {% else %}
-          <button id="connect" class="btn primary" data-user="{{ student.id }}">Connect</button>
+          <button id="connect" class="btn primary" data-user="{{ student.id }}">Send connection request</button>
         {% endif %}
-      {% endif %}
-    {% else %}
+      </div>
+    </main>
+  {% else %}
+    <header>
+      <a class="round" href="{% url 'home' %}" aria-label="Back">←</a>
+      <h1>Student Profile</h1>
+      <span class="round" aria-hidden="true">⋯</span>
+    </header>
+    <main>
       <section class="hero">
         {% if profile.photo %}<img class="avatar" src="{{ profile.photo.url }}" alt="{{ display_name }}">{% else %}<div class="placeholder">{{ student.first_name|default:student.email|slice:":1"|upper }}</div>{% endif %}
         <h2>{{ display_name }}</h2>
         <div class="sub">{% if profile.university %}<span>{{ profile.university }}</span>{% else %}<span>Campus Connect student</span>{% endif %}{% if profile.city %}<span>· {{ profile.city }}</span>{% endif %}</div>
         <div class="tags">{% if profile.major %}<span class="tag">{{ profile.major }}</span>{% endif %}{% if profile.year %}<span class="tag">{{ profile.year }}</span>{% endif %}{% if profile.age %}<span class="tag">{{ profile.age }} years</span>{% endif %}</div>
         {% if match %}<div class="match">✦ {{ match.compatibility_score|floatformat:0 }}% compatible with you</div>{% endif %}
-        <div class="actions"><a class="btn primary" href="{% url 'chat_conversation' student.id %}">Message</a><button id="cancel-connection" class="btn secondary" data-connection="{{ connection.id }}">Cancel connection</button></div>
+        <div class="actions"><a class="btn primary" href="{% url 'chat_conversation' student.id %}">Message</a>{% if connection %}<button id="cancel-connection" class="btn secondary" data-connection="{{ connection.id }}">Cancel connection</button>{% endif %}</div>
       </section>
       {% if insight %}<section class="card insight"><h3>Why you may connect</h3><p>{{ insight.insight_text }}</p></section>{% endif %}
       <section class="card"><h3>About {{ student.first_name|default:"this student" }}</h3>{% if profile.bio %}<p class="bio">{{ profile.bio }}</p>{% else %}<p class="empty">No bio added.</p>{% endif %}</section>
       <section class="card"><h3>Academic details</h3><div class="grid"><div class="item"><span class="label">University</span><span class="value">{{ profile.university|default:"Not added" }}</span></div><div class="item"><span class="label">Major</span><span class="value">{{ profile.major|default:"Not added" }}</span></div><div class="item"><span class="label">Year</span><span class="value">{{ profile.year|default:"Not added" }}</span></div><div class="item"><span class="label">Location</span><span class="value">{{ profile.city|default:"Not added" }}</span></div></div></section>
       {% if profile.languages %}<section class="card"><h3>Languages</h3><p class="bio">{{ profile.languages }}</p></section>{% endif %}
       {% if profile.interests %}<section class="card"><h3>Interests</h3><p class="bio">{{ profile.interests }}</p></section>{% endif %}
-    {% endif %}
-  </main>
+    </main>
+  {% endif %}
 </div>
 {% include 'includes/bottom_nav.html' with active_nav='profile' %}
 <script>
 const profileTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
 const profileToken = profileTokenElement ? profileTokenElement.value : '';
-const generateInsightsButton = document.getElementById('generate-ai-insights');
-const insightsStatus = document.getElementById('ai-insights-status');
-if (generateInsightsButton && insightsStatus) {
-  const generateInsights = function() {
-    generateInsightsButton.disabled = true;
-    generateInsightsButton.textContent = 'Writing reflections…';
-    insightsStatus.hidden = false;
-    insightsStatus.textContent = 'Groq is preparing a short reflection for each category. Your score-based reflections remain available below.';
-    fetch(generateInsightsButton.dataset.endpoint, {
-      method:'POST',
-      credentials:'same-origin',
-      headers:{'Content-Type':'application/json','X-CSRFToken':profileToken},
-      body:JSON.stringify({consent:true})
-    }).then(function(response) {
-      return response.json().then(function(data) {
-        return {ok:response.ok, data:data};
-      });
-    }).then(function(result) {
-      if (!result.ok) throw new Error(result.data.detail || 'AI compatibility reflections could not be generated.');
-      if (!Array.isArray(result.data.categories)) throw new Error('The AI response was incomplete.');
-      const receivedSlugs = new Set(result.data.categories.map(function(category) { return category.slug; }));
-      const cards = Array.from(document.querySelectorAll('.category-card'));
-      if (receivedSlugs.size !== cards.length || cards.some(function(card) {
-        return !receivedSlugs.has(card.dataset.categorySlug);
-      })) throw new Error('Groq did not return a reflection for every category.');
-      result.data.categories.forEach(function(category) {
-        const reflection = Array.from(document.querySelectorAll('[data-insight-for]')).find(function(node) {
-          return node.dataset.insightFor === category.slug;
-        });
-        if (reflection && typeof category.summary === 'string') {
-          reflection.textContent = category.summary;
-          reflection.closest('.category-card').dataset.source = 'ai';
-          reflection.previousElementSibling.textContent = 'AI compatibility reflection';
-        }
-      });
-      insightsStatus.textContent = 'AI reflections are ready for every category. They’re based on category names and similarity scores only.';
-      generateInsightsButton.textContent = 'Refresh AI insights';
-      generateInsightsButton.disabled = false;
-    }).catch(function(error) {
-      insightsStatus.textContent = (error.message || 'AI compatibility reflections could not be generated.') + ' Score-based reflections are still shown for every category.';
-      generateInsightsButton.textContent = 'Try AI insights again';
-      generateInsightsButton.disabled = false;
-    });
-  };
-  generateInsightsButton.addEventListener('click', generateInsights);
+
+/* --- Mystery reveal (private preview) --- */
+const mysteryBtn = document.getElementById('mystery-btn');
+if (mysteryBtn) {
+  mysteryBtn.addEventListener('click', function() {
+    const reveal = document.getElementById('mystery-reveal');
+    const shown = !reveal.hidden;
+    reveal.hidden = shown;
+    mysteryBtn.classList.toggle('open', !shown);
+    mysteryBtn.textContent = shown ? 'Mystery revealed' : 'Tap to reveal your surprise in common';
+  });
 }
+/* --- Copy conversation starter --- */
+document.querySelectorAll('[data-copy-starter]').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    const text = btn.parentElement.querySelector('.starter-text').textContent;
+    const clean = text.replace(/^“|”$/g, '');
+    const open = function() { profileMessage('Conversation starter copied — paste it into your chat.'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(clean).then(open).catch(open);
+    } else {
+      window.prompt('Copy this starter:', clean);
+    }
+  });
+});
+/* --- Guess game --- */
+const guessGame = document.getElementById('guess-game');
+if (guessGame) {
+  const correct = Number(guessGame.dataset.correct);
+  const feedback = document.getElementById('guess-feedback');
+  guessGame.querySelectorAll('.guess-opt').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (opt.disabled) return;
+      guessGame.querySelectorAll('.guess-opt').forEach(function(o) { o.disabled = true; });
+      if (Number(opt.dataset.index) === correct) {
+        opt.classList.add('correct');
+        feedback.innerHTML = '<b>Right!</b> You two landed on the same answer — a solid shared thread to build on.';
+      } else {
+        opt.classList.add('wrong');
+        guessGame.querySelectorAll('.guess-opt')[correct].classList.add('correct');
+        feedback.innerHTML = '<b>Close!</b> Their pick was “' + guessGame.querySelectorAll('.guess-opt')[correct].textContent + '”.';
+      }
+      feedback.hidden = false;
+    });
+  });
+}
+
+/* --- New AI click-story generation ('Why You Two Click') --- */
+const clickStoryButton = document.getElementById('generate-click-story');
+const clickStoryStatus = document.getElementById('click-story-status');
+if (clickStoryButton && clickStoryStatus) {
+  clickStoryButton.addEventListener('click', function() {
+    clickStoryButton.disabled = true;
+    clickStoryButton.textContent = 'Writing your duo…';
+    clickStoryStatus.hidden = false;
+    clickStoryStatus.textContent = 'Groq is writing your duo lines. Your shared answers only are sent.';
+    fetch(clickStoryButton.dataset.endpoint, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': profileToken },
+      body: JSON.stringify({ consent: true }),
+    }).then(function(response) {
+      return response.json().then(function(data) { return { ok: response.ok, data: data }; });
+    }).then(function(result) {
+      if (!result.ok) throw new Error(result.data.detail || 'Your duo story could not be generated.');
+      const story = result.data;
+      if (story.duo_name) {
+        const name = document.getElementById('duo-name-label');
+        if (name) name.textContent = story.duo_name;
+        const emoji = document.getElementById('duo-emoji');
+        if (emoji && story.duo_emoji) emoji.textContent = story.duo_emoji;
+      }
+      applyStoryLines(story, 'shared_dna', 'dna-rows');
+      applyStoryLines(story, 'sparks', 'spark-rows');
+      if (story.mystery && story.mystery.reveal) {
+        const reveal = document.getElementById('mystery-reveal');
+        if (reveal) {
+          let marker = reveal.querySelector('#mystery-ai-reveal');
+          if (!marker) {
+            marker = document.createElement('span');
+            marker.id = 'mystery-ai-reveal';
+            marker.textContent = ' ' + story.mystery.reveal;
+            reveal.appendChild(marker);
+          } else {
+            marker.textContent = ' ' + story.mystery.reveal; // refresh in place, no stacking
+          }
+        }
+      }
+      (story.starters || []).forEach(function(item, i) {
+        const line = lineOf(item);
+        const list = document.getElementById('starter-list');
+        const el = list && list.children[i] ? list.children[i].querySelector('.starter-text') : null;
+        if (el && line) el.textContent = line;
+      });
+      clickStoryStatus.textContent = 'Your AI duo story is ready.';
+      clickStoryButton.textContent = 'Refresh';
+      clickStoryButton.disabled = false;
+    }).catch(function(error) {
+      clickStoryStatus.textContent = error.message + ' Your deterministic lines are still shown above.';
+      clickStoryButton.textContent = 'Try AI duo again';
+      clickStoryButton.disabled = false;
+    });
+  });
+  // Coerce whatever the backend put in an item into a display string.
+  // The API sends each shared_dna / spark / starter item as an object with a
+  // "line" field; a plain string is accepted too. This guard means we can
+  // never leak "[object Object]" into the DOM.
+  function lineOf(item) {
+    if (typeof item === 'string') return item;
+    if (item && typeof item === 'object') {
+      return item.line || item.text || item.title || '';
+    }
+    return '';
+  }
+  function applyStoryLines(story, key, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const rows = Array.prototype.slice.call(container.querySelectorAll('.story-row'));
+    // Remove any AI lines from a previous refresh so re-applying is idempotent.
+    container.querySelectorAll('.line-text.ai-line').forEach(function(node) { node.remove(); });
+    (story[key] || []).forEach(function(item, i) {
+      const line = lineOf(item);
+      if (!line) return;
+      const body = rows[i] && rows[i].querySelector('.row-body');
+      if (body) {
+        const p = document.createElement('p');
+        p.className = 'line-text ai-line';
+        p.style.color = '#0e7c6b';
+        p.style.fontWeight = '700';
+        p.textContent = line;
+        body.appendChild(p);
+      }
+    });
+  }
+}
+
+/* --- Toast + connection actions --- */
 function profileMessage(message, isError) {
   const toast = document.createElement('div');
   toast.className = 'toast' + (isError ? ' error' : '');
@@ -322,7 +427,7 @@ if (profileConnect) profileConnect.onclick = function() {
     method:'POST',
     headers:{'Content-Type':'application/json','X-CSRFToken':profileToken},
     body:JSON.stringify({user_id:profileConnect.dataset.user})
-  }).then(function(response) { return response.json().then(function(data) { return {ok:response.ok, data:data}; }); })
+  }).then(function(response) { return response.json().then(function(data) { return {ok:response.ok, data:data}; }) })
     .then(function(result) {
       if (!result.ok) throw new Error(result.data.detail || 'Unable to send connection request.');
       profileConnect.textContent = 'Request pending';
@@ -342,4 +447,5 @@ if (profileCancel) profileCancel.onclick = function() {
   };
 });
 </script>
+</body>
 </html>

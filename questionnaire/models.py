@@ -19,6 +19,10 @@ class QuestionnaireCategory(models.Model):
 
 
 class Question(models.Model):
+    class ScoreType(models.TextChoices):
+        SIMILARITY = 'SIMILARITY', 'Similarity (same answers align)'
+        COMPLEMENTARY = 'COMPLEMENTARY', 'Complementary (opposites balance)'
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     category = models.CharField(max_length=100)
     question_key = models.CharField(max_length=100, unique=True, null=True, blank=True)
@@ -27,6 +31,14 @@ class Question(models.Model):
         on_delete=models.SET_NULL, related_name='questions',
     )
     text = models.TextField()
+    # How this question feeds the match formula: SIMILARITY questions score
+    # higher when both students pick the same answer, COMPLEMENTARY questions
+    # score higher when the two answers balance each other (opposite poles).
+    score_type = models.CharField(
+        max_length=16,
+        choices=ScoreType.choices,
+        default=ScoreType.SIMILARITY,
+    )
     question_type = models.CharField(
         max_length=30,
         choices=[
@@ -106,6 +118,7 @@ class QuestionnaireInsight(models.Model):
     )
     answer_fingerprint = models.CharField(max_length=64)
     category_summaries = models.JSONField(default=dict)
+    vibe_card = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):

@@ -14,6 +14,7 @@ from .summary import (
     groq_is_configured,
     has_groq_ai_consent,
 )
+from .vibe import VibeCardError, generate_vibe_card, get_vibe_card
 
 
 class QuestionnaireQuestionsAPIView(APIView):
@@ -120,6 +121,64 @@ class QuestionnaireSummaryInsightsAPIView(APIView):
         except ValueError as exc:
             return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
         except InsightGenerationError as exc:
+            status_code = (
+                status.HTTP_503_SERVICE_UNAVAILABLE
+                if not groq_is_configured()
+                else status.HTTP_502_BAD_GATEWAY
+            )
+            return Response({'detail': str(exc)}, status=status_code)
+        return Response(result)
+
+
+def _accepted_connections(user):
+    from connections.models import Connection
+    from django.db.models import Q
+
+    return Connection.objects.filter(
+        Q(requester=user) | Q(recipient=user),
+        status__in=('ACCEPTED', 'CONNECTED'),
+    ).count()
+
+
+class VibeCardAPIView(APIView):
+    """Your Vibe Card — read the cached card, or a pending state."""
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        if not questionnaire_progress(request.user)['is_complete']:
+            return Response(
+                {'detail': 'Complete all required questions to unlock your Vibe Card.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        result = get_vibe_card(request.user)
+        result['connections_accepted'] = _accepted_connections(request.user)
+        result['connections_to_unlock'] = max(0, 3 - result['connections_accepted'])
+        return Response(result)
+
+
+class VibeCardGenerateAPIView(APIView):
+    """Ask Groq to (re)write the Vibe Card from the latest answers."""
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        if request.data.get('consent') is not True:
+            return Response(
+                {'detail': 'Confirm before sending your answers to Groq.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        profile = getattr(request.user, 'profile', None)
+        if not has_groq_ai_consent(profile):
+            return Response(
+                {'detail': 'Opt in to Groq AI reflections before sending your answers.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        try:
+            result = generate_vibe_card(request.user)
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except VibeCardError as exc:
             status_code = (
                 status.HTTP_503_SERVICE_UNAVAILABLE
                 if not groq_is_configured()

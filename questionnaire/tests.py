@@ -524,3 +524,130 @@ class QuestionnaireSummaryTests(TestCase):
         )
         self.assertEqual(cached_response.status_code, 200)
         post.assert_called_once()
+
+
+class VibeCardTests(TestCase):
+    def setUp(self):
+        seed_questionnaire_data()
+        self.user = User.objects.create_user(email='vibe@example.com', password='Strong-password-123')
+        Profile.objects.create(
+            user=self.user,
+            questionnaire_completed=True,
+            questionnaire_ai_consent=True,
+            questionnaire_ai_consent_provider='groq',
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
+        for question in Question.objects.filter(is_active=True):
+            response = QuestionResponse.objects.create(
+                user=self.user,
+                question=question,
+                importance=QuestionResponse.Importance.NEUTRAL,
+            )
+            response.selected_options.add(question.options.first())
+
+    def vibe_payload(self):
+        return {
+            'archetype': 'The Midnight Strategist',
+            'emoji': '🦉',
+            'tagline': 'Plans the whole day after 2 AM.',
+            'traits': [
+                {'labelLeft': 'Planner', 'labelRight': 'Spontaneous', 'position': 85},
+                {'labelLeft': 'Chaos', 'labelRight': 'Cereal', 'position': 20},
+                {'labelLeft': 'Loner', 'labelRight': 'People person', 'position': 60},
+                {'labelLeft': 'Rest', 'labelRight': 'Hustle', 'position': 75},
+                {'labelLeft': 'Safe', 'labelRight': 'Wild', 'position': 40},
+            ],
+            'superpowers': [
+                'Turns chaos into a checklist',
+                'The friend trusted with secrets',
+                'Curious about everything, esp. space and startups',
+            ],
+            'plotTwist': 'Says "5 more minutes" about 14 times a night.',
+            'scenes': [
+                {'title': 'At a party', 'text': 'Deep talk in the kitchen, not the dance floor.'},
+                {'title': 'Exam week', 'text': 'Colour-coded panic, somehow still calm.'},
+                {'title': 'In a group project', 'text': 'Quiet MVP, owns the deadline.'},
+            ],
+            'rarity': 7,
+            'bestMatch': 'A calm spark who likes one bold idea a day.',
+            'hiddenTrait': 'Your hidden drive surfaces after 3 connections.',
+        }
+
+    def test_vibe_card_is_pending_until_generated(self):
+        response = self.client.get('/api/questionnaire/vibe-card/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data['vibe_card'])
+        self.assertTrue(response.data['ai_consent'])
+        self.assertEqual(response.data['connections_accepted'], 0)
+        self.assertEqual(response.data['connections_to_unlock'], 3)
+
+    def test_vibe_card_generation_requires_saved_consent(self):
+        self.user.profile.questionnaire_ai_consent = False
+        self.user.profile.save(update_fields=('questionnaire_ai_consent',))
+        response = self.client.post('/api/questionnaire/vibe-card/generate/', {'consent': True}, format='json')
+        self.assertEqual(response.status_code, 403)
+
+    def test_vibe_card_requires_explicit_consent_parameter(self):
+        response = self.client.post('/api/questionnaire/vibe-card/generate/', {}, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    @patch.dict(os.environ, {'GROQ_API_KEY': 'test-key'})
+    @patch('questionnaire.summary.requests.post')
+    def test_vibe_card_is_generated_validated_and_cached(self, post):
+        post_response = Mock()
+        post_response.raise_for_status.return_value = None
+        post_response.json.return_value = {
+            'choices': [{'message': {'content': json.dumps(self.vibe_payload())}}],
+        }
+        post.return_value = post_response
+
+        response = self.client.post('/api/questionnaire/vibe-card/generate/', {'consent': True}, format='json')
+        self.assertEqual(response.status_code, 200)
+        card = response.data['vibe_card']
+        self.assertEqual(card['archetype'], 'The Midnight Strategist')
+        self.assertEqual(len(card['traits']), 5)
+        self.assertEqual(len(card['superpowers']), 3)
+        self.assertEqual(len(card['scenes']), 3)
+        self.assertEqual(card['rarity'], 7)
+        post.assert_called_once()
+        # Only answers are sent to the model.
+        prompt = json.loads(post.call_args.kwargs['json']['messages'][1]['content'])
+        self.assertEqual(len(prompt['answers']), QuestionResponse.objects.filter(user=self.user).count())
+        self.assertTrue(all(set(answer) == {'category', 'category_slug', 'question', 'answer', 'importance'}
+                            for answer in prompt['answers']))
+
+        second = self.client.post('/api/questionnaire/vibe-card/generate/', {'consent': True}, format='json')
+        self.assertEqual(second.status_code, 200)
+        self.assertEqual(second.data['vibe_card'], card)
+        post.assert_called_once()
+
+        read = self.client.get('/api/questionnaire/vibe-card/')
+        self.assertTrue(read.data['cached'])
+        self.assertEqual(read.data['vibe_card']['archetype'], 'The Midnight Strategist')
+
+    @patch.dict(os.environ, {'GROQ_API_KEY': 'test-key'})
+    @patch('questionnaire.summary.requests.post')
+    def test_invalid_vibe_card_is_rejected(self, post):
+        bad = self.vibe_payload()
+        del bad['scenes']
+        post_response = Mock()
+        post_response.raise_for_status.return_value = None
+        post_response.json.return_value = {
+            'choices': [{'message': {'content': json.dumps(bad)}}],
+        }
+        post.return_value = post_response
+
+        response = self.client.post('/api/questionnaire/vibe-card/generate/', {'consent': True}, format='json')
+        self.assertEqual(response.status_code, 502)
+        self.assertIn('unreadable', response.data['detail'].lower())
+
+    @patch.dict(os.environ, {'GROQ_API_KEY': ''})
+    def test_vibe_card_without_groq_reports_503(self):
+        response = self.client.post('/api/questionnaire/vibe-card/generate/', {'consent': True}, format='json')
+        self.assertEqual(response.status_code, 503)
+
+    def test_vibe_card_requires_complete_questionnaire(self):
+        QuestionResponse.objects.filter(user=self.user).delete()
+        response = self.client.get('/api/questionnaire/vibe-card/')
+        self.assertEqual(response.status_code, 403)

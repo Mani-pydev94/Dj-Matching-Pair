@@ -72,6 +72,12 @@ class CompatibilityTests(TestCase):
 
         score = calculate_compatibility(self.a, self.b)
 
+        # The weighted block is the only surviving data: 3 aligned SIMILARITY
+        # questions at 100% and one at the opposite pole -> 300/4 = 75%
+        # same wavelength. No complementary questions survived, so the
+        # overall is the wavelength pool on its own.
+        self.assertEqual(score['same_wavelength'], 75)
+        self.assertEqual(score['balance_each_other'], 0)
         self.assertEqual(score['overall_score'], 75)
         self.assertEqual(len(score['categories']), 9)
         self.assertEqual(score['categories']['mindset-worldview'], 67)
@@ -235,8 +241,18 @@ class CompatibilityTests(TestCase):
             response.selected_options.clear()
             response.value = 'different'
             response.save(update_fields=('value',))
+        # b's responses from index 6 on are cleared to free-text 'different',
+        # so most similarity pairs have no shared data (0) while a handful stay
+        # aligned (100): the similarity pool averages 23. The few surviving
+        # COMPLEMENTARY pairs are all on the same pole, which under the
+        # "same answers balance" rule scores 100.
+        # Questionnaire = round(0.6 x 23 + 0.4 x 100) = 54.
+        # Profile factors (interests + university) normalize to 83 -> overall =
+        # round(0.7 x 54 + 0.3 x 83) = 63, still below the 75 match threshold,
+        # so this pair is discoverable only through the shared university.
         breakdown = score_match(self.a, self.b)
-        self.assertLess(breakdown['overall_score'], 75)
+        self.assertEqual(breakdown['questionnaire_score'], 54)
+        self.assertEqual(breakdown['overall_score'], 63)
         self.assertTrue(is_discoverable(self.a, self.b, breakdown))
 
     def test_same_university_is_discoverable_without_questionnaire_match(self):

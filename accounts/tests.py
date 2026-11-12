@@ -118,6 +118,11 @@ class SignupEmailOTPTests(TestCase):
 
         self.assertRedirects(response, reverse('signup'))
 
+    def test_signup_page_google_button_uses_allauth_login_url(self):
+        response = self.client.get(reverse('signup'))
+
+        self.assertContains(response, f'href="{reverse("google_login")}"')
+
 
 class LoginErrorVisibilityTests(TestCase):
     """Regression: a failed login must show a visible error on the page.

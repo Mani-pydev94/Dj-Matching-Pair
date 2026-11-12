@@ -5,8 +5,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from connections.models import Connection
-from questionnaire.summary import InsightGenerationError, groq_is_configured
+from questionnaire.summary import (
+    InsightGenerationError,
+    groq_is_configured,
+    has_groq_ai_consent,
+)
 from .compatibility import MIN_MATCH_SCORE, calculate_compatibility_analysis
+from .click_story import ClickStoryError, build_click_story
 from .insights import generate_compatibility_summaries
 from .services import excluded_ids, is_discoverable, score_match
 from profiles.services import can_view_full_profile
@@ -89,6 +94,62 @@ class CompatibilityAPIView(APIView):
         ):
             return Response({'detail': 'Student not found.'}, status=404)
         return Response(calculate_compatibility_analysis(request.user, student))
+
+
+class ClickStoryAPIView(APIView):
+    """'Why You Two Click' story for a public profile.
+
+    GET returns the deterministic skeleton (score split, shared answers,
+    sparks, starters) with no AI calls. POST with {"consent": true} asks
+    Groq to write the connecting lines, using the viewer's AI consent.
+    """
+
+    permission_classes = (IsAuthenticated,)
+
+    def _student_or_404(self, request, user_id):
+        student = User.objects.filter(id=user_id, is_active=True).select_related('profile').first()
+        if (
+            not student
+            or student == request.user
+            or student.id in excluded_ids(request.user)
+            or not hasattr(student, 'profile')
+            or not student.profile.is_public
+        ):
+            return None
+        return student
+
+    def get(self, request, user_id):
+        student = self._student_or_404(request, user_id)
+        if not student:
+            return Response({'detail': 'Student not found.'}, status=404)
+        analysis = calculate_compatibility_analysis(request.user, student)
+        story = build_click_story(request.user, student, analysis, use_ai=False)
+        story['ai_available'] = bool(
+            groq_is_configured() and has_groq_ai_consent(getattr(request.user, 'profile', None))
+        )
+        return Response(story)
+
+    def post(self, request, user_id):
+        student = self._student_or_404(request, user_id)
+        if not student:
+            return Response({'detail': 'Student not found.'}, status=404)
+        if request.data.get('consent') is not True:
+            return Response(
+                {'detail': 'Confirm before sending your shared answers to Groq.'},
+                status=400,
+            )
+        if not has_groq_ai_consent(getattr(request.user, 'profile', None)):
+            return Response(
+                {'detail': 'Opt in to Groq AI reflections before writing your connection story.'},
+                status=403,
+            )
+        analysis = calculate_compatibility_analysis(request.user, student)
+        try:
+            story = build_click_story(request.user, student, analysis, use_ai=True)
+        except ClickStoryError as exc:
+            status_code = 503 if not groq_is_configured() else 502
+            return Response({'detail': str(exc)}, status=status_code)
+        return Response(story)
 
 
 class CompatibilityInsightsAPIView(APIView):

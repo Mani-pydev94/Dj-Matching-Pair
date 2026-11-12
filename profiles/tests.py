@@ -144,6 +144,17 @@ class ProfileAPITests(TestCase):
         response = self.client.get(f'/profiles/{self.other.id}/')
         self.assertContains(response, 'Other Student')
 
+    def test_ai_story_refresh_removes_previous_generated_lines(self):
+        self.other.profile.is_public = True
+        self.other.profile.save(update_fields=('is_public',))
+        self.client.force_login(self.user)
+
+        response = self.client.get(f'/profiles/{self.other.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "container.querySelectorAll('.line-text.ai-line')")
+        self.assertContains(response, "p.className = 'line-text ai-line'")
+
     def test_anonymous_profile_shows_only_compatibility_analysis(self):
         seed_questionnaire_data()
         question = Question.objects.filter(is_active=True).first()
@@ -169,13 +180,18 @@ class ProfileAPITests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Overall Similarity Score')
-        self.assertContains(response, 'Category-wise Similarity')
-        self.assertContains(response, 'Similarity on Most Important Questions')
-        self.assertContains(response, 'Generate AI insights')
-        self.assertContains(response, 'Score-based reflection')
-        self.assertNotContains(response, 'Opt-in to AI reflections must be enabled')
+        # New "Why You Two Click" section instead of the old category grid.
+        self.assertContains(response, 'Why you two click')
+        self.assertContains(response, 'Same wavelength')
+        self.assertContains(response, 'Balance each other')
+        self.assertContains(response, 'Shared DNA')
+        self.assertContains(response, 'Generate AI duo')
+        # Shared DNA surfaces the concrete shared answer.
         self.assertContains(response, question.text)
         self.assertContains(response, 'Connect')
+        # No personal profile data leaks before a connection is accepted.
+        self.assertNotContains(response, 'Secret University')
+        self.assertNotContains(response, 'Private personal biography')
         self.assertNotContains(response, 'Other Student')
         self.assertNotContains(response, 'other@example.com')
         self.assertNotContains(response, 'Secret University')
