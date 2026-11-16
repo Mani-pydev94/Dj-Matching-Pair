@@ -247,6 +247,8 @@ class ProfileEditTests(TestCase):
         response = self.client.get(reverse('profiles:edit_profile'))
         self.assertContains(response, 'name="photo"')
         self.assertContains(response, 'type="file"')
+        self.assertContains(response, 'id="photo-picker-dialog"')
+        self.assertContains(response, 'id="open-photo-picker"')
 
         output = BytesIO()
         Image.new('RGB', (20, 20), color='purple').save(output, format='PNG')
