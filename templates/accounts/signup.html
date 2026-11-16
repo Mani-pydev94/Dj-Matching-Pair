@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Create Account — Campus Connect AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
   :root{--p:#6D4AFF;--pd:#7C4DFF;--black:#171717;--gray:#777780;--muted:#9A9AA3;--border:#E5E5EA;--input:#E1E1E6;--soft:#F4F0FF;--err:#EF4444;--ok:#10B981;--warn:#F59E0B;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:'Inter',system-ui,sans-serif;background:#FFFFFF;color:var(--black);-webkit-font-smoothing:antialiased;}
-  .app{max-width:430px;margin:0 auto;padding:0 20px;min-height:100dvh;display:flex;flex-direction:column;padding-bottom:calc(32px + env(safe-area-inset-bottom));}
+  .app{max-width:430px;margin:0 auto;padding:0 20px;min-height:100dvh;display:flex;flex-direction:column;padding-bottom:calc(64px + env(safe-area-inset-bottom));}
   .back{position:absolute;top:24px;left:20px;z-index:2;}
   .back a{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--border);border-radius:50%;background:#FFFFFF;text-decoration:none;transition:background .15s;}
   .back a:hover{background:#F8F7FB;}
@@ -48,6 +48,9 @@
   .checkbox-row label{font-size:13px;color:#777780;line-height:1.35;cursor:pointer;}
   .checkbox-row label a{color:var(--p);font-weight:600;text-decoration:none;}
   .btn{display:block;width:100%;height:56px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;font-family:inherit;font-weight:700;font-size:16px;box-shadow:0 10px 24px rgba(109,74,255,0.24);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;}
+  .btn.is-loading{display:flex;align-items:center;justify-content:center;gap:10px;}
+  .btn-spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:button-spin .7s linear infinite;}
+  @keyframes button-spin{to{transform:rotate(360deg);}}
   .btn:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(109,74,255,0.30);}
   .btn:active{transform:translateY(1px);}
   .btn:disabled{opacity:.7;cursor:not-allowed;transform:none;}
@@ -122,7 +125,7 @@
       {% if form.password2.errors %}<div class="error" role="alert">{{ form.password2.errors.0 }}</div>{% endif %}
     </div>
     <div class="checkbox-row"><input type="checkbox" id="terms" name="terms" required aria-required="true"><label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="{% url 'privacy_policy' %}">Privacy Policy</a>.</label></div>
-    <button type="submit" id="submit-btn" class="btn" aria-label="Create account">Create Account</button>
+    <button type="submit" id="submit-btn" class="btn" aria-label="Create account"><span class="btn-spinner" aria-hidden="true" hidden></span><span class="btn-label">Create Account</span></button>
     {% for error in form.non_field_errors %}<div class="error" role="alert">{{ error }}</div>{% endfor %}
   </form>
 
@@ -148,6 +151,7 @@ function updateStrength(v){const r1=document.getElementById('r1'),r2=document.ge
 function checkMatch(){const a=document.getElementById('id_password1').value,b=document.getElementById('id_password2').value;document.getElementById('match-err').style.display=(a&&b&&a!==b)?'block':'none';}
 document.getElementById('id_password1').addEventListener('input',function(){updateStrength(this.value);checkMatch();});
 document.getElementById('id_password2').addEventListener('input',checkMatch);
+document.querySelector('form[aria-label="Sign up form"]').addEventListener('submit',function(){const button=document.getElementById('submit-btn');button.disabled=true;button.classList.add('is-loading');button.querySelector('.btn-spinner').hidden=false;button.querySelector('.btn-label').textContent='Creating account…';});
 </script>
 </body>
 </html>
