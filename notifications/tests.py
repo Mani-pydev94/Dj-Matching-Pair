@@ -63,3 +63,48 @@ class NotificationAPITests(TestCase):
         self.assertTrue(Notification.objects.filter(
             user=self.sender, title='Connection cancelled',
         ).exists())
+
+
+class NotificationInboxTests(TestCase):
+    def setUp(self):
+        self.recipient = User.objects.create_user(
+            email='inbox-recipient@example.com',
+            password='Strong-password-123',
+        )
+        self.requester = User.objects.create_user(
+            email='inbox-requester@example.com',
+            password='Strong-password-123',
+        )
+        self.connection = Connection.objects.create(
+            requester=self.requester,
+            recipient=self.recipient,
+            status='PENDING',
+        )
+
+    def test_new_connection_request_links_to_requester_profile(self):
+        Notification.objects.create(
+            user=self.recipient,
+            title='New connection request',
+            message='Connect',
+            connection=self.connection,
+        )
+        self.client.force_login(self.recipient)
+
+        response = self.client.get('/notifications/inbox/')
+
+        self.assertContains(response, f'href="/profiles/{self.requester.id}/"')
+
+    def test_connection_accepted_links_to_accepting_user_profile(self):
+        self.connection.status = 'ACCEPTED'
+        self.connection.save(update_fields=('status',))
+        Notification.objects.create(
+            user=self.requester,
+            title='Connection accepted',
+            message='Your request was accepted.',
+            connection=self.connection,
+        )
+        self.client.force_login(self.requester)
+
+        response = self.client.get('/notifications/inbox/')
+
+        self.assertContains(response, f'href="/profiles/{self.recipient.id}/"')

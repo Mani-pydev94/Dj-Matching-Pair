@@ -10,6 +10,7 @@ from matching.models import Match
 from matching.compatibility import calculate_compatibility_analysis
 from matching.click_story import build_click_story
 from connections.models import Connection
+from questionnaire.vibe import get_vibe_card
 from django.db.models import Q
 
 from .forms import ProfileSetupForm
@@ -45,6 +46,7 @@ def my_profile(request):
     return render(request, 'profiles/my_profile.html', {
         'profile': profile,
         'profile_pct': get_profile_completion(request.user),
+        'vibe_data': get_vibe_card(request.user),
     })
 
 

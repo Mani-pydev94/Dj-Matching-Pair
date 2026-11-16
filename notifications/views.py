@@ -6,7 +6,10 @@ from .models import Notification
 
 @login_required
 def inbox(request):
-    notifications = Notification.objects.filter(user=request.user).select_related('connection')
+    notifications = Notification.objects.filter(user=request.user).select_related(
+        'connection__requester',
+        'connection__recipient',
+    )
     return render(request, 'notifications/inbox.html', {
         'notifications': notifications,
         'unread_count': notifications.filter(is_read=False).count(),

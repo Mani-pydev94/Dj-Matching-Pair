@@ -1,5 +1,6 @@
 from io import BytesIO
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
@@ -249,6 +250,7 @@ class ProfileEditTests(TestCase):
         self.assertContains(response, 'type="file"')
         self.assertContains(response, 'id="photo-picker-dialog"')
         self.assertContains(response, 'id="open-photo-picker"')
+        self.assertContains(response, 'id="done-photo-picker"')
 
         output = BytesIO()
         Image.new('RGB', (20, 20), color='purple').save(output, format='PNG')
@@ -263,3 +265,50 @@ class ProfileEditTests(TestCase):
         self.user.profile.refresh_from_db()
         self.assertTrue(self.user.profile.photo.name.endswith('.png'))
         self.assertTrue(self.user.profile.photo.storage.exists(self.user.profile.photo.name))
+
+
+class MyProfileReflectionTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='reflection@example.com',
+            password='Strong-password-123',
+            first_name='Reflection',
+        )
+        Profile.objects.create(user=self.user)
+        self.client.force_login(self.user)
+
+    @patch('profiles.views.get_vibe_card')
+    def test_my_profile_displays_cached_vibe_card(self, get_vibe_card):
+        get_vibe_card.return_value = {
+            'vibe_card': {
+                'emoji': '✨',
+                'archetype': 'The Midnight Strategist',
+                'tagline': 'Plans the whole day after 2 AM.',
+                'superpowers': ['Finds clever solutions.'],
+            },
+            'has_answers': True,
+            'ai_consent': True,
+            'ai_configured': True,
+        }
+
+        response = self.client.get(reverse('profiles:my_profile'))
+
+        self.assertContains(response, 'AI profile reflection')
+        self.assertContains(response, 'The Midnight Strategist')
+        self.assertContains(response, 'Plans the whole day after 2 AM.')
+        self.assertContains(response, 'Finds clever solutions.')
+        get_vibe_card.assert_called_once_with(self.user)
+
+    @patch('profiles.views.get_vibe_card')
+    def test_my_profile_explains_how_to_get_a_vibe_card(self, get_vibe_card):
+        get_vibe_card.return_value = {
+            'vibe_card': None,
+            'has_answers': False,
+            'ai_consent': False,
+            'ai_configured': True,
+        }
+
+        response = self.client.get(reverse('profiles:my_profile'))
+
+        self.assertContains(response, 'Complete the questionnaire to create an AI reflection')
+        self.assertContains(response, 'Continue questionnaire')
