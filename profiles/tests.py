@@ -1,7 +1,8 @@
 from io import BytesIO
+from tempfile import TemporaryDirectory
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from PIL import Image
 from rest_framework.test import APIClient
@@ -224,3 +225,39 @@ class ProfileSetupTests(TestCase):
         self.user.profile.refresh_from_db()
         self.assertTrue(self.user.profile.is_public)
         self.assertEqual(self.user.profile.interests, 'Music, hiking')
+
+
+class ProfileEditTests(TestCase):
+    def setUp(self):
+        self.media_dir = TemporaryDirectory()
+        self.addCleanup(self.media_dir.cleanup)
+        media_settings = override_settings(MEDIA_ROOT=self.media_dir.name)
+        media_settings.enable()
+        self.addCleanup(media_settings.disable)
+        self.user = User.objects.create_user(
+            email='edit@example.com',
+            password='Strong-password-123',
+            first_name='Edit',
+            last_name='Student',
+        )
+        Profile.objects.create(user=self.user)
+        self.client.force_login(self.user)
+
+    def test_edit_profile_photo_upload_is_saved(self):
+        response = self.client.get(reverse('profiles:edit_profile'))
+        self.assertContains(response, 'name="photo"')
+        self.assertContains(response, 'type="file"')
+
+        output = BytesIO()
+        Image.new('RGB', (20, 20), color='purple').save(output, format='PNG')
+        photo = SimpleUploadedFile('avatar.png', output.getvalue(), content_type='image/png')
+
+        response = self.client.post(reverse('profiles:edit_profile'), {
+            'display_name': 'Edit Student',
+            'photo': photo,
+        })
+
+        self.assertRedirects(response, reverse('profiles:my_profile'))
+        self.user.profile.refresh_from_db()
+        self.assertTrue(self.user.profile.photo.name.endswith('.png'))
+        self.assertTrue(self.user.profile.photo.storage.exists(self.user.profile.photo.name))

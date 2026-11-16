@@ -46,6 +46,7 @@ class ProfileSetupForm(forms.ModelForm):
         model = Profile
         fields = ('age', 'city', 'gender', 'university', 'major', 'year', 'bio', 'interests', 'photo')
         widgets = {
+            'photo': forms.FileInput(attrs={'accept': 'image/*'}),
             'city': forms.TextInput(attrs={'placeholder': 'Your city'}),
             'university': forms.TextInput(attrs={'placeholder': 'Your university'}),
             'major': forms.TextInput(attrs={'placeholder': 'e.g. Computer Science'}),
